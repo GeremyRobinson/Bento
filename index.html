@@ -80,6 +80,26 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .card{background:var(--card);border-radius:var(--r-card);padding:var(--u);display:grid;gap:var(--u)}
 .head{display:flex;justify-content:space-between;align-items:center;gap:var(--u);flex-wrap:wrap;padding:0 var(--s)}
 
+/* grade picker: one row that scrolls sideways */
+.grades{display:flex;gap:var(--s);overflow-x:auto;padding:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.grades::-webkit-scrollbar{display:none}
+.grades button{flex:none;min-width:var(--h);height:var(--h);padding:0 var(--u);border-radius:999px;background:var(--card);font-family:var(--num);font-size:20px;font-weight:500;transition:background .15s,color .15s}
+.grades button:hover{background:var(--hover)}
+.grades button.on{background:var(--tint);color:var(--on-tint)}
+.dotrow{display:flex;justify-content:center;align-items:center;gap:var(--u);font-size:28px;color:var(--tint);flex-wrap:wrap}
+.math sup,.workline sup{font-size:.55em}
+
+/* sideways iPad: use the width, keep the number pad beside the problem */
+.split,.col{display:grid;gap:var(--u);align-content:start;min-width:0}
+.lessons.col{gap:var(--s)}
+@media (min-width:900px) and (orientation:landscape){
+  .wrap{max-width:1120px}
+  .split{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}
+  .panel.split>.col:last-child{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+  .tray{max-width:none}
+  :root{--key:60px}
+}
+
 /* lesson list */
 .lessons{display:grid;gap:var(--s)}
 .lesson{display:flex;align-items:center;gap:var(--u);min-height:64px;padding:var(--s) 18px var(--s) var(--s);border-radius:999px;background:var(--card);text-align:left;width:100%;font-weight:800;transition:background .15s,transform .15s}
@@ -217,7 +237,6 @@ function stepsFor(p){
     work: () => `${fr(n,den)} = ${fr(N,L)} <span class="muted">(× ${k})</span>`
   });
 
-  const hasWhole = F.whole > 0, fracPart = F.num > 0;
   return [
     { label:"Step 1 · Find a common denominator",
       ask: () => `<span class="q">Smallest number that both ${b} and ${d} go into:</span> ${slot("x")}`,
@@ -266,7 +285,14 @@ function stepsFor(p){
       explain: `${A} ${op} ${C} = ${S}, and the bottom stays ${L}.`,
       work: () => `${fr(A,L)} ${op} ${fr(C,L)} = ${fr(S,L)}`
     },
-    { label:"Step 5 · Simplify",
+    simplifyStep(S, L, "Step 5 · Simplify")
+  ];
+}
+
+// simplify S/L to lowest terms or a mixed number; shared by fraction lessons
+function simplifyStep(S, L, label){
+  const F = finalForm({S, L}), hasWhole = F.whole > 0, fracPart = F.num > 0;
+  return { label,
       ask: () => `${fr(S,L)} = <span class="mixed">${slot("w","small")}<span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span></span>`,
       note: S > L ? "The top is bigger than the bottom, so pull out the wholes. Use the small box for the whole number."
           : S === L ? "Top and bottom are the same. What whole number is that?"
@@ -294,9 +320,281 @@ function stepsFor(p){
       answer: {w: hasWhole ? F.whole : null, n: fracPart ? F.num : null, d: fracPart ? F.den : null},
       explain: S >= L ? `${S} ÷ ${L} = ${Math.floor(S/L)} remainder ${S % L}, then simplify.` : gcd(S,L) > 1 ? `Divide top and bottom by ${gcd(S,L)}.` : "It was already as simple as it gets.",
       work: () => `${fr(S,L)} = <b>${showFinal(F)}</b>`
-    }
-  ];
+    };
 }
+
+// ---- shared step builders ----
+// one-box step: the right answer plus known wrong answers, each with its own explanation
+function numStep({label, ask, note="", ans, wrong=[], hint, explain, work}){
+  return { label, ask: () => ask(slot("x")), note,
+    check: v => {
+      if (v.x === ans) return {ok:true};
+      for (const [val, kind, msg] of wrong) if (v.x === val) return {kind, msg};
+      return {kind: label, msg:`Not quite. ${hint}`};
+    },
+    hint, answer:{x:ans}, explain, work };
+}
+const q = t => `<span class="q">${t}</span>`;
+const dots = n => `<span class="dots" aria-label="${n} dots">${Array(n).fill("●").join(" ")}</span>`;
+const pick = arr => arr[rand(0, arr.length-1)];
+const TRIPLES = [[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25],[12,16,20]];
+
+// ---- grade K to 12 lessons (5th grade fractions are defined above) ----
+const K_ADD = {
+  make: () => { const a = rand(1,5), b = rand(1, Math.min(5, 10-a)); return {a,b}; },
+  show: p => `<div class="math">${p.a} + ${p.b}</div><div class="dotrow">${dots(p.a)}<span>+</span>${dots(p.b)}</div>`,
+  steps: ({a,b}) => [
+    numStep({label:"Count the first group", ask:s=>`${q("How many dots are in the first group?")}${s}`, ans:a,
+      wrong:[[b,"Counted the wrong group","That's the second group. Count the dots <b>before</b> the + sign."]],
+      hint:"Touch each dot in the first group and count out loud.", explain:`There are ${a} dots in the first group.`, work:()=>`First group: <b>${a}</b>`}),
+    numStep({label:"Count on", ask:s=>`${q(`Start at ${a}. Count on ${b} more.`)}${a} + ${b} = ${s}`, ans:a+b,
+      wrong:[[a+b+1,"Counting on",`One too many. Start <i>after</i> ${a}: say ${a+1} for the first dot.`],[a+b-1,"Counting on","One short. Count every dot in the second group once."]],
+      hint:`Say ${a}, then count up one number for each dot in the second group.`, explain:`${a}, then ${Array.from({length:b},(_,i)=>a+i+1).join(", ")}.`, work:()=>`${a} + ${b} = <b>${a+b}</b>`})
+  ],
+  learn:[{h:"Count on", body:`<div class="math">3 + 2</div><div class="dotrow">${dots(3)}<span>+</span>${dots(2)}</div>
+    <div class="prose"><p>Count the first group: 3. Then keep counting for each dot in the second group: 4, 5. So 3 + 2 = 5.</p></div>`}]
+};
+
+const G1_TEN = {
+  make: () => { const a = rand(6,9); return {a, b: rand(11-a, 9)}; },
+  show: p => `<div class="math">${p.a} + ${p.b}</div>`,
+  steps: ({a,b}) => { const need = 10-a, left = b-need; return [
+    numStep({label:"Make a ten", ask:s=>`${a} + ${s} = 10`, ans:need,
+      hint:`Count up from ${a} to 10. How many did you count?`, explain:`${a} + ${need} = 10.`, work:()=>`${a} + <b>${need}</b> = 10`}),
+    numStep({label:`Break apart ${b}`, ask:s=>`${b} = ${need} + ${s}`, ans:left,
+      wrong:[[b+need,"Breaking apart",`Both parts have to be smaller than ${b}. What is ${b} take away ${need}?`]],
+      hint:`${b} take away ${need}.`, explain:`${b} − ${need} = ${left}.`, work:()=>`${b} = ${need} + <b>${left}</b>`}),
+    numStep({label:"Add to the ten", ask:s=>`10 + ${left} = ${s}`, ans:a+b,
+      wrong:[[left,"Forgot the ten","Don't forget the 10!"]],
+      hint:`10 plus ${left} is ten and ${left} more.`, explain:`10 + ${left} = ${a+b}.`, work:()=>`${a} + ${b} = 10 + ${left} = <b>${a+b}</b>`})
+  ]; },
+  learn:[{h:"Make a ten first", body:`<div class="math">8 + 5</div><div class="prose"><p>8 needs 2 more to make 10. Break 5 into 2 and 3. Now it's 10 + 3 = 13. Tens are easy to add!</p></div>`}]
+};
+
+const G2_REGROUP = {
+  make: () => { let a, b; do { a = rand(15,79); b = rand(15,79); } while (a%10 + b%10 < 10 || a+b > 99); return {a,b}; },
+  show: p => `<div class="math">${p.a} + ${p.b}</div>`,
+  steps: ({a,b}) => { const at=Math.floor(a/10), ao=a%10, bt=Math.floor(b/10), bo=b%10, O=ao+bo; return [
+    numStep({label:"Add the ones", ask:s=>`${ao} + ${bo} = ${s}`, ans:O,
+      wrong:[[at+bt,"Started with the tens","Start with the <b>ones</b>, the digits on the right."]],
+      hint:"Add just the right-hand digits.", explain:`${ao} + ${bo} = ${O}.`, work:()=>`Ones: ${ao} + ${bo} = ${O}`}),
+    numStep({label:"Regroup", ask:s=>`${q(`${O} is 1 ten and how many ones?`)}${s}`, ans:O%10,
+      wrong:[[O,"Regrouping","Only one digit fits in the ones place. The ten carries over to the tens."]],
+      hint:`${O} = 10 + ?`, explain:`${O} = 10 + ${O%10}. Write ${O%10}, carry the 1.`, work:()=>`Write <b>${O%10}</b>, carry 1 ten`}),
+    numStep({label:"Add the tens", ask:s=>`${q("Add the tens, plus the 1 you carried.")}${at} + ${bt} + 1 = ${s}`, ans:at+bt+1,
+      wrong:[[at+bt,"Forgot the carried ten","Don't forget the 1 you carried!"]],
+      hint:"Add the left-hand digits, then add 1 more.", explain:`${at} + ${bt} + 1 = ${at+bt+1}.`, work:()=>`Tens: ${at} + ${bt} + 1 = ${at+bt+1}`}),
+    numStep({label:"Answer", ask:s=>`${a} + ${b} = ${s}`, ans:a+b,
+      wrong:[[(at+bt)*10+O%10,"Forgot the carried ten","Check the tens: did you add the 1 you carried?"]],
+      hint:`${at+bt+1} tens and ${O%10} ones.`, explain:`${at+bt+1} tens and ${O%10} ones is ${a+b}.`, work:()=>`${a} + ${b} = <b>${a+b}</b>`})
+  ]; },
+  learn:[{h:"Carry the ten", body:`<div class="math">47 + 38</div><div class="prose"><p>Ones first: 7 + 8 = 15. That's 1 ten and 5 ones. Write 5 and carry the 1 to the tens.</p><p>Tens: 4 + 3 + 1 = 8. The answer is 85.</p></div>`}]
+};
+
+const G3_SPLIT = {
+  make: () => ({a: rand(3,9), b: rand(6,9)}),
+  show: p => `<div class="math">${p.a} × ${p.b}</div>`,
+  steps: ({a,b}) => { const r = b-5; return [
+    numStep({label:"Multiply by 5", ask:s=>`${a} × 5 = ${s}`, ans:a*5,
+      wrong:[[a+5,"Added instead of multiplied",`× means ${a} groups of 5, not ${a} + 5.`]],
+      hint:`Count by 5s, ${a} times.`, explain:`${a} × 5 = ${a*5}.`, work:()=>`${a} × 5 = ${a*5}`}),
+    numStep({label:`Multiply by ${r}`, ask:s=>`${a} × ${r} = ${s}`, ans:a*r,
+      wrong:[[a+r,"Added instead of multiplied",`× means ${a} groups of ${r}.`]],
+      hint:`${a} groups of ${r}.`, explain:`${a} × ${r} = ${a*r}.`, work:()=>`${a} × ${r} = ${a*r}`}),
+    numStep({label:"Add the parts", ask:s=>`${a*5} + ${a*r} = ${s}`, ans:a*b,
+      hint:`${b} is 5 + ${r}, so add the two answers.`, explain:`${a*5} + ${a*r} = ${a*b}.`, work:()=>`${a} × ${b} = <b>${a*b}</b>`})
+  ]; },
+  learn:[{h:"Break a hard fact apart", body:`<div class="math">7 × 8</div><div class="prose"><p>8 is 5 + 3. So 7 × 8 is 7 × 5 plus 7 × 3.</p><p>35 + 21 = 56.</p></div>`}]
+};
+
+const G4_PARTIAL = {
+  make: () => ({n: rand(112,989), m: rand(3,9)}),
+  show: p => `<div class="math">${p.n} × ${p.m}</div>`,
+  steps: ({n,m}) => { const H=Math.floor(n/100), T=Math.floor(n/10)%10, O=n%10, P=[H*100*m, T*10*m, O*m]; return [
+    numStep({label:"Hundreds", ask:s=>`${H*100} × ${m} = ${s}`, ans:P[0],
+      wrong:[[H*m,"Lost the place value",`That's ${H} × ${m}. The ${H} stands for ${H*100}, so put two zeros on the end.`]],
+      hint:`Do ${H} × ${m}, then add two zeros.`, explain:`${H} × ${m} = ${H*m}, so ${H*100} × ${m} = ${P[0]}.`, work:()=>`${H*100} × ${m} = ${P[0]}`}),
+    numStep({label:"Tens", ask:s=>`${T*10} × ${m} = ${s}`, ans:P[1],
+      wrong:T ? [[T*m,"Lost the place value",`That's ${T} × ${m}. The ${T} stands for ${T*10}, so put a zero on the end.`]] : [],
+      hint:`Do ${T} × ${m}, then add one zero.`, explain:`${T*10} × ${m} = ${P[1]}.`, work:()=>`${T*10} × ${m} = ${P[1]}`}),
+    numStep({label:"Ones", ask:s=>`${O} × ${m} = ${s}`, ans:P[2],
+      wrong:[[O+m,"Added instead of multiplied","This one is times, not plus."]],
+      hint:`${O} groups of ${m}.`, explain:`${O} × ${m} = ${P[2]}.`, work:()=>`${O} × ${m} = ${P[2]}`}),
+    numStep({label:"Add the parts", ask:s=>`${P.join(" + ")} = ${s}`, ans:n*m,
+      hint:"Line them up by place value and add.", explain:`${P.join(" + ")} = ${n*m}.`, work:()=>`${n} × ${m} = <b>${n*m}</b>`})
+  ]; },
+  learn:[{h:"Multiply one place at a time", body:`<div class="math">346 × 7</div><div class="prose"><p>346 is 300 + 40 + 6. Multiply each part by 7: 2100, 280 and 42. Then add: 2422.</p></div>`}]
+};
+
+const G6_DIVIDE = {
+  make: () => { const top = den => { let n; do { n = rand(1, den-1); } while (gcd(n,den) !== 1); return n; };
+    const b = rand(2,9), d = rand(2,9); return {a: top(b), b, c: top(d), d}; },
+  show: p => `<div class="math">${fr(p.a,p.b)} ÷ ${fr(p.c,p.d)}</div>`,
+  steps: ({a,b,c,d}) => [
+    { label:"Flip the second fraction",
+      ask: () => `${fr(c,d)} → <span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span>`,
+      note:"Flip means the top and bottom trade places.",
+      check: v => {
+        if (v.n == null || v.d == null) return {soft:true, msg:"Fill in both boxes, the top and the bottom."};
+        if (v.n === d && v.d === c) return {ok:true};
+        if (v.n === c && v.d === d) return {kind:"Didn't flip", msg:"That's the same fraction. Swap the top and the bottom."};
+        if (v.n === b && v.d === a) return {kind:"Flipped the wrong fraction", msg:"Keep the first fraction. Flip the <b>second</b> one."};
+        return {kind:"Flipping", msg:`Swap them: the ${d} goes on top, the ${c} on the bottom.`};
+      },
+      hint:"Top goes to the bottom, bottom goes to the top.", answer:{n:d, d:c}, explain:`${fr(c,d)} flipped is ${fr(d,c)}.`,
+      work: () => `÷ ${fr(c,d)} becomes × ${fr(d,c)}` },
+    { label:"Multiply",
+      ask: () => `${fr(a,b)} × ${fr(d,c)} = <span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span>`,
+      note:"Top times top, bottom times bottom.",
+      check: v => {
+        if (v.n == null || v.d == null) return {soft:true, msg:"Fill in both boxes, the top and the bottom."};
+        if (v.n === a*d && v.d === b*c) return {ok:true};
+        if (v.n === a*c && v.d === b*d) return {kind:"Multiplied without flipping", msg:"Use the flipped fraction from step 1."};
+        return {kind:"Multiplying fractions", msg:`Top: ${a} × ${d}. Bottom: ${b} × ${c}.`};
+      },
+      hint:`${a} × ${d} on top, ${b} × ${c} on the bottom.`, answer:{n:a*d, d:b*c}, explain:`${a} × ${d} = ${a*d} and ${b} × ${c} = ${b*c}.`,
+      work: () => `${fr(a,b)} × ${fr(d,c)} = ${fr(a*d,b*c)}` },
+    simplifyStep(a*d, b*c, "Simplify")
+  ],
+  learn:[{h:"Keep, change, flip", body:`<div class="math">${fr(2,3)} ÷ ${fr(1,4)} = ${fr(2,3)} × ${fr(4,1)} = ${fr(8,3)}</div><div class="prose"><p>Keep the first fraction, change ÷ to ×, and flip the second fraction. Then multiply and simplify: ${fr(8,3)} = 2 ${fr(2,3)}.</p></div>`}]
+};
+
+const G7_EQ = {
+  make: () => { const x = rand(2,12), a = rand(2,9), b = rand(1,20); return {x, a, b, c: a*x+b}; },
+  show: p => `<div class="math">${p.a}x + ${p.b} = ${p.c}</div>`,
+  steps: ({x,a,b,c}) => [
+    numStep({label:`Undo the + ${b}`, ask:s=>`${a}x = ${s}`, note:`Subtract ${b} from both sides.`, ans:c-b,
+      wrong:[[c+b,"Undid with the wrong operation",`To undo + ${b}, <b>subtract</b> ${b} from both sides.`]],
+      hint:`${c} − ${b}.`, explain:`${c} − ${b} = ${c-b}.`, work:()=>`${a}x = ${c} − ${b} = ${c-b}`}),
+    numStep({label:`Undo the × ${a}`, ask:s=>`x = ${s}`, note:`Divide both sides by ${a}.`, ans:x,
+      wrong:[[c-b-a,"Undid with the wrong operation",`${a}x means ${a} <b>times</b> x. Undo times by dividing.`],[(c-b)*a,"Undid with the wrong operation",`Undo times by <b>dividing</b> by ${a}.`]],
+      hint:`${c-b} ÷ ${a}.`, explain:`${c-b} ÷ ${a} = ${x}.`, work:()=>`x = ${c-b} ÷ ${a} = <b>${x}</b>`})
+  ],
+  learn:[{h:"Undo in reverse order", body:`<div class="math">3x + 5 = 20</div><div class="prose"><p>Undo the + 5 first by subtracting 5 from both sides: 3x = 15.</p><p>Then undo the × 3 by dividing both sides by 3: x = 5.</p></div>`}]
+};
+
+const G8_PYTH = {
+  make: () => { const [a,b,c] = pick(TRIPLES); return Math.random() < .5 ? {a,b,c} : {a:b, b:a, c}; },
+  show: p => `<div class="math">a = ${p.a}, b = ${p.b}, c = ?</div><p class="note">Right triangle with legs ${p.a} and ${p.b}. Find the long side, c.<br>a² + b² = c²</p>`,
+  steps: ({a,b,c}) => [
+    numStep({label:"Square a", ask:s=>`${a}² = ${s}`, ans:a*a,
+      wrong:[[2*a,"Squared as times 2",`Squared means ${a} × ${a}, not ${a} × 2.`]],
+      hint:`${a} × ${a}.`, explain:`${a} × ${a} = ${a*a}.`, work:()=>`${a}² = ${a*a}`}),
+    numStep({label:"Square b", ask:s=>`${b}² = ${s}`, ans:b*b,
+      wrong:[[2*b,"Squared as times 2",`Squared means ${b} × ${b}, not ${b} × 2.`]],
+      hint:`${b} × ${b}.`, explain:`${b} × ${b} = ${b*b}.`, work:()=>`${b}² = ${b*b}`}),
+    numStep({label:"Add them", ask:s=>`${a*a} + ${b*b} = c² = ${s}`, ans:c*c,
+      hint:"Add the two squares.", explain:`${a*a} + ${b*b} = ${c*c}.`, work:()=>`c² = ${c*c}`}),
+    numStep({label:"Square root", ask:s=>`c = √${c*c} = ${s}`, ans:c,
+      wrong:[[a+b,"Added the legs","You can't just add the legs. Find the number that times itself makes "+c*c+"."],[c*c/2,"Square root","Square root isn't half. What number times itself is "+c*c+"?"]],
+      hint:`What number times itself makes ${c*c}?`, explain:`${c} × ${c} = ${c*c}, so c = ${c}.`, work:()=>`c = <b>${c}</b>`})
+  ],
+  learn:[{h:"a² + b² = c²", body:`<div class="math">3² + 4² = c²</div><div class="prose"><p>In a right triangle, square the two short sides and add: 9 + 16 = 25.</p><p>Then take the square root: c = 5, because 5 × 5 = 25.</p></div>`}]
+};
+
+const twoNums = (p, qn, kindSum, kindProd) => v => {
+  if (v.m == null || v.n == null) return {soft:true, msg:"Fill in both boxes."};
+  if ((v.m === p && v.n === qn) || (v.m === qn && v.n === p)) return {ok:true};
+  if (v.m * v.n === p*qn) return {kind:kindSum, msg:`${v.m} × ${v.n} = ${p*qn}, good. But ${v.m} + ${v.n} = ${v.m+v.n}, not ${p+qn}. Try another pair.`};
+  if (v.m + v.n === p+qn) return {kind:kindProd, msg:`${v.m} + ${v.n} = ${p+qn}, good. But ${v.m} × ${v.n} = ${v.m*v.n}, not ${p*qn}. Try another pair.`};
+  return {kind:"Factoring", msg:`List pairs that multiply to ${p*qn}, then check which pair adds to ${p+qn}.`};
+};
+const G9_FACTOR = {
+  make: () => { const p = rand(1,9), qn = rand(p,9); return {p, qn}; },
+  show: ({p,qn}) => `<div class="math">x² + ${p+qn}x + ${p*qn}</div><p class="note">Factor it.</p>`,
+  steps: ({p,qn}) => [
+    { label:"Find the two numbers", ask: () => `${q(`They multiply to ${p*qn} and add to ${p+qn}:`)}${slot("m")} and ${slot("n")}`,
+      note:"Order doesn't matter.", check: twoNums(p, qn, "Right product, wrong sum", "Right sum, wrong product"),
+      hint:`Which pair of factors of ${p*qn} adds up to ${p+qn}?`, answer:{m:p, n:qn}, explain:`${p} × ${qn} = ${p*qn} and ${p} + ${qn} = ${p+qn}.`,
+      work: () => `${p} and ${qn}` },
+    { label:"Write the factors", ask: () => `(x + ${slot("m")})(x + ${slot("n")})`,
+      note:"Use the two numbers you found.", check: twoNums(p, qn, "Writing the factors", "Writing the factors"),
+      hint:`Put ${p} in one and ${qn} in the other.`, answer:{m:p, n:qn}, explain:`(x + ${p})(x + ${qn}).`,
+      work: () => `<b>(x + ${p})(x + ${qn})</b>` }
+  ],
+  learn:[{h:"Multiply to c, add to b", body:`<div class="math">x² + 7x + 12</div><div class="prose"><p>Find two numbers that multiply to 12 and add to 7. Try pairs: 1 and 12, 2 and 6, 3 and 4. 3 + 4 = 7.</p><p>So it factors to (x + 3)(x + 4).</p></div>`}]
+};
+
+const G10_DIST = {
+  make: () => { let [dx,dy] = pick(TRIPLES); if (Math.random() < .5) [dx,dy] = [dy,dx]; const x1 = rand(0,6), y1 = rand(0,6); return {x1, y1, x2:x1+dx, y2:y1+dy, dx, dy, d: Math.hypot(dx,dy)}; },
+  show: p => `<div class="math">(${p.x1}, ${p.y1}) to (${p.x2}, ${p.y2})</div><p class="note">How far apart are the two points?</p>`,
+  steps: ({x1,y1,x2,y2,dx,dy,d}) => [
+    numStep({label:"Change in x", ask:s=>`${x2} − ${x1} = ${s}`, ans:dx,
+      wrong:[[x2+x1,"Added instead of subtracted","Distance across is the <b>difference</b>: subtract."]],
+      hint:`${x2} − ${x1}.`, explain:`${x2} − ${x1} = ${dx}.`, work:()=>`Across: ${dx}`}),
+    numStep({label:"Change in y", ask:s=>`${y2} − ${y1} = ${s}`, ans:dy,
+      wrong:[[y2+y1,"Added instead of subtracted","Distance up is the <b>difference</b>: subtract."]],
+      hint:`${y2} − ${y1}.`, explain:`${y2} − ${y1} = ${dy}.`, work:()=>`Up: ${dy}`}),
+    numStep({label:"Square and add", ask:s=>`${dx}² + ${dy}² = ${s}`, ans:dx*dx+dy*dy,
+      wrong:[[2*dx+2*dy,"Squared as times 2","Squared means a number times itself."],[dx+dy,"Forgot to square","Square each one first."]],
+      hint:`${dx*dx} + ${dy*dy}.`, explain:`${dx*dx} + ${dy*dy} = ${dx*dx+dy*dy}.`, work:()=>`${dx}² + ${dy}² = ${dx*dx+dy*dy}`}),
+    numStep({label:"Square root", ask:s=>`d = √${dx*dx+dy*dy} = ${s}`, ans:d,
+      wrong:[[dx+dy,"Added the sides","The straight line is shorter than going across and up."]],
+      hint:`What number times itself makes ${dx*dx+dy*dy}?`, explain:`${d} × ${d} = ${d*d}.`, work:()=>`d = <b>${d}</b>`})
+  ],
+  learn:[{h:"It's a hidden right triangle", body:`<div class="math">(1, 2) to (4, 6)</div><div class="prose"><p>Go across 4 − 1 = 3 and up 6 − 2 = 4. Those are the legs of a right triangle.</p><p>3² + 4² = 25, and √25 = 5. The points are 5 apart.</p></div>`}]
+};
+
+const G11_SEQ = {
+  make: () => ({a1: rand(1,20), d: rand(2,9), n: rand(10,30)}),
+  show: ({a1,d,n}) => `<div class="math">${[0,1,2,3].map(k=>a1+k*d).join(", ")}, …</div><p class="note">Find term number ${n}.</p>`,
+  steps: ({a1,d,n}) => [
+    numStep({label:"Common difference", ask:s=>`d = ${s}`, note:"How much does each term go up?", ans:d,
+      wrong:[[a1,"Common difference",`That's the first term. d is the jump: ${a1+d} − ${a1}.`],[a1+d,"Common difference",`That's the second term. Subtract: ${a1+d} − ${a1}.`]],
+      hint:`${a1+d} − ${a1}.`, explain:`Each term goes up by ${d}.`, work:()=>`d = ${d}`}),
+    numStep({label:"Count the jumps", ask:s=>`${q(`From term 1 to term ${n}, how many jumps?`)}${s}`, ans:n-1,
+      wrong:[[n,"Off by one",`Term 1 is where you start, so it's ${n} − 1 jumps.`]],
+      hint:`${n} − 1.`, explain:`${n} − 1 = ${n-1} jumps.`, work:()=>`${n-1} jumps`}),
+    numStep({label:"Total climb", ask:s=>`${n-1} × ${d} = ${s}`, ans:(n-1)*d,
+      hint:`${n-1} jumps of ${d}.`, explain:`${n-1} × ${d} = ${(n-1)*d}.`, work:()=>`${n-1} × ${d} = ${(n-1)*d}`}),
+    numStep({label:"Add the first term", ask:s=>`a<sub>${n}</sub> = ${a1} + ${(n-1)*d} = ${s}`, ans:a1+(n-1)*d,
+      hint:"Start at the first term and add the climb.", explain:`${a1} + ${(n-1)*d} = ${a1+(n-1)*d}.`, work:()=>`a<sub>${n}</sub> = <b>${a1+(n-1)*d}</b>`})
+  ],
+  learn:[{h:"aₙ = a₁ + (n − 1)d", body:`<div class="math">5, 9, 13, 17, …</div><div class="prose"><p>Start at 5 and jump by 4 each time. To reach term 20 you make 19 jumps: 19 × 4 = 76.</p><p>So term 20 is 5 + 76 = 81.</p></div>`}]
+};
+
+const G12_POWER = {
+  make: () => ({a: rand(2,9), n: rand(2,6)}),
+  show: ({a,n}) => `<div class="math">f(x) = ${a}x<sup>${n}</sup></div><p class="note">Find f′(x).</p>`,
+  steps: ({a,n}) => [
+    numStep({label:"Bring the exponent down", ask:s=>`${n} × ${a} = ${s}`, ans:a*n,
+      wrong:[[a+n,"Added instead of multiplied","Multiply the coefficient by the exponent."]],
+      hint:`${n} × ${a}.`, explain:`${n} × ${a} = ${a*n}.`, work:()=>`New coefficient: ${a*n}`}),
+    numStep({label:"Lower the exponent", ask:s=>`${n} − 1 = ${s}`, ans:n-1,
+      wrong:[[n+1,"Raised the exponent","For a derivative the exponent goes <b>down</b> by 1."]],
+      hint:`${n} − 1.`, explain:`${n} − 1 = ${n-1}.`, work:()=>`New exponent: ${n-1}`}),
+    { label:"Write f′(x)", ask: () => `f′(x) = ${slot("c")}x<sup>${slot("e","small")}</sup>`, note:"Use your two answers.",
+      check: v => {
+        if (v.c == null || v.e == null) return {soft:true, msg:"Fill in both boxes."};
+        if (v.c === a*n && v.e === n-1) return {ok:true};
+        if (v.c === a) return {kind:"Forgot to multiply", msg:`Multiply ${a} by the exponent ${n} first.`};
+        if (v.e === n) return {kind:"Kept the exponent", msg:"Lower the exponent by 1."};
+        return {kind:"Power rule", msg:`Coefficient ${a} × ${n}, exponent ${n} − 1.`};
+      },
+      hint:`${a*n}x to the ${n-1}.`, answer:{c:a*n, e:n-1}, explain:`f′(x) = ${a*n}x<sup>${n-1}</sup>.`,
+      work: () => `f′(x) = <b>${a*n}x<sup>${n-1}</sup></b>` }
+  ],
+  learn:[{h:"The power rule", body:`<div class="math">f(x) = 3x<sup>4</sup></div><div class="prose"><p>Bring the exponent down and multiply: 4 × 3 = 12. Then lower the exponent by 1: 4 − 1 = 3.</p><p>f′(x) = 12x<sup>3</sup>.</p></div>`}]
+};
+
+const GRADES = ["K","1","2","3","4","5","6","7","8","9","10","11","12"];
+const GRADE_NAME = ["Kindergarten","1st grade","2nd grade","3rd grade","4th grade","5th grade","6th grade","7th grade","8th grade","9th grade · Algebra 1","10th grade · Geometry","11th grade · Algebra 2","12th grade · Precalc & Calculus"];
+// what's planned next for each grade
+const COMING = [
+  ["Counting to 100","Comparing numbers","Subtracting within 10","Shapes"],
+  ["Place value: tens and ones","Subtracting within 20","Telling time","Measuring length"],
+  ["Subtracting with regrouping","Skip counting","Money","Telling time to 5 minutes"],
+  ["Division facts","Fractions on a number line","Area","Rounding"],
+  ["Long division","Equivalent fractions","Decimals: tenths and hundredths","Angles"],
+  ["Adding mixed numbers","Multiplying fractions","Decimals to thousandths","Volume","Coordinate plane"],
+  ["Ratios and rates","Percents","Negative numbers","Area of triangles"],
+  ["Proportions","Adding and subtracting integers","Circles","Probability"],
+  ["Slope","Systems of equations","Exponent rules","Volume of cones and spheres"],
+  ["Slope-intercept form","Systems of equations","Exponent rules","Quadratic formula"],
+  ["Similar triangles","Trig ratios","Area of circles","Proofs"],
+  ["Logarithms","Complex numbers","Polynomial division","Geometric sequences"],
+  ["Unit circle","Limits","Chain rule","Integrals"]
+];
 
 // ---- state ----
 const LESSON_LEN = 5;
@@ -315,8 +613,9 @@ function render(){
   const key = view + cur + (view === "learn" ? learnIdx : view === "practice" ? st.i : "");
   const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML() : doneHTML();
   if (view === "practice") saveRun();
-  app.className = "wrap t" + (view === "home" ? 0 : cur);
+  app.className = "wrap t" + (view === "home" ? 0 : tintOf(cur));
   app.innerHTML = html;
+  const on = app.querySelector(".grades .on"); if (on) on.scrollIntoView({inline:"center", block:"nearest"});
   if (key !== lastKey){ app.querySelectorAll(".panel,.card").forEach((el,i)=>{ el.classList.add("rise"); el.style.animationDelay = i*60+"ms"; }); lastKey = key; }
 }
 
@@ -324,28 +623,23 @@ function statsHTML(){
   return `<span class="ctl badged"><span class="badge on">${save.xp}</span>XP</span><span class="ctl badged"><span class="badge">${save.streak}</span>day${save.streak===1?"":"s"}</span>`;
 }
 
-function nextUp(){ const i = LESSONS.findIndex(l => !lessonDone(l.id)); return i < 0 ? -1 : i; }
-
 function homeHTML(){
+  const g = save.grade, list = inGrade(g);
+  const next = list.find(i => !lessonDone(LESSONS[i].id));
+  const run = save.run && LESSONS[runIndex()];
   return `<div class="bar"><span class="ctl grow" style="background:none">Step-by-Step Math</span>${statsHTML()}</div>
-  ${save.run ? `<section class="panel t${save.run.cur}"><button class="lesson" data-act="resume"><span class="badge on">${save.run.i+1}</span><span class="name">Keep going: ${LESSONS[save.run.cur].title}</span><span class="muted">problem <span class="mono">${save.run.i+1}/${LESSON_LEN}</span></span></button></section>` : ""}
+  ${run ? `<section class="panel t${tintOf(runIndex())}"><button class="lesson" data-act="resume"><span class="badge on">${GRADES[run.grade]}</span><span class="name">Keep going: ${run.title}</span><span class="muted">problem <span class="mono">${save.run.i+1}/${LESSON_LEN}</span></span></button></section>` : ""}
   <section class="panel">
-    <div class="head"><h2>Unit 1 · Fractions with different bottoms</h2><span class="muted mono">5.NF.1</span></div>
-    <div class="lessons">
-      ${LESSONS.map((l,i)=>`<button class="lesson t${i}" data-lesson="${i}"><span class="badge ${lessonDone(l.id)?"on":""}">${i+1}</span><span class="name">${l.title}</span><span class="dot ${lessonDone(l.id)?"ok":i===nextUp()?"busy":""}"></span><span class="muted">${lessonDone(l.id) ? `done ×<span class="mono">${lessonDone(l.id)}</span>` : i===nextUp() ? "up next" : "open"}</span></button>`).join("")}
-      <div class="lesson locked t3"><span class="badge">${LESSONS.length+1}</span><span class="name">Adding mixed numbers</span><span class="dot"></span><span class="muted">coming soon</span></div>
-    </div>
+    <div class="head"><h2>Choose your grade</h2></div>
+    <div class="grades" role="tablist" aria-label="Grade">${GRADES.map((n,i)=>`<button role="tab" class="${i===g?"on":""}" data-grade="${i}" aria-selected="${i===g}">${n}</button>`).join("")}</div>
   </section>
   <section class="panel">
-    <div class="head"><h2 class="label" style="border:0;padding:0">Later units</h2></div>
-    <div class="facts" style="background:var(--card)">
-      <div><span>Multiplying big numbers</span><span class="k">partial products</span></div>
-      <div><span>Long division</span><span class="k">divide, multiply, subtract, bring down</span></div>
-      <div><span>Decimals</span><span class="k">place value to thousandths</span></div>
-      <div><span>Multiplying fractions</span><span class="k">and mixed numbers</span></div>
-      <div><span>Volume</span><span class="k mono">l × w × h</span></div>
-      <div><span>Coordinate plane</span><span class="k">points and patterns</span></div>
+    <div class="head"><h2>${GRADE_NAME[g]}</h2><span class="muted">${list.length} lesson${list.length===1?"":"s"}</span></div>
+    <div class="split"><div class="lessons col">
+      ${list.map((i,k)=>{ const l = LESSONS[i], n = lessonDone(l.id); return `<button class="lesson t${k%3}" data-lesson="${i}"><span class="badge ${n?"on":""}">${k+1}</span><span class="name">${l.title}</span><span class="dot ${n?"ok":i===next?"busy":""}"></span><span class="muted">${n ? `done ×<span class="mono">${n}</span>` : i===next ? "up next" : "open"}</span></button>`; }).join("")}
     </div>
+    <div class="col"><div class="head"><h2 class="label" style="border:0;padding:0">Coming next</h2></div>
+    <div class="facts" style="background:var(--card)">${COMING[g].map(t=>`<div><span>${t}</span><span class="k">soon</span></div>`).join("")}</div></div></div>
   </section>`;
 }
 
@@ -382,20 +676,36 @@ const LEARN_MIX = [
       <div class="prose"><p>This lesson mixes plus and minus problems. The first three steps are exactly the same. At step 4, look at the sign before you add or take away.</p></div>` }
 ];
 
-// ---- lessons: all open, so she can skip ahead or go back ----
+// ---- lessons: all open, so she can skip ahead or go back. Keep ids stable: saved progress uses them. ----
+const FRACTIONS = op => ({ make: i => makeProblem(i, op(i)), steps: stepsFor, show: p => `<div class="math">${fr(p.a,p.b)} ${p.op} ${fr(p.c,p.d)}</div>` });
 const LESSONS = [
-  { id:"add", title:"Adding fractions", ops:["+"], learn:LEARN_ADD },
-  { id:"sub", title:"Subtracting fractions", ops:["−"], learn:LEARN_SUB },
-  { id:"mix", title:"Adding and subtracting", ops:["+","−"], learn:LEARN_MIX },
+  { id:"k-add", grade:0, title:"Adding within 10", ...K_ADD },
+  { id:"g1-ten", grade:1, title:"Make a ten to add", ...G1_TEN },
+  { id:"g2-regroup", grade:2, title:"Adding with regrouping", ...G2_REGROUP },
+  { id:"g3-split", grade:3, title:"Multiply by breaking apart", ...G3_SPLIT },
+  { id:"g4-partial", grade:4, title:"Multiply big numbers", ...G4_PARTIAL },
+  { id:"add", grade:5, title:"Adding fractions", learn:LEARN_ADD, ...FRACTIONS(() => "+") },
+  { id:"sub", grade:5, title:"Subtracting fractions", learn:LEARN_SUB, ...FRACTIONS(() => "−") },
+  { id:"mix", grade:5, title:"Adding and subtracting", learn:LEARN_MIX, ...FRACTIONS(i => i % 2 ? "−" : "+") },
+  { id:"g6-divide", grade:6, title:"Dividing fractions", ...G6_DIVIDE },
+  { id:"g7-eq", grade:7, title:"Two-step equations", ...G7_EQ },
+  { id:"g8-pyth", grade:8, title:"Pythagorean theorem", ...G8_PYTH },
+  { id:"g9-factor", grade:9, title:"Factoring quadratics", ...G9_FACTOR },
+  { id:"g10-dist", grade:10, title:"Distance between points", ...G10_DIST },
+  { id:"g11-seq", grade:11, title:"Arithmetic sequences", ...G11_SEQ },
+  { id:"g12-power", grade:12, title:"Derivatives: power rule", ...G12_POWER },
 ];
+const inGrade = g => LESSONS.map((l,i)=>i).filter(i => LESSONS[i].grade === g);
+const tintOf = i => inGrade(LESSONS[i].grade).indexOf(i) % 3;
+if (save.grade == null) save.grade = 5;
 let cur = 0;
 const lessonDone = id => (save.lessons && save.lessons[id]) || 0;
 
 function lessonNav(){
-  const prev = cur > 0, next = cur < LESSONS.length-1;
-  return `<div class="bar"><button class="ctl" data-lesson="${cur-1}" ${prev?"":"disabled"} aria-label="Previous lesson">‹</button>
-    <span class="ctl grow" style="background:none;justify-content:center"><span class="badge on">${cur+1}</span><span style="overflow:hidden;text-overflow:ellipsis">${LESSONS[cur].title}</span></span>
-    <button class="ctl" data-lesson="${cur+1}" ${next?"":"disabled"} aria-label="Next lesson">›</button></div>`;
+  const g = inGrade(LESSONS[cur].grade), k = g.indexOf(cur);
+  return `<div class="bar"><button class="ctl" data-lesson="${g[k-1]}" ${k>0?"":"disabled"} aria-label="Previous lesson">‹</button>
+    <span class="ctl grow" style="background:none;justify-content:center"><span class="badge on">${GRADES[LESSONS[cur].grade]}</span><span style="overflow:hidden;text-overflow:ellipsis">${LESSONS[cur].title}</span></span>
+    <button class="ctl" data-lesson="${g[k+1]}" ${k<g.length-1?"":"disabled"} aria-label="Next lesson">›</button></div>`;
 }
 function learnHTML(){
   const L = LESSONS[cur].learn, c = L[learnIdx];
@@ -415,13 +725,16 @@ function practiceHTML(){
   return `<div class="bar"><button class="ctl" data-go="learn" aria-label="Quit to lesson">Quit</button>
     <span class="steps" aria-label="Problem ${st.i+1} of ${LESSON_LEN}">${st.problems.map((_,i)=>`<span class="dot ${i<st.i?"ok":i===st.i?"busy":""}"></span>`).join("")}</span>
     <span class="ctl badged"><span class="badge on">${st.i+1}</span>of <span class="mono">${LESSON_LEN}</span></span></div>
-  <section class="panel">
-    <div class="card"><div class="math">${fr(p.a,p.b)} ${p.op} ${fr(p.c,p.d)}</div>
+  <section class="panel split">
+    <div class="col">
+    <div class="card">${LESSONS[cur].show(p)}
       <div class="work">${st.work.map((w,k)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${k+1}</span>${w.html}</div>`).join("")}</div>
     </div>
     ${s ? `<div class="card"><div class="label">${s.label}</div>
       <div class="ask">${s.ask()}</div>
       <div class="note">${s.note}</div></div>` : ""}
+    </div>
+    <div class="col">
     ${fb ? `<div class="feedback fb-${fb.type}" role="status"><span class="dot ${dotFor[fb.type]}"></span><span>${fb.html}</span></div>` : ""}
     ${s ? `<div class="tray" style="background:none;padding:0">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-key="${n}">${n}</button>`).join("")}
       <button data-key="next" aria-label="Next box">⇥</button><button data-key="0">0</button><button data-key="back" aria-label="Erase">⌫</button></div>
@@ -430,29 +743,36 @@ function practiceHTML(){
       ${st.misses >= 2 ? `<button class="ctl" data-act="show">Show me</button>` : ""}
       <button class="ctl go" data-act="check">Check</button>
     </div>` : `<div class="actions"><button class="ctl go" data-act="nextprob">${st.i < LESSON_LEN-1 ? "Next problem" : "Finish lesson"}</button></div>`}
+    </div>
   </section>`;
 }
 
 function startPractice(){
-  st = { i:0, problems:Array.from({length:LESSON_LEN},(_,i)=>makeProblem(i, LESSONS[cur].ops[i % LESSONS[cur].ops.length])), step:0, vals:{}, active:"x",
+  st = { i:0, problems:Array.from({length:LESSON_LEN},(_,i)=>LESSONS[cur].make(i)), step:0, vals:{}, active:"x",
          misses:0, feedback:null, work:[], clean:0, mistakes:[], probMistake:false, xpEarned:0 };
   loadStep();
 }
 // a lesson in progress is saved after every change, so leaving mid-lesson loses nothing
 function saveRun(){
   if (!st) return;
-  save.run = {cur, i:st.i, step:st.step, problems:st.problems, work:st.work, clean:st.clean, mistakes:st.mistakes, probMistake:st.probMistake, xpEarned:st.xpEarned};
+  save.run = {id:LESSONS[cur].id, i:st.i, step:st.step, problems:st.problems, work:st.work, clean:st.clean, mistakes:st.mistakes, probMistake:st.probMistake, xpEarned:st.xpEarned};
   persist();
 }
+function runIndex(){
+  const r = save.run; if (!r) return -1;
+  const id = r.id || ["add","sub","mix"][r.cur]; // older saves stored a position
+  return LESSONS.findIndex(l => l.id === id);
+}
 function resumeRun(){
+  if (runIndex() < 0) { delete save.run; return; }
   const r = save.run; if (!r) return;
-  cur = Math.min(r.cur, LESSONS.length-1);
+  cur = runIndex();
   st = Object.assign({vals:{}, misses:0, feedback:null}, r);
   loadStep();
   view = "practice";
 }
 function loadStep(){
-  const steps = stepsFor(st.problems[st.i]);
+  const steps = LESSONS[cur].steps(st.problems[st.i]).map((s,k) => /^Step /.test(s.label) ? s : {...s, label:`Step ${k+1} · ${s.label}`});
   st.steps = steps;
   st.vals = {};
   st.misses = 0;
@@ -475,7 +795,7 @@ function check(){
   if (r.soft){ st.feedback = {type:"hint", html:r.msg}; return; }
   st.misses++;
   st.probMistake = true;
-  st.mistakes.push({kind:r.kind, problem:`${st.problems[st.i].a}/${st.problems[st.i].b} + ${st.problems[st.i].c}/${st.problems[st.i].d}`});
+  st.mistakes.push({kind:r.kind});
   st.feedback = {type:"bad", html:`<strong>Not yet.</strong> ${r.msg}${st.misses>=2?" <br>Stuck? Tap <b>Show me</b>.":""}`};
 }
 function pass(shown){
@@ -523,7 +843,7 @@ function doneHTML(){
       <div><span class="k">No mistakes</span><span class="v">${st.clean}/${LESSON_LEN}</span></div>
       <div><span class="k">Streak</span><span class="v">${save.streak}d</span></div>
     </div>
-    <div class="actions">${cur < LESSONS.length-1 ? `<button class="ctl go" data-lesson="${cur+1}">Next lesson</button>` : ""}<button class="ctl" data-go="practice">Practice again</button><button class="ctl" data-go="home">All lessons</button></div>
+    <div class="actions">${(g => g.indexOf(cur) < g.length-1 ? `<button class="ctl go" data-lesson="${g[g.indexOf(cur)+1]}">Next lesson</button>` : "")(inGrade(LESSONS[cur].grade))}<button class="ctl" data-go="practice">Practice again</button><button class="ctl" data-go="home">All lessons</button></div>
   </section>
   <section class="panel">
     <div class="head"><h2>For the grown-up</h2><span class="muted">${list.length ? "mistakes, most common first" : ""}</span></div>
@@ -538,12 +858,13 @@ function key(k){
   const ids = slotIds();
   if (k === "next"){ st.active = ids[(ids.indexOf(st.active)+1) % ids.length]; }
   else if (k === "back"){ st.vals[st.active] = String(st.vals[st.active] ?? "").slice(0,-1); }
-  else { const cur = String(st.vals[st.active] ?? ""); if (cur.length < 3) st.vals[st.active] = (cur === "0" ? "" : cur) + k; }
+  else { const cur = String(st.vals[st.active] ?? ""); if (cur.length < 4) st.vals[st.active] = (cur === "0" ? "" : cur) + k; }
   render();
 }
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
-  if (t.dataset.lesson){ cur = Math.max(0, Math.min(LESSONS.length-1, Number(t.dataset.lesson))); view = "learn"; learnIdx = 0; }
+  if (t.dataset.grade){ save.grade = Number(t.dataset.grade); persist(); }
+  else if (t.dataset.lesson){ cur = Math.max(0, Math.min(LESSONS.length-1, Number(t.dataset.lesson))); view = "learn"; learnIdx = 0; }
   else if (t.dataset.go){
     view = t.dataset.go;
     if (view === "learn") learnIdx = 0;
