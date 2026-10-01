@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Math">
+<title>Step-by-Step Math</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Fredoka:wght@500;600&display=swap">
+<style>
+/* System One for kids: same pills, 1px lines, calm grey wells and status dots, scaled up for small fingers and young readers, rounder type, and one soft colour per lesson. One centred column. */
+:root{
+  --fs:18px; --lh:26px; --s:8px; --u:14px; --sec:28px; --h:48px; --ctl:var(--s) 18px;
+  --r-panel:30px; --r-card:22px; --r-box:16px;
+  --ease:cubic-bezier(.34,1.4,.64,1);
+  --text:#1b1d22; --muted:#7b8090; --faint:#c9ccd4; --rule:#e4e6eb; --page:#fbfbfd; --well:#f1f2f6; --card:#fff; --hover:#e8eaf0;
+  --ok:#1fbf5f; --busy:#f5a524; --err:#ef4444; --on-tint:#fff;
+  --sans:"Nunito","Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --num:"Fredoka","Nunito","Avenir Next",ui-rounded,sans-serif;
+  --math:52px; --key:64px;
+  --tint:#3b82f6; --tint-soft:#e5efff;
+}
+.t0{--tint:#3b82f6; --tint-soft:#e5efff}
+.t1{--tint:#f2683c; --tint-soft:#ffebe3}
+.t2{--tint:#8b5cf6; --tint-soft:#efe9ff}
+.t3{--tint:#9aa0ad; --tint-soft:#eef0f4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --text:#eef0f4; --muted:#9097a6; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}
+  :root:not([data-theme="light"]) .t0{--tint:#6ea8ff; --tint-soft:#1c2a45}
+  :root:not([data-theme="light"]) .t1{--tint:#ff8a63; --tint-soft:#3a2219}
+  :root:not([data-theme="light"]) .t2{--tint:#a98bff; --tint-soft:#2a2245}
+  :root:not([data-theme="light"]) .t3{--tint:#7b8090; --tint-soft:#23262e}}
+:root[data-theme="dark"]{
+  --text:#eef0f4; --muted:#9097a6; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}
+:root[data-theme="dark"] .t0{--tint:#6ea8ff; --tint-soft:#1c2a45}
+:root[data-theme="dark"] .t1{--tint:#ff8a63; --tint-soft:#3a2219}
+:root[data-theme="dark"] .t2{--tint:#a98bff; --tint-soft:#2a2245}
+:root[data-theme="dark"] .t3{--tint:#7b8090; --tint-soft:#23262e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--page);color:var(--text);font:500 var(--fs)/var(--lh) var(--sans);min-height:100vh}
+.wrap{max-width:680px;margin:0 auto;padding-inline:20px;padding-block:24px 48px;display:grid;gap:var(--sec)}
+@media (max-width:480px){.wrap{padding-inline:12px}}
+h1,h2,h3,p{font-size:var(--fs);font-weight:800;margin:0}
+p{font-weight:500}
+.label{color:var(--tint);border-bottom:1px solid var(--rule);padding-bottom:var(--s);font-weight:800;font-size:15px}
+.muted{color:var(--muted)}
+b,strong{font-weight:800}
+.mono{font-family:var(--num);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.rise{animation:rise .5s var(--ease) both}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.pop{display:inline-block;animation:pop .45s var(--ease) both}
+
+/* controls */
+.ctl{height:var(--h);padding:var(--ctl);border-radius:999px;background:var(--well);display:inline-flex;align-items:center;gap:var(--s);white-space:nowrap;font-weight:700;transition:background .15s,transform .15s}
+.ctl:hover{background:var(--hover)}
+.ctl:active{transform:scale(.96)}
+.ctl[disabled]{color:var(--faint);cursor:default;transform:none}
+.ctl.badged{padding-left:var(--s)}
+.card .ctl,.panel .ctl{background:var(--card)}
+.card .ctl:hover,.panel .ctl:hover{background:var(--hover)}
+.ctl.go,.panel .ctl.go{background:var(--tint);color:var(--on-tint)}
+.ctl.go:hover{background:var(--tint);filter:brightness(1.06)}
+.ctl.go .badge{background:rgba(255,255,255,.25);color:var(--on-tint)}
+.badge{min-width:32px;height:32px;border-radius:999px;display:inline-grid;place-items:center;padding:0 var(--s);font-family:var(--num);font-weight:600;background:var(--well);color:var(--text)}
+.card .badge,.ctl .badge{background:var(--tint-soft);color:var(--tint)}
+.badge.on,.card .badge.on,.ctl .badge.on{background:var(--tint);color:var(--on-tint)}
+.bar{display:flex;align-items:center;gap:var(--s);padding:var(--s);background:var(--well);border-radius:999px;flex-wrap:nowrap;min-width:0}
+.bar .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:block;line-height:32px}
+.wrap>*,.panel>*,.lessons>*,.card>*,.bento>*{min-width:0}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;background:var(--faint);transition:background .3s}
+.dot.ok{background:var(--ok)} .dot.busy{background:var(--busy)} .dot.err{background:var(--err)}
+
+/* panels, cards */
+.panel{background:var(--well);border-radius:var(--r-panel);padding:var(--u);display:grid;gap:var(--u)}
+.card{background:var(--card);border-radius:var(--r-card);padding:var(--u);display:grid;gap:var(--u)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:var(--u);flex-wrap:wrap;padding:0 var(--s)}
+
+/* lesson list */
+.lessons{display:grid;gap:var(--s)}
+.lesson{display:flex;align-items:center;gap:var(--u);min-height:64px;padding:var(--s) 18px var(--s) var(--s);border-radius:999px;background:var(--card);text-align:left;width:100%;font-weight:800;transition:background .15s,transform .15s}
+.lesson:hover{background:var(--tint-soft)}
+.lesson:active{transform:scale(.98)}
+.lesson .badge{min-width:48px;height:48px;font-size:22px}
+.lesson .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lesson .muted{font-weight:700;font-size:15px}
+.lesson.locked{color:var(--muted);cursor:default}
+.lesson.locked:hover{background:var(--card)}
+.facts{border-radius:var(--r-box);background:var(--well)}
+.facts>div{display:flex;justify-content:space-between;align-items:center;gap:var(--u);padding:var(--s) var(--u);min-height:var(--h)}
+.facts>div+div{border-top:1px solid var(--rule)}
+.facts .k{color:var(--muted);font-size:15px}
+.facts .v{font-family:var(--num);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bento{display:grid;grid-template-columns:repeat(3,1fr);border-radius:var(--r-box);background:var(--well)}
+.bento>div{padding:var(--u);display:grid;gap:2px}
+.bento>div+div{border-left:1px solid var(--rule)}
+.bento .k{color:var(--muted);font-size:15px} .bento .v{font-family:var(--num);font-size:32px;line-height:1.2;color:var(--tint)}
+
+/* learn */
+.strips{display:grid;gap:var(--s)}
+.strip{display:flex;height:44px;border:1px solid var(--text);border-radius:var(--r-box);overflow:hidden}
+.strip span{flex:1;border-right:1px solid var(--text)}
+.strip span:last-child{border-right:0}
+.strip span.f{background:var(--tint)}
+.strip span.g{background:color-mix(in srgb,var(--tint) 45%,var(--card))}
+.prose{display:grid;gap:var(--s);max-width:60ch}
+
+/* math */
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;font-family:var(--num);font-variant-numeric:tabular-nums}
+.fr>span:first-child{border-bottom:2px solid currentColor}
+.fr>span{padding:0 .2em}
+.math{font-family:var(--num);font-weight:500;font-size:var(--math);line-height:1.2;display:flex;align-items:center;justify-content:center;gap:.35em;flex-wrap:wrap;padding:var(--u) 0}
+
+/* practice */
+.steps{display:flex;gap:var(--s);align-items:center;flex:1;justify-content:center}
+.work{display:grid;border-radius:var(--r-box);background:var(--well)}
+.work:empty{display:none}
+.workline{display:flex;align-items:center;gap:var(--u);padding:var(--s) var(--u);font-family:var(--num);font-size:24px;line-height:1.2;flex-wrap:wrap;min-width:0}
+.workline+.workline{border-top:1px solid var(--rule)}
+.workline .k{font-family:var(--sans);font-size:15px;font-weight:800;color:var(--tint);width:56px;flex:none}
+.workline.shown{color:var(--muted)}
+.ask{font-family:var(--num);font-size:40px;line-height:1.2;display:flex;align-items:center;justify-content:center;gap:var(--u);flex-wrap:wrap;padding:var(--u) 0}
+.ask .q{font-family:var(--sans);font-weight:700;font-size:var(--fs);width:100%;text-align:center}
+.slot{min-width:84px;height:64px;padding:0 var(--u);border-radius:var(--r-box);background:var(--well);border:2px solid var(--rule);font-family:var(--num);font-size:40px;display:inline-grid;place-items:center;color:var(--text);transition:border-color .15s,background .15s}
+.slot.active{border-color:var(--tint);background:var(--tint-soft)}
+.slot.small{min-width:64px}
+.fr .slot{margin:var(--s) 0}
+.fr.slots>span:first-child{padding-bottom:var(--s)}
+.mixed{display:inline-flex;align-items:center;gap:var(--s)}
+.note{color:var(--muted);text-align:center;font-size:16px}
+.feedback{display:flex;gap:var(--u);align-items:flex-start;padding:var(--u);border-radius:var(--r-box)}
+.feedback .dot{margin-top:7px}
+.fb-good{background:color-mix(in srgb,var(--ok) 14%,var(--card))}
+.fb-bad{background:color-mix(in srgb,var(--err) 12%,var(--card))}
+.fb-hint{background:color-mix(in srgb,var(--busy) 14%,var(--card))}
+.feedback .fr{font-size:var(--fs)}
+.tray{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s);max-width:460px;width:100%;margin:0 auto}
+.tray button{height:var(--key);border-radius:999px;background:var(--card);font-family:var(--num);font-weight:500;font-size:30px;transition:background .15s,transform .12s}
+.tray button:hover{background:var(--tint-soft)}
+.tray button:active{transform:scale(.94);background:var(--tint-soft)}
+.actions{display:flex;gap:var(--s);justify-content:center;flex-wrap:wrap}
+@media (max-width:480px){ :root{--fs:17px;--math:40px;--key:56px;--h:44px} .ask{font-size:32px} .slot{font-size:32px;height:54px;min-width:68px} .lesson{min-height:56px} .lesson .badge{min-width:40px;height:40px;font-size:18px} .bento .v{font-size:26px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const gcd = (a,b) => b ? gcd(b, a % b) : a;
+const lcm = (a,b) => a*b/gcd(a,b);
+const rand = (lo,hi) => lo + Math.floor(Math.random()*(hi-lo+1));
+const fr = (n,d) => `<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+
+// ---- saved progress (this iPad only) ----
+let save = {xp:0, streak:0, last:"", done:0, lessons:{}};
+try { save = Object.assign(save, JSON.parse(localStorage.getItem("stepmath") || "{}")); } catch(e){}
+if (save.done && !save.lessons.add) save.lessons.add = save.done; // older saves
+function persist(){ try { localStorage.setItem("stepmath", JSON.stringify(save)); } catch(e){} }
+
+// ---- problem generator: a/b + c/d or a/b − c/d ----
+function makeProblem(i, op){
+  let b, d;
+  for(;;){
+    b = rand(2,12); d = rand(2,12);
+    if (b === d || lcm(b,d) > 24) continue;
+    const multiple = b % d === 0 || d % b === 0;
+    if (i === 0 && !multiple) continue;          // first problem: easy kind
+    if (i >= 2 && multiple && Math.random() < .6) continue; // later: mostly harder kind
+    break;
+  }
+  const pickTop = den => { let n; do { n = rand(1, den-1); } while (gcd(n,den) !== 1); return n; };
+  let a = pickTop(b), c = pickTop(d), L = lcm(b,d);
+  let A = a*(L/b), C = c*(L/d);
+  if (op === "−"){
+    if (A === C) return makeProblem(i, op);
+    if (A < C) { [a,b,c,d,A,C] = [c,d,a,b,C,A]; } // keep the answer positive
+  }
+  const S = op === "−" ? A - C : A + C;
+  return {a,b,c,d,L,A,C,S,op};
+}
+
+function finalForm(p){
+  const g = gcd(p.S, p.L), n = p.S/g, d = p.L/g;
+  return { whole: Math.floor(n/d), num: n % d, den: d };
+}
+function showFinal(f){
+  if (f.num === 0) return `${f.whole}`;
+  return (f.whole ? `${f.whole} ` : "") + fr(f.num, f.den);
+}
+
+// ---- the steps; each knows the right answer and the common wrong ones ----
+function stepsFor(p){
+  const {a,b,c,d,L,A,C,S,op} = p, sub = op === "−", ka = L/b, kc = L/d, F = finalForm(p);
+  const rewrite = (n, den, k, N, which) => ({
+    label: `Step ${which+1} · Rewrite ${which===1?"the first":"the second"} fraction`,
+    ask: () => `${fr(n,den)} <span>=</span> <span class="fr slots"><span>${slot("x")}</span><span>${L}</span></span>`,
+    note: `Make ${L} the bottom number.`,
+    check: v => {
+      const x = v.x;
+      if (x === N) return {ok:true};
+      if (x === n) return {kind:"Changed the bottom but not the top",
+        msg:`You changed the bottom from ${den} to ${L}, but kept the top as ${n}. Whatever you multiply the bottom by, multiply the top by the same number.`};
+      if (x === n + (L-den)) return {kind:"Added instead of multiplied",
+        msg:`It looks like you added ${L-den} to the top because the bottom went up by ${L-den}. Fractions stay equal when we <b>multiply</b> top and bottom by the same number. What times ${den} makes ${L}?`};
+      return {kind:"Rewriting a fraction",
+        msg:`Not quite. Ask: ${den} × <b>?</b> = ${L}. Then multiply the top, ${n}, by that same number.`};
+    },
+    hint: `${den} × ? = ${L}. Whatever you multiply the bottom by, do the same to the top.`,
+    answer: {x:N},
+    explain: `${den} × ${k} = ${L}, so ${n} × ${k} = ${N}.`,
+    work: () => `${fr(n,den)} = ${fr(N,L)} <span class="muted">(× ${k})</span>`
+  });
+
+  const hasWhole = F.whole > 0, fracPart = F.num > 0;
+  return [
+    { label:"Step 1 · Find a common denominator",
+      ask: () => `<span class="q">Smallest number that both ${b} and ${d} go into:</span> ${slot("x")}`,
+      note: "This is the least common denominator (LCD).",
+      check: v => {
+        const x = v.x;
+        if (x === L) return {ok:true};
+        if (x === b + d) return {kind:"Added the denominators",
+          msg:`It looks like you added ${b} + ${d}. The bottom number tells the <b>size of the pieces</b>, so we can't add them. We need a number that both ${b} and ${d} divide into evenly.`};
+        if (sub && x === Math.abs(b - d)) return {kind:"Subtracted the denominators",
+          msg:`It looks like you subtracted ${Math.max(b,d)} − ${Math.min(b,d)}. The bottom number tells the <b>size of the pieces</b>, so we don't subtract it. We need a number that both ${b} and ${d} divide into evenly.`};
+        if (x > 0 && x % b === 0 && x % d === 0) return {kind:"Common denominator, but not the least",
+          msg:`${x} works, because both ${b} and ${d} go into it. But there is a <b>smaller</b> one, and smaller numbers make the rest easier. Try again.`};
+        const bad = x % b !== 0 ? b : d;
+        return {kind:"Finding the LCD",
+          msg: x > 0 ? `${bad} doesn't go into ${x} evenly (${x} ÷ ${bad} has a remainder). Both bottom numbers must divide into it.` : "Type a number first."};
+      },
+      hint: `Count by ${Math.max(b,d)}s: ${[1,2,3,4].map(i=>i*Math.max(b,d)).join(", ")}… Stop at the first one that ${Math.min(b,d)} also goes into.`,
+      answer: {x:L},
+      explain: `Counting by ${Math.max(b,d)}s, the first number ${Math.min(b,d)} also goes into is ${L}.`,
+      work: () => `LCD of ${b} and ${d} is <b>${L}</b>`
+    },
+    rewrite(a,b,ka,A,1),
+    rewrite(c,d,kc,C,2),
+    { label: sub ? "Step 4 · Subtract" : "Step 4 · Add",
+      ask: () => `${fr(A,L)} ${op} ${fr(C,L)} = <span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span>`,
+      note: "Fill in the top and the bottom.",
+      check: v => {
+        if (v.n == null || v.d == null) return {soft:true, msg:"Fill in both boxes, the top and the bottom."};
+        if (v.n === S && v.d === L) return {ok:true};
+        if (!sub && v.d === 2*L) return {kind:"Added the denominators",
+          msg:`You added the bottoms too (${L} + ${L}). The pieces are already the same size, ${L}ths, so the bottom stays <b>${L}</b>. Think: ${A} slices + ${C} slices of the same pizza = ${S} slices, still ${L}ths.`};
+        if (sub && v.d === 0) return {kind:"Subtracted the denominators",
+          msg:`You subtracted the bottoms too (${L} − ${L} = 0). The pieces are already the same size, ${L}ths, so the bottom stays <b>${L}</b>. Think: ${A} slices take away ${C} slices = ${S} slices, still ${L}ths.`};
+        if (v.d !== L) return {kind:"Changed the denominator",
+          msg:`When the bottoms match, the bottom stays the same: <b>${L}</b>. Only the tops get ${sub ? "subtracted" : "added"}.`};
+        if (sub && v.n === A + C) return {kind:"Added instead of subtracting",
+          msg:`You added ${A} + ${C}. Look at the sign: this one is a <b>minus</b>.`};
+        if (!sub && v.n === Math.abs(A - C)) return {kind:"Subtracted instead of adding",
+          msg:`You subtracted. Look at the sign: this one is a <b>plus</b>.`};
+        return {kind: sub ? "Subtracting numerators" : "Adding numerators",
+          msg:`The bottom is right. Check the top: ${A} ${op} ${C} = ?`};
+      },
+      hint: `${sub ? "Subtract" : "Add"} only the tops. The bottom stays ${L}.`,
+      answer: {n:S, d:L},
+      explain: `${A} ${op} ${C} = ${S}, and the bottom stays ${L}.`,
+      work: () => `${fr(A,L)} ${op} ${fr(C,L)} = ${fr(S,L)}`
+    },
+    { label:"Step 5 · Simplify",
+      ask: () => `${fr(S,L)} = <span class="mixed">${slot("w","small")}<span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span></span>`,
+      note: S > L ? "The top is bigger than the bottom, so pull out the wholes. Use the small box for the whole number."
+          : S === L ? "Top and bottom are the same. What whole number is that?"
+          : gcd(S,L) > 1 ? "Can both numbers be divided by the same number?"
+          : "If it can't be simplified, just copy it. Leave the whole-number box empty.",
+      check: v => {
+        const w = v.w || 0, n = v.n || 0, dd = v.d;
+        if (v.n != null && dd == null) return {soft:true, msg:"Fill in the bottom number too."};
+        if (dd === 0) return {soft:true, msg:"The bottom can't be 0."};
+        const den = dd || 1;
+        const equal = (w*den + n) * L === S * den;
+        if (!equal){
+          return {kind:"Simplifying",
+            msg: S > L ? `That's not equal to ${fr(S,L)}. How many whole ${L}s fit into ${S}? That's the whole number. What's left over goes on top.`
+                       : `That's not equal to ${fr(S,L)}. Divide the top <b>and</b> the bottom by the same number.`};
+        }
+        if (dd && n >= dd) return {soft:true, kind:"Mixed number",
+          msg:`That's the right amount! Now write it as a mixed number: how many whole ${dd}s fit into ${n}?`};
+        if (dd && n > 0 && gcd(n,dd) > 1) return {kind:"Not fully simplified",
+          msg:`Same amount, good! But ${fr(n,dd)} can still be simplified: both ${n} and ${dd} divide by ${gcd(n,dd)}.`};
+        return {ok:true};
+      },
+      hint: S >= L ? `${S} ÷ ${L} = ${Math.floor(S/L)} remainder ${S % L}. The remainder goes on top.`
+                   : gcd(S,L) > 1 ? `Both ${S} and ${L} can be divided by ${gcd(S,L)}.` : `No number (other than 1) divides both ${S} and ${L}. It's already simplest.`,
+      answer: {w: hasWhole ? F.whole : null, n: fracPart ? F.num : null, d: fracPart ? F.den : null},
+      explain: S >= L ? `${S} ÷ ${L} = ${Math.floor(S/L)} remainder ${S % L}, then simplify.` : gcd(S,L) > 1 ? `Divide top and bottom by ${gcd(S,L)}.` : "It was already as simple as it gets.",
+      work: () => `${fr(S,L)} = <b>${showFinal(F)}</b>`
+    }
+  ];
+}
+
+// ---- state ----
+const LESSON_LEN = 5;
+let st = null; // practice state
+let view = "home", learnIdx = 0;
+
+function slot(id, cls=""){
+  const v = st && st.vals[id];
+  const active = st && st.active === id;
+  return `<button class="slot ${cls} ${active?"active":""}" data-slot="${id}" aria-label="answer box">${v ?? ""}</button>`;
+}
+
+let lastKey = "";
+function render(){
+  const app = $("#app");
+  const key = view + cur + (view === "learn" ? learnIdx : view === "practice" ? st.i : "");
+  const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML() : doneHTML();
+  if (view === "practice") saveRun();
+  app.className = "wrap t" + (view === "home" ? 0 : cur);
+  app.innerHTML = html;
+  if (key !== lastKey){ app.querySelectorAll(".panel,.card").forEach((el,i)=>{ el.classList.add("rise"); el.style.animationDelay = i*60+"ms"; }); lastKey = key; }
+}
+
+function statsHTML(){
+  return `<span class="ctl badged"><span class="badge on">${save.xp}</span>XP</span><span class="ctl badged"><span class="badge">${save.streak}</span>day${save.streak===1?"":"s"}</span>`;
+}
+
+function nextUp(){ const i = LESSONS.findIndex(l => !lessonDone(l.id)); return i < 0 ? -1 : i; }
+
+function homeHTML(){
+  return `<div class="bar"><span class="ctl grow" style="background:none">Step-by-Step Math</span>${statsHTML()}</div>
+  ${save.run ? `<section class="panel t${save.run.cur}"><button class="lesson" data-act="resume"><span class="badge on">${save.run.i+1}</span><span class="name">Keep going: ${LESSONS[save.run.cur].title}</span><span class="muted">problem <span class="mono">${save.run.i+1}/${LESSON_LEN}</span></span></button></section>` : ""}
+  <section class="panel">
+    <div class="head"><h2>Unit 1 · Fractions with different bottoms</h2><span class="muted mono">5.NF.1</span></div>
+    <div class="lessons">
+      ${LESSONS.map((l,i)=>`<button class="lesson t${i}" data-lesson="${i}"><span class="badge ${lessonDone(l.id)?"on":""}">${i+1}</span><span class="name">${l.title}</span><span class="dot ${lessonDone(l.id)?"ok":i===nextUp()?"busy":""}"></span><span class="muted">${lessonDone(l.id) ? `done ×<span class="mono">${lessonDone(l.id)}</span>` : i===nextUp() ? "up next" : "open"}</span></button>`).join("")}
+      <div class="lesson locked t3"><span class="badge">${LESSONS.length+1}</span><span class="name">Adding mixed numbers</span><span class="dot"></span><span class="muted">coming soon</span></div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="head"><h2 class="label" style="border:0;padding:0">Later units</h2></div>
+    <div class="facts" style="background:var(--card)">
+      <div><span>Multiplying big numbers</span><span class="k">partial products</span></div>
+      <div><span>Long division</span><span class="k">divide, multiply, subtract, bring down</span></div>
+      <div><span>Decimals</span><span class="k">place value to thousandths</span></div>
+      <div><span>Multiplying fractions</span><span class="k">and mixed numbers</span></div>
+      <div><span>Volume</span><span class="k mono">l × w × h</span></div>
+      <div><span>Coordinate plane</span><span class="k">points and patterns</span></div>
+    </div>
+  </section>`;
+}
+
+const strip = (fill, cls, total) => `<div class="strip">${`<span class="${cls}"></span>`.repeat(fill)}${"<span></span>".repeat(total-fill)}</div>`;
+const LEARN_ADD = [
+  { h:"Why can't we just add the bottoms?",
+    body:`<div class="math">${fr(1,2)} + ${fr(1,3)}</div>
+      <div class="strips"><span class="muted">One half</span>${strip(1,"f",2)}<span class="muted">One third</span>${strip(1,"g",3)}</div>
+      <div class="prose"><p>The bottom number tells you the <b>size of the pieces</b>. Halves and thirds are different sizes, so we can't add them yet.</p><p>And <span class="mono">2/5</span> is wrong: it's <i>less</i> than one half!</p></div>` },
+  { h:"Cut them into same size pieces",
+    body:`<div class="strips"><span class="muted"><span class="mono">1/2 = 3/6</span></span>${strip(3,"f",6)}<span class="muted"><span class="mono">1/3 = 2/6</span></span>${strip(2,"g",6)}</div>
+      <div class="prose"><p>Find the smallest number both bottoms go into. 2 and 3 both go into <b class="mono">6</b>. That's the <b>least common denominator</b>.</p>
+      <p>To turn halves into sixths we multiply the bottom by 3, so we multiply the top by 3 too.</p></div>` },
+  { h:"Now add the tops",
+    body:`<div class="math">${fr(3,6)} + ${fr(2,6)} = ${fr(5,6)}</div>
+      <div class="strips">${'<div class="strip">'+'<span class="f"></span>'.repeat(3)+'<span class="g"></span>'.repeat(2)+'<span></span></div>'}</div>
+      <div class="prose"><p>Same size pieces: 3 sixths + 2 sixths = 5 sixths. The bottom stays 6.</p>
+      <p>Every problem goes in 5 steps: find the LCD, rewrite the first, rewrite the second, add, simplify. Your finished steps stay on the page like written work.</p></div>` }
+];
+
+const LEARN_SUB = [
+  { h:"Subtracting works the same way",
+    body:`<div class="math">${fr(1,2)} − ${fr(1,3)}</div>
+      <div class="strips"><span class="muted"><span class="mono">1/2 = 3/6</span></span>${strip(3,"f",6)}<span class="muted"><span class="mono">1/3 = 2/6</span></span>${strip(2,"g",6)}</div>
+      <div class="prose"><p>Before we can take away, the pieces have to be the same size. Find the least common denominator, <b class="mono">6</b>, and rewrite both fractions.</p></div>` },
+  { h:"Take away the tops",
+    body:`<div class="math">${fr(3,6)} − ${fr(2,6)} = ${fr(1,6)}</div>
+      <div class="strips"><div class="strip"><span class="f"></span>${"<span></span>".repeat(5)}</div></div>
+      <div class="prose"><p>3 sixths take away 2 sixths leaves 1 sixth. The bottom stays 6. Never subtract the bottoms: 6 − 6 would make 0, and you can't cut something into 0 pieces.</p></div>` }
+];
+const LEARN_MIX = [
+  { h:"Watch the sign",
+    body:`<div class="math">${fr(2,3)} + ${fr(1,4)}&nbsp;&nbsp;${fr(2,3)} − ${fr(1,4)}</div>
+      <div class="prose"><p>This lesson mixes plus and minus problems. The first three steps are exactly the same. At step 4, look at the sign before you add or take away.</p></div>` }
+];
+
+// ---- lessons: all open, so she can skip ahead or go back ----
+const LESSONS = [
+  { id:"add", title:"Adding fractions", ops:["+"], learn:LEARN_ADD },
+  { id:"sub", title:"Subtracting fractions", ops:["−"], learn:LEARN_SUB },
+  { id:"mix", title:"Adding and subtracting", ops:["+","−"], learn:LEARN_MIX },
+];
+let cur = 0;
+const lessonDone = id => (save.lessons && save.lessons[id]) || 0;
+
+function lessonNav(){
+  const prev = cur > 0, next = cur < LESSONS.length-1;
+  return `<div class="bar"><button class="ctl" data-lesson="${cur-1}" ${prev?"":"disabled"} aria-label="Previous lesson">‹</button>
+    <span class="ctl grow" style="background:none;justify-content:center"><span class="badge on">${cur+1}</span><span style="overflow:hidden;text-overflow:ellipsis">${LESSONS[cur].title}</span></span>
+    <button class="ctl" data-lesson="${cur+1}" ${next?"":"disabled"} aria-label="Next lesson">›</button></div>`;
+}
+function learnHTML(){
+  const L = LESSONS[cur].learn, c = L[learnIdx];
+  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="steps">${L.map((_,i)=>`<span class="dot ${i<learnIdx?"ok":i===learnIdx?"busy":""}"></span>`).join("")}</span><button class="ctl" data-go="practice">Skip to practice</button></div>
+  ${lessonNav()}
+  <section class="panel"><div class="card"><h2 class="label">${c.h}</h2>${c.body}</div>
+    <div class="actions" style="justify-content:space-between">
+      <button class="ctl" data-learn="-1" ${learnIdx===0?"disabled":""}>Previous</button>
+      ${learnIdx < L.length-1 ? `<button class="ctl" data-learn="1">Next</button>` : `<button class="ctl go" data-go="practice">Start practice</button>`}
+    </div></section>`;
+}
+
+function practiceHTML(){
+  const p = st.problems[st.i], s = st.steps[st.step];
+  const fb = st.feedback;
+  const dotFor = {good:"ok", bad:"err", hint:"busy"};
+  return `<div class="bar"><button class="ctl" data-go="learn" aria-label="Quit to lesson">Quit</button>
+    <span class="steps" aria-label="Problem ${st.i+1} of ${LESSON_LEN}">${st.problems.map((_,i)=>`<span class="dot ${i<st.i?"ok":i===st.i?"busy":""}"></span>`).join("")}</span>
+    <span class="ctl badged"><span class="badge on">${st.i+1}</span>of <span class="mono">${LESSON_LEN}</span></span></div>
+  <section class="panel">
+    <div class="card"><div class="math">${fr(p.a,p.b)} ${p.op} ${fr(p.c,p.d)}</div>
+      <div class="work">${st.work.map((w,k)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${k+1}</span>${w.html}</div>`).join("")}</div>
+    </div>
+    ${s ? `<div class="card"><div class="label">${s.label}</div>
+      <div class="ask">${s.ask()}</div>
+      <div class="note">${s.note}</div></div>` : ""}
+    ${fb ? `<div class="feedback fb-${fb.type}" role="status"><span class="dot ${dotFor[fb.type]}"></span><span>${fb.html}</span></div>` : ""}
+    ${s ? `<div class="tray" style="background:none;padding:0">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-key="${n}">${n}</button>`).join("")}
+      <button data-key="next" aria-label="Next box">⇥</button><button data-key="0">0</button><button data-key="back" aria-label="Erase">⌫</button></div>
+    <div class="actions">
+      <button class="ctl" data-act="hint">Hint</button>
+      ${st.misses >= 2 ? `<button class="ctl" data-act="show">Show me</button>` : ""}
+      <button class="ctl go" data-act="check">Check</button>
+    </div>` : `<div class="actions"><button class="ctl go" data-act="nextprob">${st.i < LESSON_LEN-1 ? "Next problem" : "Finish lesson"}</button></div>`}
+  </section>`;
+}
+
+function startPractice(){
+  st = { i:0, problems:Array.from({length:LESSON_LEN},(_,i)=>makeProblem(i, LESSONS[cur].ops[i % LESSONS[cur].ops.length])), step:0, vals:{}, active:"x",
+         misses:0, feedback:null, work:[], clean:0, mistakes:[], probMistake:false, xpEarned:0 };
+  loadStep();
+}
+// a lesson in progress is saved after every change, so leaving mid-lesson loses nothing
+function saveRun(){
+  if (!st) return;
+  save.run = {cur, i:st.i, step:st.step, problems:st.problems, work:st.work, clean:st.clean, mistakes:st.mistakes, probMistake:st.probMistake, xpEarned:st.xpEarned};
+  persist();
+}
+function resumeRun(){
+  const r = save.run; if (!r) return;
+  cur = Math.min(r.cur, LESSONS.length-1);
+  st = Object.assign({vals:{}, misses:0, feedback:null}, r);
+  loadStep();
+  view = "practice";
+}
+function loadStep(){
+  const steps = stepsFor(st.problems[st.i]);
+  st.steps = steps;
+  st.vals = {};
+  st.misses = 0;
+  const ids = slotIds();
+  st.active = ids[0];
+  st.feedback = null;
+}
+function slotIds(){
+  const s = st.steps[st.step]; if (!s) return [];
+  return [...s.ask().matchAll(/data-slot="(\w+)"/g)].map(m=>m[1]);
+}
+
+function check(){
+  const s = st.steps[st.step];
+  const v = {};
+  for (const id of slotIds()) v[id] = st.vals[id] === undefined || st.vals[id] === "" ? null : Number(st.vals[id]);
+  if (Object.values(v).every(x => x == null)) { st.feedback = {type:"hint", html:"Tap a box and use the number pad to type your answer."}; return; }
+  const r = s.check(v);
+  if (r.ok) return pass(false);
+  if (r.soft){ st.feedback = {type:"hint", html:r.msg}; return; }
+  st.misses++;
+  st.probMistake = true;
+  st.mistakes.push({kind:r.kind, problem:`${st.problems[st.i].a}/${st.problems[st.i].b} + ${st.problems[st.i].c}/${st.problems[st.i].d}`});
+  st.feedback = {type:"bad", html:`<strong>Not yet.</strong> ${r.msg}${st.misses>=2?" <br>Stuck? Tap <b>Show me</b>.":""}`};
+}
+function pass(shown){
+  const s = st.steps[st.step];
+  st.work.push({html:s.work(), shown});
+  st.step++;
+  if (st.step < st.steps.length){
+    const praise = ["Nice!","Yes!","Exactly.","You got it.","Good thinking."][rand(0,4)];
+    const msg = shown ? `Here's how: ${s.explain}` : praise;
+    loadStep();
+    st.feedback = {type: shown ? "hint" : "good", html:`<strong>${msg}</strong>`};
+  } else {
+    const xp = st.probMistake ? 10 : 15;
+    st.xpEarned += xp;
+    if (!st.probMistake) st.clean++;
+    st.feedback = {type:"good", html: shown ? `Here's how: ${s.explain} <br><strong>+${xp} XP.</strong> That one was tricky, and you finished it.`
+      : `<span class="pop">⭐</span> <strong>Solved! +${xp} XP</strong>${st.probMistake ? "" : " (no mistakes bonus)"}`};
+  }
+}
+function showMe(){
+  const s = st.steps[st.step];
+  st.vals = Object.fromEntries(Object.entries(s.answer).filter(([k,v])=>v!=null));
+  pass(true);
+}
+function nextProblem(){
+  if (st.i < LESSON_LEN-1){
+    st.i++; st.step = 0; st.work = []; st.probMistake = false; loadStep();
+  } else {
+    save.xp += st.xpEarned; save.done++; save.lessons[LESSONS[cur].id] = lessonDone(LESSONS[cur].id) + 1;
+    const today = new Date().toDateString(), yest = new Date(Date.now()-864e5).toDateString();
+    if (save.last !== today) save.streak = save.last === yest ? save.streak + 1 : 1;
+    save.last = today; delete save.run; persist();
+    view = "done";
+  }
+}
+
+function doneHTML(){
+  const counts = {};
+  st.mistakes.forEach(m => counts[m.kind] = (counts[m.kind]||0) + 1);
+  const list = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  return `<div class="bar"><span class="ctl grow" style="background:none">${LESSONS[cur].title}: complete</span>${statsHTML()}</div>
+  <section class="panel">
+    <div class="bento" style="background:var(--card)">
+      <div><span class="k">XP earned</span><span class="v">+${st.xpEarned}</span></div>
+      <div><span class="k">No mistakes</span><span class="v">${st.clean}/${LESSON_LEN}</span></div>
+      <div><span class="k">Streak</span><span class="v">${save.streak}d</span></div>
+    </div>
+    <div class="actions">${cur < LESSONS.length-1 ? `<button class="ctl go" data-lesson="${cur+1}">Next lesson</button>` : ""}<button class="ctl" data-go="practice">Practice again</button><button class="ctl" data-go="home">All lessons</button></div>
+  </section>
+  <section class="panel">
+    <div class="head"><h2>For the grown-up</h2><span class="muted">${list.length ? "mistakes, most common first" : ""}</span></div>
+    ${list.length ? `<div class="facts" style="background:var(--card)">${list.map(([k,n])=>`<div><span>${k}</span><span class="v">×${n}</span></div>`).join("")}</div>`
+      : `<p style="padding:0 5px">No mistakes this time. Ready for the next lesson.</p>`}
+  </section>`;
+}
+
+// ---- input ----
+function key(k){
+  if (view !== "practice" || !st.steps[st.step]) return;
+  const ids = slotIds();
+  if (k === "next"){ st.active = ids[(ids.indexOf(st.active)+1) % ids.length]; }
+  else if (k === "back"){ st.vals[st.active] = String(st.vals[st.active] ?? "").slice(0,-1); }
+  else { const cur = String(st.vals[st.active] ?? ""); if (cur.length < 3) st.vals[st.active] = (cur === "0" ? "" : cur) + k; }
+  render();
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.lesson){ cur = Math.max(0, Math.min(LESSONS.length-1, Number(t.dataset.lesson))); view = "learn"; learnIdx = 0; }
+  else if (t.dataset.go){
+    view = t.dataset.go;
+    if (view === "learn") learnIdx = 0;
+    if (view === "practice") startPractice();
+  }
+  else if (t.dataset.learn) learnIdx = Math.max(0, Math.min(LESSONS[cur].learn.length-1, learnIdx + Number(t.dataset.learn)));
+  else if (t.dataset.slot){ st.active = t.dataset.slot; }
+  else if (t.dataset.key){ return key(t.dataset.key); }
+  else if (t.dataset.act === "check") check();
+  else if (t.dataset.act === "hint") st.feedback = {type:"hint", html:`<strong>Hint:</strong> ${st.steps[st.step].hint}`};
+  else if (t.dataset.act === "show") showMe();
+  else if (t.dataset.act === "nextprob") nextProblem();
+  else if (t.dataset.act === "resume") resumeRun();
+  render();
+});
+document.addEventListener("keydown", e => {
+  if (view !== "practice") return;
+  if (/^\d$/.test(e.key)) key(e.key);
+  else if (e.key === "Backspace") key("back");
+  else if (e.key === "Tab"){ e.preventDefault(); key("next"); }
+  else if (e.key === "Enter"){ e.preventDefault(); if (st.steps[st.step]) check(); else nextProblem(); render(); }
+});
+render();
+</script>
+</body>
+</html>
