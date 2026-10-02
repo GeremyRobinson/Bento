@@ -10,7 +10,6 @@ h1,h2,h3,p{font-size:inherit;font-weight:var(--w-bold);margin:0}
 p{font-weight:500}
 b,strong{font-weight:var(--w-bold)}
 .label{color:var(--tint);border-bottom:1px solid var(--rule);padding-bottom:var(--s);font-weight:var(--w-bold);font-size:var(--small);line-height:20px}
-.wrap[data-band="high"] .label{text-transform:uppercase;color:var(--muted)}
 .muted{color:var(--muted)}
 .mono{font-family:var(--num);font-variant-numeric:tabular-nums}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;-webkit-user-select:none;user-select:none}

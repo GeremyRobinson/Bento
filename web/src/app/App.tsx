@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { bandOf } from "../curriculum/grades";
+import { bandOf, lineOf } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { currentItem } from "../engine/session/practice";
 import { GradeSheet } from "../components/GradeSheet";
@@ -40,6 +40,10 @@ export function App() {
   const top = isTopLevel(route);
   const grade = top ? chosenGrade : testGrade ?? lesson?.grade ?? chosenGrade;
   const tint = top || !lesson ? 0 : lessonsInGrade(lesson.grade).indexOf(lesson) % 3;
+
+  // the canvas behind the bento follows the line the screen belongs to; the landing page stays plain
+  const line = route.name === "welcome" ? "welcome" : lineOf(grade).id;
+  useEffect(() => { document.documentElement.dataset.line = line; }, [line]);
 
   useEffect(() => {
     document.title = route.name === "learn" && lesson ? `${lesson.title} · Bento` : "Bento";
