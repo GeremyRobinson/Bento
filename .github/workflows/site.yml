@@ -1,0 +1,28 @@
+name: site
+# Rebuilds the live site at the repository root whenever the app in web/ changes on main.
+on:
+  push:
+    branches: [main]
+    paths: ["web/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: web/scripts/publish-site.sh
+      - name: Commit the built site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add -A index.html assets sw.js manifest.webmanifest apple-touch-icon.png icon-192.png icon-512.png
+          git diff --cached --quiet || (git commit -m "Publish the site from web/" && git push)
