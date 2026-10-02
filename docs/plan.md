@@ -84,23 +84,25 @@ After two misses on one step, a **"Show me"** button walks through that step so 
 - **Summaries**: after every lesson or test, "What you did" lists every problem with the finished steps, and "For the grown-up" shows the score, mistake patterns with a tip for each, and every mistake (what was typed, the right answer, what kind of slip). The last summary for each lesson opens from its intro screen.
 - **For the grown-up page** (home screen): scores by grade, mistake patterns across recent sessions, hints used, guessing, lessons that need more practice, and recent sessions.
 
-## 7. A look for each age
+## 7. A look for each grade
 
-One design that grows up with the grade. The layout, number pad, scores and reports stay the same, so moving up never feels like a new app.
+One app shell that never changes (header, grade sheet, number pad, scores, reports), and inside it each grade carries its own theme.
 
-| Grades | Look |
-|---|---|
-| K–2 | Biggest type, buttons and number pad. Ten frames and base-ten blocks on the problems. No minus or decimal keys. Big 🎉 when a problem is solved. |
-| 3–5 | The kid-friendly System One look as first designed: rounded type, one soft colour per lesson, a ⭐ for each solve. |
-| 6–8 | A little smaller and calmer: more on screen, quieter praise ("Correct."), no stars. |
-| 9–12 | Close to plain System One: Helvetica, grey and black only, uppercase muted labels, outlined main button, small XP and streak badges. Once a skill scores 3 or more, "Skip steps" asks only for the final answer; a miss goes back to the full steps for that problem. |
+- **Header with grade XP:** the top bar is one compact row: a grade badge with a ring that fills as she earns XP in that grade (Level up every 300 XP), plus the streak and total XP. Tapping the badge opens a grade sheet with all 13 grades, each showing its level and lessons done.
+- **Each grade has its own palette and background pattern** (K is warm and bright, 12th is monochrome). Lesson rows, buttons, pictures and the progress ring all take the grade's colours.
+- **Four age bands** set size and tone: K–2 biggest with ten frames and blocks, no minus or decimal keys; 3–5 the original kid look; 6–8 calmer; 9–12 closest to plain System One, with "Skip steps" once a skill scores 3 or more.
+- **Every lesson explains before it drills:** idea cards with an animated picture (number lines, area models, tape diagrams, balances, graphs, triangles, circles, 3D boxes and more, with a Replay button), then "Watch one, step by step", a worked example revealed one step at a time with the reason under each step. Then practice.
+- **Motion:** screens fade and slide between each other (forward slides left, back slides right), so changing grade or going from a lesson to its results is never a jump. Wrong answers shake, solved lines slide in, the results ring and XP count up, with confetti for a 4. Motion is turned off when the device asks for reduced motion.
+- **Alignment system:** every size is a multiple of 4px, nested corners are concentric, and numbers in pills, badges and answer boxes are optically centred. Fonts are built into the file so it looks the same offline.
+- **Home-screen ready:** an app icon and manifest, so "Add to Home Screen" on the iPad opens it full screen like an app.
 
 ## 8. Build order
 
 1. ✅ Prototype: grade picker, lesson picker, saved progress and resume, a sideways (landscape) iPad layout, and a kid-friendly System One style.
 2. ✅ Full year for grades 5–12, unit tests and grade check-ups, 0–4 scores, limited hints, detailed mistake reports, adaptive practice length.
 3. ✅ A look for each age band, pictures for K–2, and "Skip steps" for mastered 9–12 skills.
-4. Try it with her for a week. Note where she gets stuck or bored.
-5. Fill in the full year for K–4.
-6. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
-7. Optional: move to Swift once the lessons are settled.
+4. ✅ Ship polish: a theme per grade, grade XP header, explanations with animated pictures and worked examples, screen transitions, alignment system, home-screen icon.
+5. Try it with her for a week. Note where she gets stuck or bored.
+6. Fill in the full year for K–4.
+7. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
+8. Optional: move to Swift once the lessons are settled.
