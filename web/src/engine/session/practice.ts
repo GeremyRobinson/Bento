@@ -289,7 +289,7 @@ export function finishRun(s: PracticeSession, progress: Progress, now: number): 
     key: s.key, mode: s.mode, title: s.title, date: now, ms: now - s.t0, total: s.items.length, extra: s.extra, clean: s.clean,
     hints: s.hints, shown: s.shown, pct, level, xp: s.xpEarned, probs: s.probs, mistakes: s.mistakes,
   };
-  const p: Progress = structuredClone(progress);
+  const p: Progress = JSON.parse(JSON.stringify(progress)); // plain data; works on older iPads too
   p.xp += s.xpEarned;
   const grade = s.mode === "test" ? Number(s.key.split(":")[1]) : s.mode === "review" ? (p.grade ?? 5) : requireLesson(s.key).grade;
   p.gxp[grade] = (p.gxp[grade] ?? 0) + s.xpEarned;

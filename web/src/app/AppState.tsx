@@ -57,7 +57,7 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
   useEffect(() => {
     if (props.initial) return;
     let live = true;
-    loadAll().then(r => {
+    loadAll().catch(() => ({ store: null, ...emptyData() })).then(r => {
       if (!live) return;
       store.current = r.store;
       setData({ progress: r.progress, reports: r.reports });
@@ -94,8 +94,9 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
   const go = useCallback((r: Route) => {
     setRoute(r);
     const h = routeHash(r);
-    if (location.hash !== h) history.pushState(null, "", h);
-    scrollTo?.(0, 0);
+    // sandboxed frames can refuse history changes; the app keeps working from its own state
+    try { if (location.hash !== h) history.pushState(null, "", h); } catch { /* ignore */ }
+    try { scrollTo(0, 0); } catch { /* ignore */ }
   }, []);
 
   const deps = useCallback((): Deps => ({ now: now(), rng: rng.current }), [now]);

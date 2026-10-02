@@ -7,7 +7,8 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 export default defineConfig(({ mode }) => ({
   base: "./",
   plugins: [react(), ...(mode === "preview" ? [viteSingleFile()] : [])],
-  build: { outDir: mode === "preview" ? "dist-preview" : "dist" },
+  // the preview inlines the fonts too, so the single file needs nothing else
+  build: { target: ["es2020", "safari14"], outDir: mode === "preview" ? "dist-preview" : "dist", assetsInlineLimit: mode === "preview" ? 1e8 : 4096 },
   test: {
     environment: "jsdom",
     globals: true,

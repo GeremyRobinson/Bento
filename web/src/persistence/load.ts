@@ -19,19 +19,24 @@ export async function loadAll(opts: { factory?: IDBFactory; storage?: Storage | 
   } catch {
     store = null; // private browsing or storage blocked: the app still runs, nothing is saved
   }
-  const saved = store ? await store.getProgress() : undefined;
+  let saved: unknown;
+  try { saved = store ? await store.getProgress() : undefined; } catch { store = null; }
   if (saved) {
     const progress = migrateProgress(saved);
     if (!canResume(progress.run)) progress.run = null;
-    return { store, progress, reports: store ? await store.getReports() : {}, imported: false };
+    let reports: Record<string, SessionReport> = {};
+    try { reports = store ? await store.getReports() : {}; } catch { /* reports are optional */ }
+    return { store, progress, reports, imported: false };
   }
   const legacy = readJson(storage, LEGACY_KEYS.save);
   if (legacy) {
     const progress = fromLegacySave(legacy);
     const reports = fromLegacyReports(readJson(storage, LEGACY_KEYS.reports) ?? (legacy as { reports?: unknown }).reports);
     if (store) {
-      await store.replaceAll(progress, reports);
-      await store.putMeta("importedLegacy", Date.now());
+      try {
+        await store.replaceAll(progress, reports);
+        await store.putMeta("importedLegacy", Date.now());
+      } catch { /* runs from memory this time; the import is tried again next visit */ }
     }
     return { store, progress, reports, imported: true };
   }

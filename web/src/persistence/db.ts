@@ -7,6 +7,7 @@ import type { SessionReport } from "../engine/session/types";
 
 export const DB_NAME = "bento";
 export const DB_VERSION = 1;
+export const OPEN_TIMEOUT_MS = 2000;
 
 function request<T>(r: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -24,8 +25,10 @@ function done(tx: IDBTransaction): Promise<void> {
 }
 
 /** Opens the database, creating or upgrading stores. Each schema version adds its steps here. */
-export function openDb(factory: IDBFactory = indexedDB, name = DB_NAME): Promise<IDBDatabase> {
+export function openDb(factory: IDBFactory = indexedDB, name = DB_NAME, timeoutMs = OPEN_TIMEOUT_MS): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
+    // some embedded or private browsers never answer; the app then runs without saving instead of waiting forever
+    const timer = setTimeout(() => reject(new Error("storage did not open")), timeoutMs);
     const r = factory.open(name, DB_VERSION);
     r.onupgradeneeded = () => {
       const db = r.result;
@@ -34,7 +37,7 @@ export function openDb(factory: IDBFactory = indexedDB, name = DB_NAME): Promise
       if (!db.objectStoreNames.contains("reports")) db.createObjectStore("reports");
       if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta");
     };
-    r.onsuccess = () => resolve(r.result);
+    r.onsuccess = () => { clearTimeout(timer); resolve(r.result); };
     r.onerror = () => reject(r.error);
     r.onblocked = () => reject(new Error("database upgrade blocked by another open tab"));
   });

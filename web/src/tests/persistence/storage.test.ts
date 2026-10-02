@@ -47,3 +47,11 @@ describe("storage", () => {
     expect(() => readBackup("not json")).toThrow();
   });
 });
+
+describe("storage that never answers", () => {
+  it("gives up after a moment and runs without saving", async () => {
+    const silent = { open: () => ({}) } as unknown as IDBFactory;
+    const { openDb } = await import("../../persistence/db");
+    await expect(openDb(silent, "x", 20)).rejects.toThrow("storage did not open");
+  });
+});
