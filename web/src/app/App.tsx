@@ -4,6 +4,7 @@ import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { currentItem } from "../engine/session/practice";
 import { GradeSheet } from "../components/GradeSheet";
 import { Home } from "../screens/Home";
+import { Intro } from "../screens/Intro";
 import { Learn } from "../screens/Learn";
 import { Parent } from "../screens/Parent";
 import { Practice } from "../screens/Practice";
@@ -51,6 +52,7 @@ export function App() {
     case "results": screen = <Results />; break;
     case "report": screen = <ReportScreen rep={reports[route.key]} />; break;
     case "parent": screen = <Parent />; break;
+    case "intro": screen = <Intro />; break;
     default: screen = <Home />;
   }
   // a new screen (or a new grade on a top-level screen) re-enters; with view transitions the browser cross-fades instead

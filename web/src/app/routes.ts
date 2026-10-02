@@ -2,6 +2,8 @@
 export type Route =
   | { name: "welcome" }
   | { name: "home" }
+  /** the chosen grade's opening page: the year at a glance */
+  | { name: "intro" }
   | { name: "learn"; lessonId: string }
   | { name: "practice" }
   | { name: "results" }
@@ -14,6 +16,7 @@ export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decode);
   switch (parts[0]) {
     case "welcome": return { name: "welcome" };
+    case "year": return { name: "intro" };
     case "learn": return parts[1] ? { name: "learn", lessonId: parts[1] } : { name: "home" };
     case "practice": return { name: "practice" };
     case "results": return { name: "results" };
@@ -27,6 +30,7 @@ export function routeHash(r: Route): string {
   switch (r.name) {
     case "welcome": return "#/welcome";
     case "home": return "#/";
+    case "intro": return "#/year";
     case "learn": return `#/learn/${encodeURIComponent(r.lessonId)}`;
     case "practice": return "#/practice";
     case "results": return "#/results";
@@ -36,4 +40,4 @@ export function routeHash(r: Route): string {
 }
 
 /** Screens that take the chosen grade's look rather than a lesson's (the current app's "home" group). */
-export const isTopLevel = (r: Route) => r.name === "welcome" || r.name === "home" || r.name === "parent";
+export const isTopLevel = (r: Route) => r.name === "welcome" || r.name === "home" || r.name === "intro" || r.name === "parent";

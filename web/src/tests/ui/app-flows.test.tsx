@@ -30,6 +30,11 @@ describe("first launch: landing → grade → home", () => {
     const grades = within(document.querySelector(".lgrades") as HTMLElement).getAllByRole("button");
     expect(grades).toHaveLength(13);
     fireEvent.click(screen.getByRole("button", { name: "5th grade" }));
+    // a grade opens on its year page the first time: every unit, every lesson, then into the lessons
+    expect(screen.getByText("This year: fractions and decimals.")).toBeInTheDocument();
+    expect(document.querySelectorAll(".yunit")).toHaveLength(4);
+    expect(document.querySelectorAll(".yunit li")).toHaveLength(grade5.length);
+    tap("Start the year ›");
     expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
     expect(screen.getByText(`Fractions and decimals · ${grade5.length} lessons`)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: new RegExp(`Up next.*${LESSON}`) })).toBeInTheDocument();
@@ -74,6 +79,7 @@ describe("home", () => {
     const sheet = screen.getByRole("dialog", { name: "Choose your grade" });
     fireEvent.click(within(sheet).getByRole("button", { name: /2nd/ }));
     expect(screen.queryByRole("dialog")).toBeNull();
+    tap("Start the year ›");
     expect(screen.getByRole("heading", { level: 1, name: "2nd grade" })).toBeInTheDocument();
     expect(document.querySelector("main")!.dataset.band).toBe("little");
     expect(screen.getByRole("heading", { level: 3, name: "Coming soon" })).toBeInTheDocument();
@@ -81,6 +87,7 @@ describe("home", () => {
     // 9th grade has no coming-soon list and takes the plain look
     fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /9th/ }));
+    tap("Start the year ›");
     expect(screen.queryByText("Coming soon")).toBeNull();
     expect(document.querySelector("main")!.dataset.band).toBe("high");
   });
@@ -90,10 +97,28 @@ describe("home", () => {
     fireEvent.click(screen.getByRole("button", { name: new RegExp(`Up next.*${LESSON}`) }));
     tap("Start practice ›");
     tap("Home");
-    const resume = screen.getByRole("button", { name: /Keep going/ });
-    expect(resume).toHaveTextContent(`Keep going · 5th grade${LESSON}Problem 1 of 8`);
-    fireEvent.click(resume);
+    // the unfinished lesson waits in the top bar; each grade's big card keeps showing its own next lesson
+    const resume = screen.getByRole("button", { name: new RegExp(`Resume ${LESSON}, 5th grade, problem 1 of 8`) });
+    expect(resume).toHaveTextContent(`Resume · 5th grade${LESSON}1/8`);
+    fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /Kindergarten/ }));
+    tap("Start the year ›");
+    expect(screen.queryByRole("button", { name: new RegExp(`Up next.*${LESSON}`) })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /^Resume / }));
     expect(screen.getByRole("button", { name: "Check" })).toBeInTheDocument();
+  });
+
+  it("opens a grade's year page from its title, and again on a grade picked before goes straight home", () => {
+    renderApp();
+    fireEvent.click(document.querySelector(".yearlink")!);
+    expect(screen.getByText("This year: fractions and decimals.")).toBeInTheDocument();
+    tap("My lessons ›");
+    fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /7th/ }));
+    tap("Start the year ›");
+    fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /7th/ }));
+    expect(screen.getByRole("heading", { level: 1, name: "7th grade" })).toBeInTheDocument();
   });
 });
 

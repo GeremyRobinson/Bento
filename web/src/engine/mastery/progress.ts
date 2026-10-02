@@ -49,11 +49,13 @@ export interface Progress {
   reviews: Record<string, Level>;
   /** the run in progress, so leaving mid-lesson loses nothing */
   run: PracticeSession | null;
+  /** grades whose opening page has been shown */
+  intros: number[];
 }
 
 export const emptyProgress = (): Progress => ({
   version: 1, grade: null, chosen: false, xp: 0, gxp: {}, streak: 0, last: "", done: 0,
-  lessons: {}, scores: {}, tests: {}, log: [], seen: {}, reviews: {}, run: null,
+  lessons: {}, scores: {}, tests: {}, log: [], seen: {}, reviews: {}, run: null, intros: [],
 });
 
 export const lastScore = (p: Progress, id: string) => p.scores[id]?.last ?? null;

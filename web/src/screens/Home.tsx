@@ -4,7 +4,6 @@ import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, u
 import { COMING_SOON } from "../curriculum/catalog";
 import { gradeOf } from "../curriculum/grades";
 import { lastScore, timesDone } from "../engine/mastery/progress";
-import { currentItem, lessonOfItem } from "../engine/session/practice";
 import { TopBar } from "../components/TopBar";
 import { BigRing, ScoreChip } from "../components/primitives/Score";
 import { gradePattern } from "../components/primitives/gradePattern";
@@ -21,7 +20,6 @@ export function Home() {
   const ready = list.filter(c => isReady(c.id));
   const next = ready.find(c => !isDone(c.id));
   const pick = next ?? [...ready].sort((a, b) => (lastScore(progress, a.id) ?? 9) - (lastScore(progress, b.id) ?? 9))[0];
-  const run = progress.run;
   const done = doneCount(progress, list), avg = gradeAverage(progress, g);
   const weak = list.filter(c => { const s = lastScore(progress, c.id); return s != null && s <= 1; });
   const gt = progress.tests[testKey(g)];
@@ -34,18 +32,13 @@ export function Home() {
       <TopBar />
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="hero t0 b-hero"><div className="pat" style={{ backgroundImage: gradePattern(g) }} />
-          <div><h1>{grade.name}</h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
+          <div><h1><button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} title="See the year">{grade.name}<span aria-hidden> ›</span></button></h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
           {units.length > 1 && (
             <div className="uprog">{units.map(u => { const d = doneCount(progress, u.entries); return (
               <div key={u.name}><span className="k">{u.name}</span><span className="bar2"><i className={d ? undefined : "zero"} style={{ width: `${(100 * d / u.entries.length).toFixed(1)}%` }} /></span><span className="mono">{d}/{u.entries.length}</span></div>
             ); })}</div>
           )}
-          {run ? (
-            <button className="upnext" onClick={() => go({ name: "practice" })}>
-              <span className="k">Keep going · {gradeOf(lessonOfItem(currentItem(run)).grade).name}</span><b>{run.title}</b>
-              <span className="row"><span className="muted">Problem <span className="mono">{run.i + 1}</span> of <span className="mono">{run.items.length}</span></span><span className="ctl go">Keep going ›</span></span>
-            </button>
-          ) : pick ? (
+          {pick ? (
             <button className="upnext" onClick={() => open(pick)}>
               <span className="k">{next ? "Up next" : "Practice"} · {pick.unit || "Lesson"} · lesson {list.indexOf(pick) + 1}</span><b>{pick.title}</b>
               <span className="row">{lastScore(progress, pick.id) != null ? <ScoreChip n={lastScore(progress, pick.id)} words /> : <span className="muted">Learn it, then practice</span>}<span className="ctl go">Start ›</span></span>

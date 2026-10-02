@@ -58,3 +58,28 @@
 .lpend::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--card) 55%,transparent))}
 .lpend-mark{position:relative;z-index:1;width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--tint);color:#fff;font:600 30px/1 var(--num);text-box:trim-both cap alphabetic;animation:popIn .5s var(--spring) calc(var(--i) * 60ms + .2s) both}
 .lshot.big .lpend-mark{width:104px;height:104px;font-size:44px}
+
+/* ---- a grade's opening page: the year at a glance ---- */
+.year{width:100%;max-width:1040px;margin:0 auto;display:grid;gap:calc(var(--u) * 2);padding:0 4px calc(var(--u) * 2)}
+.yhero{display:grid;justify-items:center;gap:calc(var(--u) - 2px);text-align:center;padding:calc(var(--u) * 2) var(--u) 0;animation:rise .7s var(--ease) both}
+.yhero .gbadge{transform:scale(1.5);margin-bottom:12px}
+.yhero h1{font:700 clamp(40px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--tint,var(--text))}
+.yhero .ysub{font:700 clamp(20px,3vw,28px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--text)}
+.yhero p{max-width:540px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.05);text-wrap:pretty}
+.yhero .ctl.big{margin-top:6px;height:56px;padding:0 28px;font-size:calc(var(--fs) * 1.1)}
+.yunits{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.yunits{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.yunit{background:var(--card);border-radius:var(--r-panel);padding:var(--u);display:grid;grid-template-rows:auto 1fr;gap:var(--u);box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) both;animation-delay:calc(.15s + var(--i) * 70ms)}
+.yunit .ypic{cursor:pointer;display:grid;align-content:center;min-height:0}
+.yunit .ypic .viz-cap,.yunit .ypic .replay{display:none}
+.yunit .ypic .viz-svg,.yunit .ypic .am{max-height:220px;width:100%}
+.yunit .k{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted)}
+.yunit h2{font:700 calc(var(--fs) * 1.5)/1.15 var(--sans);letter-spacing:-.02em;margin:2px 0 8px}
+.yunit ol{list-style:none;padding:0;margin:0;display:grid;gap:2px;counter-reset:l}
+.yunit li{counter-increment:l}
+.yunit li button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:8px 10px;margin:0 -10px;border-radius:12px;font-weight:var(--w-mid);transition:background .15s}
+.yunit li button::before{content:counter(l);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--well);font:700 13px/1 var(--num);color:var(--muted)}
+.yunit li button:hover:not(:disabled){background:var(--well)}
+@media (min-width:700px){.yunit.solo{grid-column:1 / -1;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:none;align-items:center}}
+.yunit li.soon button{color:var(--muted)}
+.yunit li button small{margin-left:auto;font-size:var(--small);color:var(--muted);font-weight:var(--w-mid)}
