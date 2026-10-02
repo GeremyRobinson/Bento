@@ -146,6 +146,10 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .top{--fs:16px;--h:44px;font:700 16px/22px "Nunito","Avenir Next",sans-serif;display:flex;align-items:center;gap:8px;padding:6px;background:var(--well);border-radius:999px;min-width:0}
 .top .gpick{display:flex;align-items:center;gap:12px;flex:1;min-width:0;height:52px;padding:0 16px 0 0;border-radius:999px;text-align:left;transition:background .15s}
 .top .gpick:hover{background:var(--hover)}
+.top .brand{flex:none;height:52px;padding:0 16px 0 14px;border-radius:999px;font:700 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em;color:var(--text);transition:background .15s;position:relative}
+.top .brand::after{content:"";position:absolute;right:0;top:14px;bottom:14px;width:1px;background:var(--rule)}
+.top .brand:hover{background:var(--hover)}
+@media (max-width:430px){.top .gpick .gtext{display:none}.top .brand{padding:0 12px}}
 .gbadge{position:relative;width:52px;height:52px;flex:none;display:grid;place-items:center}
 .gbadge svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .gbadge circle{fill:none;stroke-width:4}
@@ -1158,6 +1162,7 @@ function gradeBadge(g){
 function topHTML(){
   const g = save.grade, b = gradeBadge(g);
   return `<header class="top">
+    <button class="brand" data-go="welcome" aria-label="Bento home page">Bento</button>
     <button class="gpick" data-act="grades" aria-label="Change grade">${b.html}<span class="gtext"><b>${GRADE_NAME[g]}</b><small>Level ${b.lvl} · ${b.into}/${LEVEL_XP} XP</small></span></button>
     <span class="chip" title="Days in a row"><i>🔥</i><span class="mono">${save.streak}</span><span class="w">day${save.streak === 1 ? "" : "s"}</span></span>
     <span class="chip" title="All XP"><i>⭐</i><span class="mono">${save.xp}</span><span class="w">XP</span></span>
