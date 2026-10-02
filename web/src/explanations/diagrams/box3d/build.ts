@@ -71,6 +71,8 @@ export function buildBox3d(spec: Box3dSpec): SceneDiagram {
     }
   } else if (spec.mode === "faces") {
     const b = spec.beats;
+    // the box's outline first, so each face lands in its place
+    items.push(poly(top(h), "wire", 0, "fade"), poly(front(0, h), "wire", 0, "fade"), poly(side(0, h), "wire", 0, "fade"));
     if (b.hidden != null) for (const e of [[[l, 0, 0], [0, 0, 0]], [[0, w, 0], [0, 0, 0]], [[0, 0, h], [0, 0, 0]]] as [P3, P3][]) items.push(seg(e[0], e[1], "wire", b.hidden, "fade"));
     const faces: [P3[], string, number, string | undefined][] = [
       [top(h), "cf top", b.top, spec.text?.top], [front(0, h), "cf left", b.front, spec.text?.front], [side(0, h), "cf right", b.side, spec.text?.side],

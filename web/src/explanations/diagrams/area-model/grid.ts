@@ -23,6 +23,8 @@ export interface AreaCell {
   sup?: string;
   /** beat the cell appears at */
   from?: number;
+  /** beat its text appears at, when later than the cell */
+  textFrom?: number;
   /** cell colour 0–2; defaults to the current app's (row + column) % 3 */
   color?: number;
   /** beats at which the cell is outlined as the one being talked about */
@@ -152,7 +154,7 @@ export function buildAreaGrid(spec: AreaGridSpec): SceneDiagram & { geometry: Ar
   // cell texts last, so nothing covers them
   spec.cells.forEach((row, j) => row.forEach((c, i) => {
     if (!c?.text) return;
-    items.push({ type: "text", x: r1((xs[i]! + xs[i + 1]!) / 2), y: r1((ys[j]! + ys[j + 1]!) / 2), text: c.text, ...(c.sup ? { sup: c.sup } : {}), cls: "lbl", from: c.from ?? 0, enter: "rise", delay: 0.3 });
+    items.push({ type: "text", x: r1((xs[i]! + xs[i + 1]!) / 2), y: r1((ys[j]! + ys[j + 1]!) / 2), text: c.text, ...(c.sup ? { sup: c.sup } : {}), cls: "lbl", from: Math.max(c.from ?? 0, c.textFrom ?? 0), enter: "rise", delay: 0.3 });
   }));
 
   const lines = spec.lines ?? [];

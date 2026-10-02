@@ -15,8 +15,8 @@ export interface FracGridSpec {
   /** labels for the shaded rows and columns, e.g. "2/3" */
   rowLabel: string;
   colLabel: string;
-  /** a line under the grid at the overlap beat, e.g. "6 of 12 squares" */
-  bothLabel?: string;
+  /** lines under the grid, e.g. "6 of 12 squares" at the overlap beat; lines never shown together share a row */
+  notes?: { text: string; from: number; until?: number; cls?: string }[];
   alt: string;
 }
 
@@ -48,12 +48,23 @@ export function buildFracGrid(spec: FracGridSpec): SceneDiagram {
     items.push({ type: "path", d: `M${r1(x0)} ${r1(y + 6)} V${r1(y)} H${r1(x1)} V${r1(y + 6)}`, cls: "ln2", from: beats.cols, enter: "draw" });
     items.push({ type: "text", x: r1((x0 + x1) / 2), y: r1(y - 12), text: spec.colLabel, cls: "lbl acc", from: beats.cols, enter: "rise", delay: 0.3 });
   }
-  const gridH = rows * cell;
-  if (spec.bothLabel) items.push({ type: "text", x: r1(left + (cols * cell) / 2), y: r1(top + gridH + 24), text: spec.bothLabel, cls: "lbl", from: beats.both, enter: "rise", delay: 0.6 });
+  const gridH = rows * cell, notes = spec.notes ?? [];
+  const noteW = Math.max(0, ...notes.map(n => n.text.length * 10.2));
+  const width = Math.max(left + cols * cell + 20, noteW + 24);
+  const slots: { from: number; until: number }[][] = [], rowOf: number[] = [];
+  notes.forEach(n => {
+    const span = { from: n.from, until: n.until ?? Infinity };
+    let row = slots.findIndex(s => s.every(o => span.until < o.from || o.until < span.from));
+    if (row < 0) { row = slots.length; slots.push([]); }
+    slots[row]!.push(span);
+    rowOf.push(row);
+  });
+  const cx = Math.min(Math.max(left + (cols * cell) / 2, noteW / 2 + 12), width - noteW / 2 - 12);
+  notes.forEach((n, k) => items.push({ type: "text", x: r1(cx), y: r1(top + gridH + 24 + rowOf[k]! * 26), text: n.text, cls: n.cls ?? "lbl", from: n.from, ...(n.until != null ? { until: n.until } : {}), enter: "rise", delay: 0.4 }));
   return {
     kind: "scene", family: "frac-grid",
-    width: r1(Math.max(left + cols * cell + 20, left + (cols * cell) / 2 + (spec.bothLabel?.length ?? 0) * 5.2 + 16)),
-    height: r1(top + gridH + (spec.bothLabel ? 44 : 16)),
+    width: r1(width),
+    height: r1(top + gridH + (slots.length ? 12 + slots.length * 26 : 16)),
     items, alt: spec.alt,
   };
 }

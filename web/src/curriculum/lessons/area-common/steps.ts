@@ -123,6 +123,19 @@ export function expectedOf(steps: AnswerStep[], stepId: string, slotId?: string)
   return v;
 }
 
+/** A polynomial as plain text from [coefficient, "x²"] pairs, skipping zero terms (the current app's poly). */
+export function polyText(terms: [number, string][]): string {
+  const sgn = (c: number, first: boolean) => (c < 0 ? (first ? "−" : " − ") : first ? "" : " + ");
+  return terms.filter(([c]) => c !== 0).map(([c, v], i) => `${sgn(c, i === 0)}${Math.abs(c) === 1 && v ? "" : f(Math.abs(c))}${v}`).join("") || "0";
+}
+
+/** A nonzero whole number in [lo, hi] (the current app's nz). */
+export function nonZero(rng: { int(lo: number, hi: number): number }, lo: number, hi: number): number {
+  let v: number;
+  do v = rng.int(lo, hi); while (v === 0);
+  return v;
+}
+
 /** Reads a stored problem: every named field must be a finite number (or a boolean where asked). */
 export function readNumbers<K extends string>(raw: unknown, keys: readonly K[]): Record<K, number> | null {
   if (!raw || typeof raw !== "object") return null;
