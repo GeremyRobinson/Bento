@@ -452,54 +452,37 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .lesson.backup{box-shadow:inset 0 0 0 2px var(--tint-soft)}
 .lesson.review .name{display:flex;flex-direction:column;line-height:1.2}
 .lesson.review small{font-size:var(--small);font-weight:var(--w-mid)}
-/* ---- tickets ---- */
-.tk{display:inline-block;width:22px;height:15px;border-radius:4px;background:#f2683c;vertical-align:-2px;flex:none;
-  -webkit-mask:radial-gradient(circle at 0 50%,#0000 4px,#000 4.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,#0000 4px,#000 4.5px) right/51% 100% no-repeat;
-  mask:radial-gradient(circle at 0 50%,#0000 4px,#000 4.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,#0000 4px,#000 4.5px) right/51% 100% no-repeat}
-.tk.gold{background:linear-gradient(135deg,#f7d774,#e0a526 55%,#fff1b8)}
-.tixchip{cursor:pointer;transition:background .15s,transform .2s var(--spring)} .tixchip:active{transform:scale(.95)}
-.tixchip .tk{margin:0 4px}
-.tixwin{display:grid;gap:var(--s);background:var(--card);border-radius:var(--r-card);padding:var(--u)}
-.tixwin>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap;animation:pop .5s var(--spring) both}
-.tixwin>div:nth-child(2){animation-delay:.12s}.tixwin>div:nth-child(3){animation-delay:.24s}
-.tixwin .ctl{justify-self:start}
-.ctl.gold,.panel .ctl.gold{background:linear-gradient(135deg,#f7d774,#e0a526);color:#3b2a00}
-/* ---- sticker machine and book ---- */
-.machine-wrap{grid-template-columns:minmax(0,220px) minmax(0,1fr);align-items:center;overflow:hidden}
-@media (max-width:600px){.machine-wrap{grid-template-columns:1fr}.machine{max-width:200px;justify-self:center}}
-.machine svg{width:100%;height:auto;display:block}
-.machine.go svg{animation:jiggle .7s ease both}
-.machine.go .cap{animation:drop .5s .55s ease-in both}
-@keyframes jiggle{15%{transform:rotate(-4deg)}35%{transform:rotate(4deg)}55%{transform:rotate(-3deg)}75%{transform:rotate(2deg)}}
-@keyframes drop{from{transform:translateY(-40px);opacity:0}}
-.mside{display:grid;gap:var(--s)}
-.mside h2{font-size:calc(var(--fs) * 1.3);color:var(--tint)}
-.tixrow{display:flex;gap:var(--u);flex-wrap:wrap;font-size:calc(var(--fs) * 1.1)}
-.tixrow>span{display:inline-flex;align-items:center;gap:8px}
-.mside .actions{justify-content:flex-start;flex-wrap:wrap}
-.reveal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;align-content:center;gap:var(--s);background:color-mix(in srgb,var(--page) 88%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeIn .3s 1s both;cursor:pointer;text-align:center;padding:var(--u)}
-.reveal .stk.big{width:180px;animation:pop .6s 1.1s var(--spring) both}
-.reveal .rtext{display:grid;gap:2px;animation:rise .4s 1.4s var(--ease) both}
-.reveal .rtext b{font-size:calc(var(--fs) * 1.25)}
-.reveal .burst{position:absolute;width:300px;height:300px;border-radius:50%;background:repeating-conic-gradient(var(--tint-soft) 0 10deg,transparent 10deg 20deg);animation:spin 12s linear infinite,popIn .6s 1s var(--spring) both;opacity:.8}
-.reveal.r1 .burst{background:repeating-conic-gradient(#bfe0ff 0 10deg,transparent 10deg 20deg)}
-.reveal.r2 .burst{background:repeating-conic-gradient(#ffe7a3 0 10deg,transparent 10deg 20deg)}
-.reveal>*:not(.burst){position:relative}
-@keyframes spin{to{rotate:360deg}}
-.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:var(--s)}
-.stk{position:relative;aspect-ratio:1;border-radius:24px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 6px rgba(0,0,0,.06);display:grid;place-items:center;padding:8px 8px 22px;overflow:hidden}
-.stk svg{width:100%;height:100%;display:block}
-.stk .nm{position:absolute;left:0;right:0;bottom:6px;font-size:13px;line-height:16px;font-weight:800;color:#5b6070;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
-.stk .cnt{position:absolute;top:6px;right:8px;font:600 13px/1 var(--num);color:#717786}
-.stk.none{background:var(--well);box-shadow:inset 0 0 0 2px var(--rule)}
-.stk.none .q{font:600 40px/1 var(--num);color:var(--faint)}
-.stk.none .nm{color:var(--faint)}
-.stk.r1{box-shadow:0 0 0 3px #9cc9ff,0 2px 8px rgba(59,130,246,.25)}
-.stk.r2{box-shadow:0 0 0 3px #f2c94c,0 2px 10px rgba(224,165,38,.35);background:linear-gradient(135deg,#fffaf0,#fff 40%,#fff5d6 70%,#fff)}
-.stk.r2::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.85) 45%,transparent 60%);background-size:250% 100%;animation:shine 3s ease-in-out infinite;pointer-events:none}
-.stk.r1.none,.stk.r2.none{box-shadow:inset 0 0 0 2px var(--rule);background:var(--well)} .stk.none::after{display:none}
+/* ---- badges: pixel badges for passing tests, kept in a badge book for each grade ---- */
+.bchip{cursor:pointer;transition:background .15s,transform .2s var(--spring)} .bchip:active{transform:scale(.95)}
+.bdg{position:relative;display:grid;justify-items:center;gap:6px;text-align:center;min-width:0}
+.bdg .art{width:100%;max-width:112px;aspect-ratio:1;display:grid;place-items:center}
+.bdg svg{width:100%;height:100%;display:block;image-rendering:pixelated;shape-rendering:crispEdges;filter:drop-shadow(0 3px 0 rgba(0,0,0,.12))}
+.bdg .nm{font-size:var(--small);line-height:18px;font-weight:var(--w-bold);max-width:100%;text-wrap:balance}
+.bdg .sub{font-size:12px;line-height:16px;color:var(--muted);font-weight:var(--w-mid)}
+.bdg.none svg{filter:none;opacity:.5}
+.bdg.none .nm{color:var(--muted)}
+.bdg.gold .art{position:relative;overflow:hidden;border-radius:12px}
+.bdg.gold .art::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.7) 48%,transparent 60%);background-size:250% 100%;animation:shine 3s ease-in-out infinite;pointer-events:none}
 @keyframes shine{0%{background-position:150% 0}60%,100%{background-position:-60% 0}}
-.stk .rare{position:absolute;top:6px;left:8px;font-size:12px}
+.bdg .ctl{height:36px;font-size:var(--small);padding:0 12px}
+.bbook{display:grid;gap:var(--u);grid-template-columns:minmax(0,1fr)}
+.bbook .crown{display:grid;gap:var(--s);justify-items:center;align-content:center;text-align:center;background:linear-gradient(160deg,var(--tint-soft),var(--well))}
+.bbook .crown .art{max-width:180px}
+.bbook .crown h2{font-size:calc(var(--fs) * 1.3);color:var(--tint)}
+.bslots{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:var(--s);background:var(--card);border-radius:var(--r-card);padding:var(--u)}
+.bslots .bdg{padding:var(--s) 4px}
+@media (min-width:700px){.bbook{grid-template-columns:minmax(0,4fr) minmax(0,7fr);align-items:stretch}}
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding:var(--inset);background:var(--well);border-radius:999px;scrollbar-width:none}
+.gtabs::-webkit-scrollbar{display:none}
+.gtabs button{flex:none;min-width:44px;height:44px;padding:0 12px;border-radius:999px;font-weight:var(--w-bold);display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.gtabs button.on{background:var(--card);color:var(--tint);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.gtabs small{font:600 12px/1 var(--num);color:var(--muted)}
+.badgewin{display:flex;align-items:center;gap:var(--u);background:var(--card);border-radius:var(--r-card);padding:var(--u)}
+.badgewin .bdg{flex:none;width:96px;animation:pop .6s .4s var(--spring) both}
+.badgewin .txt{display:grid;gap:4px;min-width:0}
+.badgewin .txt b{font-size:calc(var(--fs) * 1.15)}
+.badgewin .actions{justify-content:flex-start}
+.badgewin.miss .bdg{animation:none}
 @media (prefers-reduced-motion:reduce){ *,::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){transition:none!important;animation:none!important} .a-outsoon,.a-flash:not(:last-of-type){opacity:0} .a-move{transform:translateX(var(--dx))} .viz-svg .bar.mid{fill:var(--acc)} }
 </style>
 </head>
@@ -965,12 +948,10 @@ let st = null; // the run in progress: a lesson's practice or a test
 let view = "home", learnIdx = 0, reportKey = null;
 for (const k of ["scores","tests","reports"]) save[k] = save[k] || {};
 save.log = save.log || [];
-// rewards and spacing: tickets, gold tickets, stickers owned, when each lesson was last practiced, daily reviews
-for (const k of ["stk","seen","reviews"]) save[k] = save[k] || {};
-save.tix = save.tix || 0; save.gold = save.gold || 0; save.dupe = save.dupe || 0;
-// stickers and tickets are built but switched off until the next big update
-const REWARDS = false;
-if (REWARDS && !save.welcome){ save.welcome = 1; save.tix += 1; } // one ticket to try the sticker machine
+// spacing: when each lesson was last practiced, daily reviews
+for (const k of ["seen","reviews"]) save[k] = save[k] || {};
+// badges are built but switched off until G approves the art. A badge comes from the best score on a test (save.tests), so there is nothing extra to save.
+const REWARDS = true;
 
 // ---- 0 to 4 proficiency, like a standards-based report card ----
 const LEVELS = ["Not yet", "Beginning", "Approaching", "Proficient", "Advanced"];
@@ -999,7 +980,7 @@ function slot(id, cls=""){
 let lastKey = "", sheetOpen = false, learnEx = null;
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function viewKey(){
-  return [view, cur, view === "learn" ? learnIdx : view === "practice" ? st.i : view === "report" ? reportKey : "", ["home","parent","stickers"].includes(view) ? save.grade : ""].join("|");
+  return [view, cur, view === "learn" ? learnIdx : view === "practice" ? st.i : view === "report" ? reportKey : "", ["home","parent","badges"].includes(view) ? save.grade : ""].join("|");
 }
 function render(dir){
   const key = viewKey(), nav = key !== lastKey;
@@ -1009,9 +990,9 @@ function render(dir){
   } else paint(key, nav);
 }
 function paint(key, nav){
-  const app = $("#app"), home = ["home","parent","stickers"].includes(view);
+  const app = $("#app"), home = ["home","parent","badges"].includes(view);
   const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML()
-    : view === "report" ? reportViewHTML() : view === "parent" ? parentHTML() : view === "stickers" ? stickersHTML() : doneHTML();
+    : view === "report" ? reportViewHTML() : view === "parent" ? parentHTML() : view === "badges" ? badgesHTML() : doneHTML();
   if (view === "practice") saveRun();
   const g = home ? save.grade : LESSONS[cur].grade;
   app.className = "wrap t" + (home ? 0 : tintOf(cur));
@@ -1021,6 +1002,7 @@ function paint(key, nav){
   app.querySelectorAll(".strip").forEach(sx => sx.querySelectorAll("span").forEach((s, i) => s.style.setProperty("--i", i)));
   if (nav){
     lastKey = key; window.scrollTo(0, 0);
+    const tab = app.querySelector(".gtabs .on"); if (tab) tab.parentElement.scrollLeft = tab.offsetLeft - tab.parentElement.clientWidth / 2 + tab.clientWidth / 2;
     if (!document.startViewTransition && !reduceMotion()) app.querySelectorAll(":scope > *").forEach((el, i) => { el.classList.add("rise"); el.style.animationDelay = Math.min(i, 6)*50 + "ms"; });
   }
   app.querySelectorAll("[data-count]").forEach(countUp);
@@ -1113,7 +1095,7 @@ function topHTML(){
     <button class="gpick" data-act="grades" aria-label="Change grade">${b.html}<span class="gtext"><b>${GRADE_NAME[g]}</b><small>Level ${b.lvl} · ${b.into}/${LEVEL_XP} XP</small></span></button>
     <span class="chip" title="Days in a row"><i>🔥</i><span class="mono">${save.streak}</span><span class="w">day${save.streak === 1 ? "" : "s"}</span></span>
     <span class="chip" title="All XP"><i>⭐</i><span class="mono">${save.xp}</span><span class="w">XP</span></span>
-    ${REWARDS ? `<button class="chip tixchip" data-go="stickers" aria-label="Stickers: ${save.tix} tickets, ${save.gold} gold"><span class="tk${save.gold ? " gold" : ""}" aria-hidden="true"></span><span class="mono">${save.tix + save.gold}</span><span class="w">stickers</span></button>` : ""}
+    ${REWARDS ? `<button class="chip bchip" data-go="badges" aria-label="Badge book: ${badgeCount(save.grade)[0]} of ${badgeCount(save.grade)[1]} badges">${badgeSVG(testKey(save.grade), true, 18)}<span class="mono">${badgeCount(save.grade)[0]}</span><span class="w">badges</span></button>` : ""}
   </header>`;
 }
 function sheetHTML(){
@@ -3308,7 +3290,8 @@ function nextProblem(){
   if (save.last !== today) save.streak = save.last === yest ? save.streak + 1 : 1;
   save.last = today;
   const book = st.mode === "test" ? save.tests : st.mode === "practice" ? save.scores : null, old = book && book[st.key];
-  rep.tix = earnTickets(old, level, prevStreak);
+  // a new badge, or a badge turning gold, when a test score reaches 3 or 4 for the first time
+  if (st.mode === "test") rep.badge = {key:st.key, level, isNew: level >= 3 && (!old || old.best < 3), gold: level === 4 && (!old || old.best < 4)};
   if (book) book[st.key] = {last:level, best:Math.max(level, old ? old.best : 0), pct, date:now, mastered: !!(old && old.mastered) || (level === 4 && st.startTier === 2)};
   if (st.mode === "practice"){ save.done++; save.lessons[st.key] = lessonDone(st.key) + 1; }
   if (st.mode === "review") save.reviews[today] = level;
@@ -3322,23 +3305,6 @@ function nextProblem(){
   st.report = rep;
   view = "done";
 }
-// ---- tickets: earned by learning, never bought. Gold tickets pull only rare or shiny stickers: they come from tests and from mastering a skill. ----
-function earnTickets(old, level, prevStreak){
-  if (!REWARDS) return [];
-  const got = [], add = (n, why, gold) => { got.push({n, why, gold:!!gold}); if (gold) save.gold += n; else save.tix += n; };
-  if (st.mode === "practice"){
-    if (!lessonDone(st.key)) add(1, "First time finishing this lesson");
-    if (level >= 3 && (!old || level > old.best)) add(1, "New best score");
-    if (old && old.last <= 1 && level >= 2) add(1, "Bounced back from a low score");
-    if (level === 4 && st.startTier === 2 && !(old && old.mastered)) add(1, "Mastered: a 4 with final answers only", true);
-  } else if (st.mode === "test"){
-    const grade = st.key.startsWith("grade");
-    if (level >= 3 && (!old || level > old.best)) add(grade ? 2 : 1, grade ? "Strong grade check-up" : "Strong unit test", true);
-  } else if (save.reviews[new Date().toDateString()] == null) add(2, "Today's review");
-  for (const m of [3, 7, 14, 30, 60, 100]) if (prevStreak < m && save.streak >= m) add(2, `${m} days in a row`);
-  return got;
-}
-
 // ---- daily review: problems from lessons she has already done, weighted to low scores and long gaps ----
 function reviewPool(){
   const now = Date.now();
@@ -3397,11 +3363,14 @@ function confetti(){
   const cols = ["var(--c0)","var(--c1)","var(--c2)","var(--acc)"];
   return `<div class="confetti" aria-hidden="true">${Array.from({length:28}, (_, i) => `<i style="--x:${rand(-160,160)}px;--y:${rand(-220,-80)}px;--r:${rand(-300,300)}deg;--c:${cols[i % 4]};--d:${(i % 7) * .03}s"></i>`).join("")}</div>`;
 }
-// tickets earned this time, and the way to the sticker machine
-function tixHTML(rep){
-  if (!rep.tix || !rep.tix.length) return "";
-  return `<div class="tixwin">${rep.tix.map(t => `<div><span class="tk${t.gold ? " gold" : ""}" aria-hidden="true"></span><b>+${t.n} ${t.gold ? "gold " : ""}ticket${t.n === 1 ? "" : "s"}</b><span class="muted">${t.why}</span></div>`).join("")}
-    <button class="ctl go" data-go="stickers">Open the sticker machine</button></div>`;
+// the badge a test earned (or the one it would have earned), on the results screen
+function badgeWinHTML(rep){
+  if (!REWARDS || !rep.badge) return "";
+  const b = rep.badge, nm = badgeName(b.key);
+  if (b.isNew || b.gold) return `<div class="badgewin">${badgeCard(b.key, true, b.level === 4)}<div class="txt"><b>${b.isNew ? "New badge" : "Your badge turned gold"}: ${nm}</b>
+    <span class="muted">${b.level === 4 ? "A perfect 4 makes it gold." : "Score a 4 on this test to make it gold."}</span><div class="actions"><button class="ctl go" data-bookgrade="${b.key.split(":")[1]}">Open the badge book</button></div></div></div>`;
+  if (b.level >= 3) return "";
+  return `<div class="badgewin miss">${badgeCard(b.key, false)}<div class="txt"><b>${nm} badge</b><span class="muted">Score 3 or more on this test to earn it.</span></div></div>`;
 }
 // a low score suggests the lesson that builds up to this one
 function backFor(id){
@@ -3424,7 +3393,7 @@ function doneHTML(){
       <div><span class="k">${test ? "All steps right" : "No mistakes"}</span><span class="v">${rep.clean}/${rep.total}</span></div>
       <div><span class="k">Time</span><span class="v">${mins(rep.ms)}<small class="muted"> min</small></span></div>
     </div>
-    ${tixHTML(rep)}
+    ${badgeWinHTML(rep)}
     ${back >= 0 ? `<button class="lesson t1 backup" data-lesson="${back}"><span class="badge">↩</span><span class="name">Build up first: ${LESSONS[back].title}</span><span class="muted">${GRADE_NAME[LESSONS[back].grade]}</span></button>` : ""}
     <div class="actions">${rep.mode === "practice" && k < g.length-1 ? `<button class="ctl go" data-lesson="${g[k+1]}">Next lesson</button>` : ""}${test ? `<button class="ctl go" data-test="${rep.key}">Take it again</button>` : review ? "" : `<button class="ctl" data-go="practice">Practice again</button>`}<button class="ctl" data-go="home">All lessons</button></div>
   </section>
@@ -3463,79 +3432,59 @@ function parentHTML(){
 
 
 
-// ---- sticker art. Placeholder animals until the full set is drawn: soft grey outline, white body, dot eyes, pink cheeks. ----
-const STICKERS = (() => {
-  const ln = `fill="none" stroke="#8a8d96" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"`;
-  const face = (y = 66, eyes = "dot") => `${eyes === "wink" ? `<circle cx="46" cy="${y}" r="5" fill="#55585f"/><path d="M70 ${y-5}l8 5-8 5" ${ln} stroke-width="4"/>` : eyes === "sleep" ? `<path d="M41 ${y}h10M69 ${y}h10" ${ln} stroke-width="4"/>` : `<circle cx="46" cy="${y}" r="5" fill="#55585f"/><circle cx="74" cy="${y}" r="5" fill="#55585f"/>`}
-    <path d="M55 ${y+9}q5 4 10 0" ${ln} stroke-width="3.5"/><ellipse cx="34" cy="${y+10}" rx="8" ry="5" fill="#ffc9d4" opacity=".8"/><ellipse cx="86" cy="${y+10}" rx="8" ry="5" fill="#ffc9d4" opacity=".8"/>`;
-  const body = (d, fill = "#fff") => `<path d="${d}" fill="${fill}" stroke="#8a8d96" stroke-width="5" stroke-linejoin="round"/>`;
-  const head = "M22 72c0-24 16-40 38-40s38 16 38 40-16 32-38 32-38-8-38-32z";
-  const svg = inner => `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
-  const A = [
-    ["cat", "Cat", 0, () => body("M20 74c0-14 4-26 10-34l-2-20 18 12c9-3 19-3 28 0l18-12-2 20c6 8 10 20 10 34 0 22-17 30-40 30s-40-8-40-30z") + face()],
-    ["bunny", "Bunny", 0, () => body("M40 40c-6-14-6-30 4-30s10 16 8 26M80 40c6-14 6-30-4-30s-10 16-8 26") + body(head) + face(70)],
-    ["bear", "Bear", 0, () => `<circle cx="32" cy="42" r="12" fill="#fff" stroke="#8a8d96" stroke-width="5"/><circle cx="88" cy="42" r="12" fill="#fff" stroke="#8a8d96" stroke-width="5"/>` + body(head) + face()],
-    ["seal", "Seal", 0, () => body("M14 92c0-30 18-52 46-52s46 22 46 52c0 8-8 12-46 12S14 100 14 92z") + face(70, "sleep")],
-    ["chick", "Chick", 0, () => body("M24 74c0-26 16-44 36-44s36 18 36 44-14 30-36 30-36-4-36-30z", "#fff7d1") + `<path d="M56 78l4 5 4-5z" fill="#f5a524"/><path d="M54 30q6-12 12 0" ${ln}/>` + face(66)],
-    ["frog", "Frog", 0, () => `<circle cx="38" cy="40" r="13" fill="#e4f7df" stroke="#8a8d96" stroke-width="5"/><circle cx="82" cy="40" r="13" fill="#e4f7df" stroke="#8a8d96" stroke-width="5"/>` + body("M18 80c0-22 18-34 42-34s42 12 42 34-18 24-42 24-42-2-42-24z", "#e4f7df") + face(72)],
-    ["pig", "Piglet", 0, () => body("M30 44l-6-16 18 8M90 44l6-16-18 8", "#ffe4ea") + body(head, "#ffe4ea") + `<ellipse cx="60" cy="80" rx="11" ry="8" fill="#ffc9d4" stroke="#8a8d96" stroke-width="3"/>` + face(64)],
-    ["mouse", "Mouse", 0, () => `<circle cx="28" cy="40" r="16" fill="#fff" stroke="#8a8d96" stroke-width="5"/><circle cx="92" cy="40" r="16" fill="#fff" stroke="#8a8d96" stroke-width="5"/>` + body(head) + face(70, "wink")],
-    ["fox", "Fox", 1, () => body("M24 70l6-46 22 18h16l22-18 6 46c0 22-16 34-36 34S24 92 24 70z", "#ffe2cc") + face()],
-    ["panda", "Panda", 1, () => `<circle cx="32" cy="42" r="12" fill="#55585f"/><circle cx="88" cy="42" r="12" fill="#55585f"/>` + body(head) + `<ellipse cx="46" cy="66" rx="9" ry="11" fill="#55585f" opacity=".85"/><ellipse cx="74" cy="66" rx="9" ry="11" fill="#55585f" opacity=".85"/><circle cx="47" cy="66" r="3" fill="#fff"/><circle cx="73" cy="66" r="3" fill="#fff"/><path d="M55 77q5 4 10 0" ${ln} stroke-width="3.5"/>`],
-    ["axolotl", "Axolotl", 1, () => `<path d="M24 52l-12-8M22 62H8M26 72l-12 8M96 52l12-8M98 62h14M94 72l12 8" stroke="#ff9db4" stroke-width="6" stroke-linecap="round"/>` + body("M22 70c0-22 16-36 38-36s38 14 38 36-16 32-38 32-38-10-38-32z", "#ffe4ea") + face(68)],
-    ["star-cat", "Star cat", 2, () => `<defs><linearGradient id="star-cat-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset="1" stop-color="#ffd86b"/></linearGradient></defs>` + body("M20 74c0-14 4-26 10-34l-2-20 18 12c9-3 19-3 28 0l18-12-2 20c6 8 10 20 10 34 0 22-17 30-40 30s-40-8-40-30z", "url(#star-cat-g)") + face() + `<path d="M100 14l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z" fill="#f5a524"/>`],
-  ];
-  return A.map(([id, name, rar, f]) => ({id, name, rar, set: ["Friends", "Rare friends", "Shiny"][rar], svg: svg(f())}));
-})();
-// ---- sticker machine and sticker book ----
-const RAR = ["Common", "Rare", "Shiny"];
-let pulled = null; // the sticker that just came out of the machine
-// normal ticket: 78% common, 18% rare, 4% shiny. Gold ticket: 80% rare, 20% shiny. After two duplicates in a row, the next one is always new.
-function pullSticker(gold){
-  if (gold ? !save.gold : !save.tix) return;
-  if (gold) save.gold--; else save.tix--;
-  const roll = Math.random(), rar = gold ? (roll < .2 ? 2 : 1) : roll < .04 ? 2 : roll < .22 ? 1 : 0;
-  const ok = x => gold ? x.rar >= 1 : true;
-  let pool = STICKERS.filter(x => x.rar === rar);
-  if (!pool.length) pool = STICKERS.filter(ok);
-  if (save.dupe >= 2){
-    const fresh = pool.filter(x => !save.stk[x.id]), any = STICKERS.filter(x => ok(x) && !save.stk[x.id]);
-    if (fresh.length) pool = fresh; else if (any.length) pool = any;
+// ---- badges. Placeholder pixel art until the drawn set arrives as BADGES = [{id, grade, unit, name, svg}] (id is the test key). ----
+const BADGE_HUES = ["#3b82f6","#f2683c","#8b5cf6","#16a34a","#db2777","#0891b2","#f59e0b","#4f46e5","#0d9488","#e11d48"];
+const mixHex = (a, b, t) => "#" + [0,1,2].map(i => Math.round(parseInt(a.substr(1+2*i,2),16)*(1-t) + parseInt(b.substr(1+2*i,2),16)*t).toString(16).padStart(2,"0")).join("");
+// four unit shapes on a 16×16 grid, plus a star for the grade check-up
+const SHAPES = [
+  (x, y) => (x-7.5)**2 + (y-7.5)**2 <= 60,
+  (x, y) => y < 9 ? Math.abs(x-7.5) <= 6.6 : Math.abs(x-7.5) <= 6.6 - (y-8)*1.05,
+  (x, y) => Math.abs(y-7.5) <= 7 && Math.abs(x-7.5) <= 7.2 - Math.abs(y-7.5)*.55,
+  (x, y) => Math.abs(x-7.5) + Math.abs(y-7.5) <= 8.2,
+];
+const STAR = ["................", ".......oo.......", "......offo......", ".....offffo.....", "ooooooffffoooooo", "offffffllffffffo", ".offfffllfffffo.", "..offffffffffo..", "...offffffffo...", "...offffffffo...", "..offfo..offfo..", "..offo....offo..", ".offo......offo.", ".oo..........oo.", "................", "................"];
+function badgeSVG(key, have, size, gold){
+  const art = typeof BADGES !== "undefined" && BADGES.find(b => b.id === key);
+  if (art && have) return art.svg;
+  const [kind, g, unit] = key.split(":"), units = unitsOf(Number(g)).map(u => u.name), k = Math.max(0, units.indexOf(unit));
+  const hue = !have ? "#b9bdc7" : gold ? "#f2b630" : kind === "grade" ? "#f59e0b" : BADGE_HUES[(Number(g) * 3 + k) % BADGE_HUES.length];
+  const C = {o: mixHex(hue, "#000000", .45), f: hue, l: mixHex(hue, "#ffffff", .45), s: "#ffffff", r: gold ? "#fff3b0" : mixHex(hue, "#ffffff", .25)};
+  let px = "";
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++){
+    let c;
+    if (kind === "grade") c = (STAR[y] || "")[x] || ".";
+    else {
+      const sh = SHAPES[k % 4], inS = sh(x, y), edge = inS && [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy]) => !sh(x+dx, y+dy));
+      const inner = (x-7.5)**2 + (y-7.5)**2 <= 10 + (k % 3) * 3;
+      c = !inS ? "." : edge ? "o" : inner ? "l" : "f";
+      if (c === "f" && x + y <= 9 && x + y >= 7 && have) c = "r";
+    }
+    if (c === "l" && have && (x === 6 && y === 6 || x === 7 && y === 6 || x === 6 && y === 7)) c = "s";
+    if (c !== ".") px += `<rect x="${x}" y="${y}" width="1" height="1" fill="${C[c] || C.f}"/>`;
   }
-  const x = pick(pool), isNew = !save.stk[x.id];
-  save.stk[x.id] = (save.stk[x.id] || 0) + 1; save.dupe = isNew ? 0 : save.dupe + 1;
-  pulled = {id:x.id, isNew}; persist();
+  if (gold && have) px += `<rect x="13" y="1" width="1" height="3" fill="#fff"/><rect x="12" y="2" width="3" height="1" fill="#fff"/>`;
+  return `<svg viewBox="0 0 16 16" ${size ? `width="${size}" height="${size}"` : ""} aria-hidden="true">${px}</svg>`;
 }
-function machineSVG(){
-  const caps = [[70,62,"#f2683c"],[100,52,"#3b82f6"],[128,66,"#8b5cf6"],[84,88,"#f59e0b"],[114,90,"#1fbf5f"],[142,92,"#ec4899"],[60,94,"#06b6d4"],[98,114,"#ef4444"],[130,118,"#3b82f6"],[72,120,"#a3e635"]];
-  return `<svg viewBox="0 0 200 250" aria-hidden="true">
-    <circle cx="100" cy="88" r="76" fill="#eaf4ff" stroke="#c9ccd4" stroke-width="4"/>
-    ${caps.map(([x,y,c]) => `<g><circle cx="${x}" cy="${y}" r="15" fill="${c}"/><path d="M${x-15} ${y}a15 15 0 0 0 30 0z" fill="#fff" opacity=".85"/></g>`).join("")}
-    <ellipse cx="72" cy="50" rx="18" ry="10" fill="#fff" opacity=".7" transform="rotate(-30 72 50)"/>
-    <path d="M38 150h124l10 84a8 8 0 0 1-8 9H36a8 8 0 0 1-8-9z" fill="var(--tint)"/>
-    <rect x="30" y="146" width="140" height="14" rx="7" fill="var(--tint)"/><rect x="30" y="146" width="140" height="14" rx="7" fill="#000" opacity=".12"/>
-    <circle cx="100" cy="186" r="16" fill="#fff"/><rect x="96" y="174" width="8" height="24" rx="4" fill="#c9ccd4"/>
-    <rect x="70" y="212" width="60" height="22" rx="11" fill="#000" opacity=".25"/>
-    <g class="cap"><circle cx="100" cy="223" r="9" fill="#f59e0b"/><path d="M91 223a9 9 0 0 0 18 0z" fill="#fff" opacity=".85"/></g>
-  </svg>`;
-}
-const stickerCard = (x, have) => `<div class="stk r${x.rar}${have ? "" : " none"}" role="img" aria-label="${have ? `${x.name}, ${RAR[x.rar]}` : "Not found yet"}">${have ? x.svg : `<span class="q">?</span>`}${have && x.rar ? `<span class="rare">${x.rar === 2 ? "✨" : "💎"}</span>` : ""}${have > 1 ? `<span class="cnt">×${have}</span>` : ""}<span class="nm">${have ? x.name : "?"}</span></div>`;
-function stickersHTML(){
-  const got = STICKERS.filter(x => save.stk[x.id]).length, sets = [...new Set(STICKERS.map(x => x.set || RAR[x.rar]))];
-  const x = pulled && STICKERS.find(s => s.id === pulled.id);
-  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="ctl grow" style="background:none">Sticker book</span><span class="ctl badged"><span class="badge on">${got}</span>of <span class="mono">${STICKERS.length}</span></span></div>
-  <section class="panel machine-wrap">
-    <div class="machine${x ? " go" : ""}">${machineSVG()}</div>
-    <div class="mside">
-      <h2>Sticker machine</h2>
-      <div class="tixrow"><span><span class="tk" aria-hidden="true"></span><b class="mono">${save.tix}</b> ticket${save.tix === 1 ? "" : "s"}</span><span><span class="tk gold" aria-hidden="true"></span><b class="mono">${save.gold}</b> gold</span></div>
-      <div class="actions"><button class="ctl go" data-act="pull" ${save.tix ? "" : "disabled"}>Use a ticket</button><button class="ctl gold" data-act="pullgold" ${save.gold ? "" : "disabled"}>Use a gold ticket</button></div>
-      <p class="muted">Earn tickets by finishing new lessons, beating your best score, bouncing back, daily reviews and streaks. Gold tickets come from strong tests and from mastering a skill, and always give a rare or shiny sticker.</p>
-    </div>
-    ${x ? `<div class="reveal r${x.rar}" data-act="closereveal" role="status"><div class="burst"></div>${stickerCard(x, 1).replace('class="stk', 'class="stk big')}<div class="rtext"><b>${pulled.isNew ? "New sticker!" : "Another one!"} ${x.name}</b><span class="muted">${RAR[x.rar]}${pulled.isNew ? "" : ` · you have ${save.stk[x.id]}`} · tap to close</span></div></div>` : ""}
-  </section>
-  ${sets.map(name => { const list = STICKERS.filter(s => (s.set || RAR[s.rar]) === name), have = list.filter(s => save.stk[s.id]).length;
-    return `<section class="panel"><div class="unit"><h3>${name}</h3><span class="muted">${have} of ${list.length}</span></div><div class="book">${list.map(s => stickerCard(s, save.stk[s.id] || 0)).join("")}</div></section>`; }).join("")}`;
+const badgeName = key => { const [kind, g, unit] = key.split(":"); return kind === "grade" ? `${GRADE_NAME[g].split(" · ")[0]} check-up` : unit; };
+const badgeLevel = key => { const t = save.tests[key]; return t && t.best >= 3 ? t.best : 0; };
+const badgeKeys = g => [...unitsOf(g).map(u => testKey(g, u.name)), testKey(g)];
+const badgeCount = g => { const ks = badgeKeys(g); return [ks.filter(badgeLevel).length, ks.length]; };
+const badgeCard = (key, have, gold) => `<div class="bdg${have ? "" : " none"}${gold ? " gold" : ""}"><div class="art">${badgeSVG(key, have, 0, gold)}</div></div>`;
+let bookGrade = null;
+function badgesHTML(){
+  const g = bookGrade ?? save.grade, [got, all] = badgeCount(g), gk = testKey(g), gl = badgeLevel(gk);
+  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="ctl grow" style="background:none">Badge book</span><span class="ctl badged"><span class="badge on">${got}</span>of <span class="mono">${all}</span></span></div>
+  <nav class="gtabs" aria-label="Grade">${GRADES.map((n, i) => { const [c] = badgeCount(i); return `<button class="${i === g ? "on" : ""}" data-bookgrade="${i}">${n}${c ? `<small>${c}</small>` : ""}</button>`; }).join("")}</nav>
+  <div class="bbook">
+    <section class="tile crown">${badgeCard(gk, gl, gl === 4)}<h2>${GRADE_NAME[g].split(" · ")[0]}</h2>
+      <p class="muted">${gl ? `Check-up passed with a ${gl}${gl === 4 ? ". Gold!" : ". Score a 4 to make it gold."}` : "Pass the grade check-up with a 3 or more to earn the big badge."}</p>
+      <button class="ctl${gl ? "" : " go"}" data-test="${gk}">${gl ? "Retake check-up" : "Take the check-up"}</button></section>
+    <section class="tile"><div class="unit"><h3>Unit badges</h3><span class="muted">${got - (gl ? 1 : 0)} of ${all - 1}</span></div>
+      <div class="bslots">${unitsOf(g).map(u => { const k = testKey(g, u.name), lv = badgeLevel(k);
+        return `<div class="bdg${lv ? "" : " none"}${lv === 4 ? " gold" : ""}"><div class="art">${badgeSVG(k, lv, 0, lv === 4)}</div><span class="nm">${u.name}</span>${lv ? `<span class="sub">${lv === 4 ? "Gold · score 4" : "Score 3 · a 4 makes it gold"}</span>` : `<button class="ctl" data-test="${k}">Unit test</button>`}</div>`; }).join("")}</div>
+    </section>
+  </div>
+  <p class="helpline muted">Each unit test earns a badge at a score of 3 or more, and a gold one at 4. The grade check-up earns the big star.</p>`;
 }
 
 // ---- input ----
@@ -3566,7 +3515,6 @@ function goLearn(step){
 }
 document.addEventListener("click", e => {
   if (e.target.dataset && e.target.dataset.close){ sheetOpen = false; return render(); }
-  if (e.target.closest(".reveal")){ pulled = null; return render(); }
   const t = e.target.closest("button"); if (!t || t.disabled) return;
   if (t.dataset.act === "replay"){ const v = t.closest(".viz"), pic = v.querySelector(".viz-svg,.rs"); if (pic) pic.replaceWith(pic.cloneNode(true)); return; }
   if (t.dataset.slot){ st.active = t.dataset.slot; return updateSlots(); }
@@ -3588,7 +3536,6 @@ document.addEventListener("click", e => {
     else { newExample(); }
   }
   else if (t.dataset.go){
-    pulled = null;
     if (t.dataset.go === "learn" && view === "practice") learnIdx = LESSONS[cur].learn.length; // back to the worked example
     else if (t.dataset.go === "learn") learnIdx = 0;
     view = t.dataset.go;
@@ -3600,7 +3547,7 @@ document.addEventListener("click", e => {
   else if (t.dataset.act === "nextprob") nextProblem();
   else if (t.dataset.act === "resume") resumeRun();
   else if (t.dataset.act === "review") startReview();
-  else if (t.dataset.act === "pull" || t.dataset.act === "pullgold") pullSticker(t.dataset.act === "pullgold");
+  else if (t.dataset.bookgrade != null){ bookGrade = Number(t.dataset.bookgrade); view = "badges"; }
   else if (t.dataset.act === "skip"){ st.skip = !st.skip; st.skipThis = true; const s0 = st.steps[0]; if (st.step === (s0 && s0.choices ? 1 : 0)) loadStep(); }
   else return; // a tap on a summary row opens it natively
   render(dir);
