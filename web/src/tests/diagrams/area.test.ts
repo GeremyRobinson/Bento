@@ -1,6 +1,8 @@
 // The area-and-grids family: area grids, place-value blocks, fraction grids and boxes follow the problem's values,
 // and every lesson's picture stays on its canvas for any problem the generator makes.
 import { createRng } from "../../curriculum/generators/rng";
+import { buildSplitAreaDiagram, labelWidth } from "../../explanations/diagrams/area-model/build";
+import { createSplitMultiplication } from "../../curriculum/lessons/grade5/g5-mult2/problem";
 import { lessonById } from "../../curriculum/registry";
 import { buildAreaGrid, fitParts, layoutAreaGrid, lineRows, textWidth } from "../../explanations/diagrams/area-model/grid";
 import { buildRegroupBlocks } from "../../explanations/diagrams/area-model/blocks";
@@ -156,5 +158,23 @@ describe.each(AREA_LESSONS)("%s picture fits its canvas", id => {
         }
       }
     }
+  });
+});
+
+describe("split area model labels", () => {
+  const boxes = (rows: { x: number; label: string; row: number }[]) => rows.map(r => ({ ...r, w: labelWidth(r.label, 20) }));
+  const apart = (ls: ReturnType<typeof boxes>) => ls.every((a, i) => ls.slice(i + 1).every(b => a.row !== b.row || Math.abs(a.x - b.x) >= (a.w + b.w) / 2));
+  it("never lets two labels in the same row touch, for any problem", () => {
+    for (let a = 12; a <= 98; a += 5) for (let b = 12; b <= 98; b++) {
+      if (b % 10 === 0) continue;
+      const d = buildSplitAreaDiagram(createSplitMultiplication(a, b));
+      expect(apart(boxes(d.regions.map(r => ({ x: r.x + r.width / 2, label: r.partLabel, row: r.partRow }))))).toBe(true);
+      expect(apart(boxes(d.regions.filter(r => r.labelPlacement === "below").map(r => ({ x: r.x + r.width / 2, label: r.productLabel, row: r.productRow }))))).toBe(true);
+      expect(d.regions.every(r => r.y === d.vertical.start)).toBe(true);
+    }
+  });
+  it("steps the second label of a narrow 77 × 17 down a row", () => {
+    const d = buildSplitAreaDiagram(createSplitMultiplication(77, 17));
+    expect(d.regions.map(r => r.productRow)).toEqual([0, 1]);
   });
 });

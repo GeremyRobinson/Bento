@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { AreaDiagram } from "../../explanations/diagrams/area-model/schema";
 import type { AnimationState } from "../../explanations/schema";
 import { formatNumber } from "../../curriculum/schemas/math-text";
+import { ROW } from "../../explanations/diagrams/area-model/build";
 
 /** What the picture shows at one point of the timeline. Pure, so tests can check it without rendering. */
 export function areaView(timeline: AnimationState[], at: number) {
@@ -35,13 +36,13 @@ export function AreaModelDiagram({ diagram: d, timeline, at }: { diagram: AreaDi
       {d.regions.map(r => (
         <g key={r.index} className={`region r${r.index % 3}`} data-shown={v.shown.has(r.index) || v.sum} data-active={v.active === r.index}>
           <rect x={r.x} y={r.y} width={r.width} height={r.height} />
-          <text className="part" x={r.x + r.width / 2} y={top - LABEL_GAP}>{r.partLabel}</text>
+          <text className="part" x={r.x + r.width / 2} y={top - LABEL_GAP - r.partRow * ROW}>{r.partLabel}</text>
           {r.labelPlacement === "inside" ? (
             <text className="product" x={r.x + r.width / 2} y={r.y + r.height / 2}>{r.productLabel}</text>
           ) : (
             <g className="product">
-              <line className="leader" x1={r.x + r.width / 2} y1={r.y + r.height - 6} x2={r.x + r.width / 2} y2={r.y + r.height + 8} />
-              <text x={r.x + r.width / 2} y={r.y + r.height + 22}>{r.productLabel}</text>
+              <line className="leader" x1={r.x + r.width / 2} y1={r.y + r.height - 6} x2={r.x + r.width / 2} y2={r.y + r.height + 8 + r.productRow * ROW} />
+              <text x={r.x + r.width / 2} y={r.y + r.height + 22 + r.productRow * ROW}>{r.productLabel}</text>
             </g>
           )}
         </g>

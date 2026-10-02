@@ -28,6 +28,9 @@ export interface AreaRegion {
   productLabel: string;
   /** narrow regions put their product below the rectangle instead of inside it */
   labelPlacement: "inside" | "below";
+  /** which row a label sits in when neighbours would touch: 0 next to the rectangle, 1 a row further out */
+  partRow: number;
+  productRow: number;
   /** the multiplication this region proves, e.g. 47 × 30 = 1410 */
   equation: { factors: [number, number]; product: number };
 }
