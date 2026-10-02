@@ -3087,6 +3087,8 @@ if (save.grade == null) save.grade = 5;
 let cur = 0;
 const lessonDone = id => (save.lessons && save.lessons[id]) || 0;
 
+// a small house: the way home from any lesson, practice or report
+const HOME_ICON = `<svg viewBox="2.5 2.5 19 19" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7M6.5 9.5V19h4v-5h3v5h4V9.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function lessonNav(){
   const g = inGrade(LESSONS[cur].grade), k = g.indexOf(cur);
   return `<div class="bar"><button class="ctl circ" data-lesson="${g[k-1]}" ${k>0?"":"disabled"} aria-label="Previous lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -3098,7 +3100,7 @@ function newExample(){ const l = LESSONS[cur]; learnEx = {id:l.id, p:l.make(rand
 function learnHTML(){
   const l = LESSONS[cur], cards = l.learn, total = cards.length + 1, rep = save.reports[l.id];
   if (!learnEx || learnEx.id !== l.id) newExample();
-  const nav = `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="dots-nav">${Array.from({length:total}, (_, i) => `<span class="dot ${i < learnIdx ? "ok" : i === learnIdx ? "busy" : ""}"></span>`).join("")}</span><button class="ctl" data-go="practice">Practice</button></div>`;
+  const nav = `<div class="bar"><button class="ctl circ" data-go="home" aria-label="Home">${HOME_ICON}</button><span class="dots-nav">${Array.from({length:total}, (_, i) => `<span class="dot ${i < learnIdx ? "ok" : i === learnIdx ? "busy" : ""}"></span>`).join("")}</span><button class="ctl" data-go="practice">Practice</button></div>`;
   let body;
   if (learnIdx < cards.length){
     const c = cards[learnIdx], pic = learnIdx === 0 && VIZ[l.id] ? VIZ[l.id]() : "";
@@ -3132,7 +3134,7 @@ function practiceHTML(){
   const it = item(), s = st.steps[st.step], fb = st.feedback, n = st.items.length, test = st.mode === "test", mixed = st.mode !== "practice", fx = st.fx || {};
   const tapOnly = s && (s.choices || st.pick);
   const dotFor = {good:"ok", bad:"err", hint:"busy"};
-  return `<div class="bar"><button class="ctl" data-go="${mixed ? "home" : "learn"}" aria-label="Quit">${mixed ? "Quit" : "Lesson"}</button>
+  return `<div class="bar"><button class="ctl circ" data-go="home" aria-label="Home">${HOME_ICON}</button><button class="ctl" data-go="${mixed ? "home" : "learn"}" aria-label="${mixed ? "Quit" : "Back to the lesson"}">${mixed ? "Quit" : "Lesson"}</button>
     <span class="steps" aria-label="Problem ${st.i+1} of ${n}">${st.items.map((_,i)=>`<span class="dot ${i<st.i?"ok":i===st.i?"busy":""}"></span>`).join("")}</span>
     <span class="ctl badged"><span class="badge on">${st.i+1}</span>of <span class="mono">${n}</span></span></div>
   ${test ? `<div class="bar"><span class="grow" style="text-align:center">${st.title}: no hints, one try per step</span></div>` : ""}
@@ -3522,7 +3524,7 @@ function parentHTML(){
   const top = Object.entries(totals).sort((a,b) => b[1]-a[1]).slice(0, 8);
   const weak = LESSONS.map((l,i)=>i).filter(i => { const s = lastScore(LESSONS[i].id); return s != null && s <= 2; });
   const hints = save.log.reduce((a,e) => a + (e.hints||0), 0), rushed = save.log.reduce((a,e) => a + (e.rushed||0), 0);
-  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="ctl grow" style="background:none">For the grown-up</span></div>
+  return `<div class="bar"><button class="ctl circ" data-go="home" aria-label="Home">${HOME_ICON}</button><span class="ctl grow" style="background:none">For the grown-up</span></div>
   <div class="bgrown"><section class="panel">
     <div class="head"><h2>Scores by grade</h2><span class="muted">0 to 4</span></div>
     <div class="facts" style="background:var(--card)">${GRADES.map((n,g) => { const a = gradeLevel(g), t = save.tests[testKey(g)]; if (a == null && !t) return "";
@@ -3731,7 +3733,7 @@ const badgeCard = (key, have, gold) => `<div class="bdg${have ? "" : " none"}${g
 let bookGrade = null;
 function badgesHTML(){
   const g = bookGrade ?? save.grade, [got, all] = badgeCount(g), gk = testKey(g), gl = badgeLevel(gk);
-  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="ctl grow" style="background:none">Badge book</span><span class="ctl badged"><span class="badge on">${got}</span>of <span class="mono">${all}</span></span></div>
+  return `<div class="bar"><button class="ctl circ" data-go="home" aria-label="Home">${HOME_ICON}</button><span class="ctl grow" style="background:none">Badge book</span><span class="ctl badged"><span class="badge on">${got}</span>of <span class="mono">${all}</span></span></div>
   <nav class="gtabs" aria-label="Grade">${GRADES.map((n, i) => { const [c] = badgeCount(i); return `<button class="${i === g ? "on" : ""}" data-bookgrade="${i}">${n}${c ? `<small>${c}</small>` : ""}</button>`; }).join("")}</nav>
   <div class="bbook">
     <section class="tile crown">${badgeCard(gk, gl, gl === 4)}<h2>${GRADE_NAME[g].split(" · ")[0]}</h2>
