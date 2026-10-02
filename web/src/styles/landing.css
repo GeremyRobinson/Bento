@@ -90,3 +90,25 @@
 .lgbtns{display:flex;gap:2px}
 .lgsoon{width:54px;height:54px;margin:4px;border-radius:50%;display:grid;place-items:center;align-content:center;background:linear-gradient(135deg,#0b0d12,#2a2140);color:#f5d08a;font:800 16px/1 var(--num)}
 .lgsoon small{font:700 9px/1 var(--sans);color:#b9bdc9;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+
+/* the two step tiles play: rows fill in, a slip shakes, the fix lands; a tap brings another problem */
+.ldemo{cursor:pointer;grid-template-rows:auto 1fr auto;-webkit-user-select:none;user-select:none}
+.ldemo .lk{display:flex;align-items:center;gap:8px}
+.ldemo .lk .lchip{text-transform:none;letter-spacing:0}
+.ldemo .lsteps>div,.ldemo .lmiss>div,.ldemo .lmiss p{transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.ldemo .off{opacity:0;transform:translateY(8px)}
+.ldemo .lsteps>div.off b{opacity:0}
+.ldemo .lsteps>div.on b{animation:popIn .4s var(--ease) .25s both;display:inline-block}
+.ldemo .lsteps>div:not(.q)>span{color:var(--muted);font-family:var(--sans);font-weight:var(--w-mid);font-size:calc(var(--fs) * .95)}
+.ldemo .lsteps>div:not(.q)>span .n{font-family:var(--num);font-weight:500}
+.ldemo .lsteps>div>b{font-weight:600}
+.ldemo .lmiss .bad b{position:relative;text-decoration:none}
+.ldemo .lmiss .bad b::after{content:"";position:absolute;left:-3px;right:-3px;top:52%;height:2px;border-radius:2px;background:currentColor;transform-origin:left;transform:scaleX(0);transition:transform .35s var(--ease) .15s}
+.ldemo .lmiss .bad.shook b::after{transform:scaleX(1)}
+.ldemo .shook{animation:shake .5s ease .2s both}
+.lmiss .good{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:color-mix(in srgb,var(--ok) 14%,var(--card));font-size:calc(var(--fs) * 1.05)}
+.lmiss .good b{color:color-mix(in srgb,var(--ok) 70%,var(--text));font-weight:600}
+.lmiss .good.on b{animation:popIn .4s var(--ease) .2s both;display:inline-block}
+.lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--faint);margin-top:4px}
+.ldemo:hover .lnew{color:var(--muted)}
+.ldemo .lsteps>div:not(.q),.ldemo .lmiss>div:not(.q){align-items:center}

@@ -7,6 +7,7 @@ import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { GradeBadge } from "../components/primitives/Score";
+import { SlipTile, SolveTile } from "../components/StepDemos";
 import type { Explanation } from "../explanations/schema";
 
 /**
@@ -79,6 +80,7 @@ function Shot({ id, size, color, ex, k, tail }: Showcase & { ex: Pictured; k: nu
 export function Welcome() {
   const { progress, chooseGrade, deps, go } = useApp();
   const shots = useMemo(() => pickShowcase(deps().rng), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const demoRng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="land">
       <nav className="lnav"><b>Bento</b>
@@ -105,15 +107,7 @@ export function Welcome() {
       <section className="lsec"><h2>See it first.</h2><p>Every lesson opens with a picture that moves, so the idea makes sense before the numbers show up.</p></section>
       <section className="lshots">{shots.map((s, k) => <Shot key={s.id} {...s} k={k} />)}</section>
       <section className="lsec"><h2>One step at a time.</h2><p>Big problems get split into small moves. Each one is checked the moment you enter it.</p></section>
-      <section className="lpair">
-        <article className="lf"><span className="lk">Solve it</span>
-          <div className="lsteps"><div className="q">47 × 36</div><div><span>47 × 30</span><b>1410</b></div><div><span>47 × 6</span><b>282</b></div><div className="sum"><span>1410 + 282</span><b>1692</b></div></div>
-        </article>
-        <article className="lf"><span className="lk">Slip up</span>
-          <div className="lmiss"><div className="q">47 × 6</div><div className="bad"><span>Your answer</span><b>242</b></div>
-            <p><b>You dropped a carry.</b> 7 × 6 is 42, so the 4 carries over. 40 × 6 = 240, plus 42 makes 282.</p></div>
-        </article>
-      </section>
+      <section className="lpair"><SolveTile rng={demoRng} /><SlipTile rng={demoRng} /></section>
       <section className="lfeats">
         <article className="lf"><h3>Help that steps back.</h3><p>Hints and worked steps fade as you get stronger, until it's just you and the problem.</p></article>
         <article className="lf"><h3>Review that sticks.</h3><p>A few old problems every day, picked from the skills you're shakiest on.</p></article>
