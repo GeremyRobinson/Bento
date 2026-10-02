@@ -164,6 +164,14 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .gcell:active{transform:scale(.96)}
 .gcell.on{box-shadow:inset 0 0 0 2px var(--tint)}
 .gcell .gtext b{font-size:15px} .gcell .gtext small{font-size:12px}
+.gcell .gtext{display:grid;min-width:0}
+.gcell .gtext small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.gradegrid.big{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--s)}
+.gradegrid.big .gcell{height:72px}
+.gradegrid.big .gcell .gtext b{font-size:17px}
+.gradegrid.big .gcell .gtext small{font-size:13px}
+.hero.welcome{min-height:160px;align-content:end}
+.hero.welcome h1{font-size:calc(var(--fs) * 2)}
 
 /* ---- grade hero ---- */
 .hero{position:relative;overflow:hidden;background:var(--tint-soft);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:var(--u)}
@@ -991,8 +999,8 @@ function render(dir){
   } else paint(key, nav);
 }
 function paint(key, nav){
-  const app = $("#app"), home = ["home","parent","badges"].includes(view);
-  const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML()
+  const app = $("#app"), home = ["home","parent","badges","welcome"].includes(view);
+  const html = view === "welcome" ? welcomeHTML() : view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML()
     : view === "report" ? reportViewHTML() : view === "parent" ? parentHTML() : view === "badges" ? badgesHTML() : doneHTML();
   if (view === "practice") saveRun();
   const g = home ? save.grade : LESSONS[cur].grade;
@@ -1105,6 +1113,13 @@ function sheetHTML(){
     <div class="gradegrid">${GRADES.map((n, g) => { const b = gradeBadge(g), done = inGrade(g).filter(i => lessonDone(LESSONS[i].id)).length;
       return `<button class="gcell${g === save.grade ? " on" : ""}" data-grade="${g}" style="--tint:${GRADE_COLOR[g]}">${b.html}<span class="gtext"><b>${GRADE_NAME[g].replace(" grade", "")}</b><small>Lv ${b.lvl} · ${done}/${inGrade(g).length}</small></span></button>`; }).join("")}</div>
   </div></div>`;
+}
+// the first screen on a new device: pick a grade
+function welcomeHTML(){
+  return `<section class="hero t0 welcome"><div class="pat" style="background-image:${gradePattern(5)}"></div>
+    <div><h1>Welcome to Bento</h1><p class="sub">Math, one step at a time. Which grade are you in?</p></div></section>
+  <section class="panel"><div class="gradegrid big">${GRADES.map((n, g) => `<button class="gcell" data-grade="${g}" style="--tint:${GRADE_COLOR[g]}">${gradeBadge(g).html}<span class="gtext"><b>${GRADE_NAME[g].split(" · ")[0]}</b><small>${GRADE_SUB[g]}</small></span></button>`).join("")}</div>
+    <p class="muted" style="padding:0 5px">You can switch grades any time by tapping the grade badge at the top.</p></section>`;
 }
 // a soft repeating pattern for each grade's hero, in that grade's colour
 function gradePattern(g){
@@ -2973,6 +2988,8 @@ if (!save.gxp){ // grade XP started later: count what the summaries already show
   save.gxp = {};
   for (const r of Object.values(save.reports)){ const g = r.mode === "test" ? Number(r.key.split(":")[1]) : (LESSONS.find(l => l.id === r.key) || {}).grade; if (g != null) save.gxp[g] = (save.gxp[g] || 0) + (r.xp || 0); }
 }
+// first time on this device: start on the grade picker instead of assuming a grade
+if (!save.chosen && !save.xp && !save.done) view = "welcome";
 if (save.grade == null) save.grade = 5;
 let cur = 0;
 const lessonDone = id => (save.lessons && save.lessons[id]) || 0;
@@ -3671,7 +3688,7 @@ document.addEventListener("click", e => {
   if (t.dataset.choice){ st.vals.c = t.dataset.choice; check(); return render(); }
   if (t.dataset.learn) return goLearn(Number(t.dataset.learn));
   let dir = "";
-  if (t.dataset.grade){ save.grade = Number(t.dataset.grade); sheetOpen = false; persist(); }
+  if (t.dataset.grade){ save.grade = Number(t.dataset.grade); save.chosen = 1; sheetOpen = false; if (view === "welcome") view = "home"; persist(); }
   else if (t.dataset.act === "grades"){ sheetOpen = true; }
   else if (t.dataset.act === "closesheet"){ sheetOpen = false; }
   else if (t.dataset.lesson){ const to = Math.max(0, Math.min(LESSONS.length-1, Number(t.dataset.lesson))); dir = view === "learn" ? (to > cur ? "fwd" : "back") : ""; cur = to; view = "learn"; learnIdx = 0; newExample(); }
