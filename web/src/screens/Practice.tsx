@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useApp } from "../app/AppState";
 import { HomeIcon } from "../components/primitives/icons";
-import { MathLine } from "../components/primitives/MathLine";
+import { MathLine, Rich } from "../components/primitives/MathLine";
+import { ProblemView } from "../components/practice/ProblemView";
 import { FeedbackBox } from "../components/practice/FeedbackBox";
 import { Keypad } from "../components/practice/Keypad";
 import {
-  bandOfSession, check, currentItem, currentStep, focusSlot, hint, isLastProblem, lessonOfItem, nextProblem,
+  bandOfSession, check, choose, currentItem, currentStep, focusSlot, hint, isLastProblem, lessonOfItem, nextProblem,
   pickPlan, pressKey, problemOf, showMe, showMeAvailable, skipAvailable, toggleSkip,
 } from "../engine/session/practice";
 
@@ -40,7 +41,7 @@ export function Practice() {
 
   const it = currentItem(s), lesson = lessonOfItem(it), step = currentStep(s), fb = s.feedback, n = s.items.length;
   const test = s.mode === "test", mixed = s.mode !== "practice", band = bandOfSession(s);
-  const tapOnly = !!s.pick;
+  const tapOnly = !!s.pick || !!step?.choices;
   function onNext() {
     if (s && isLastProblem(s)) finish();
     else act((st, p, d) => nextProblem(st, p, d));
@@ -62,7 +63,7 @@ export function Practice() {
         <div className="col">
           <div className="card">
             {mixed && <div className="label">{lesson.title}</div>}
-            <div className="math"><MathLine math={lesson.display(problemOf(it))} /></div>
+            <ProblemView lessonId={it.lessonId} problem={problemOf(it)} story={!!it.story} />
             <div className="work">
               {s.work.map((w, k) => (
                 <div key={k} className={`workline${w.shown ? " shown" : ""}${s.fx === "line" && k === s.work.length - 1 ? " enter" : ""}`}>
@@ -82,10 +83,13 @@ export function Practice() {
                 <>
                   <div className="label">{step.label}</div>
                   <div className="ask">
-                    {step.question && <span className="q">{step.question}</span>}
+                    {step.question && <span className="q"><Rich text={step.question} /></span>}
                     <MathLine math={step.prompt} values={s.values} active={s.active} onSlot={id => act(st => focusSlot(st, id))} />
                   </div>
-                  {step.note && <div className="note">{step.note}</div>}
+                  {step.choices && (
+                    <div className="choices">{step.choices.map((o, i) => <button key={o} className="choice" onClick={() => act((st, p, d) => choose(st, i, p, d))}>{o}</button>)}</div>
+                  )}
+                  {step.note && <div className="note"><Rich text={step.note} /></div>}
                 </>
               )}
             </div>
@@ -93,7 +97,7 @@ export function Practice() {
         </div>
         <div className="col">
           {fb && <FeedbackBox key={`${s.i}-${s.step}-${s.mistakes.length}-${s.hints}-${fb.strong}-${fb.text}`} fb={fb} enter={s.fx != null} />}
-          {step && tapOnly && <div className="tapnote muted">You plan this one: tap the step that comes next.</div>}
+          {step && tapOnly && <div className="tapnote muted">{s.pick ? "You plan this one: tap the step that comes next." : "Tap your answer."}</div>}
           {step && !tapOnly && <Keypad band={band} onKey={key => act(st => pressKey(st, key))} />}
           {step ? (
             <div className="actions">

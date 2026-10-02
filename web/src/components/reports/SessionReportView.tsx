@@ -4,6 +4,7 @@ import { LEVELS } from "../../engine/mastery/levels";
 import type { Mistake, SessionReport } from "../../engine/session/types";
 import { LEVEL_SENTENCES, plural, summaryLine, when } from "../../app/format";
 import { MathLine } from "../primitives/MathLine";
+import { ProblemView } from "../practice/ProblemView";
 import { ScoreChip } from "../primitives/Score";
 
 const explainMistake = (m: { cat: Mistake["cat"]; label: string; msg: string }) =>
@@ -35,7 +36,7 @@ export function SessionReportView({ rep }: { rep: SessionReport }) {
             return (
               <details className="card" key={k}>
                 <summary><span className="badge">{k + 1}</span><span className="name">{rep.mode !== "practice" ? l.title : `Problem ${k + 1}`}</span><span className={`dot ${tag[0]}`} /><span className="muted">{tag[1]}</span></summary>
-                <div className="math"><MathLine math={l.display(p)} /></div>
+                <ProblemView lessonId={pr.lessonId} problem={p} story={!!pr.story} />
                 <div className="work">
                   {pr.work.map((w, j) => <div key={j} className={`workline${w.shown ? " shown" : ""}`}><span className="k">Step {j + 1}</span><span className="wl"><MathLine math={w.math} /></span></div>)}
                 </div>

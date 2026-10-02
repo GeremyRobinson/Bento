@@ -1,7 +1,7 @@
 // Parity with the current app: same step labels, prompts, answers, hints, explanations and mistake messages.
 import fixture from "../fixtures/legacy-g5-mult2.json";
-import { splitMultiplication as lesson } from "../../curriculum/lessons/grade5/split-multiplication";
-import { createSplitMultiplication } from "../../curriculum/lessons/grade5/split-multiplication/problem";
+import { splitMultiplication as lesson } from "../../curriculum/lessons/grade5/g5-mult2";
+import { createSplitMultiplication } from "../../curriculum/lessons/grade5/g5-mult2/problem";
 import { toPlainText } from "../../curriculum/schemas/math-text";
 import { checkStep, runtimeSteps } from "../../engine/evaluation/steps";
 

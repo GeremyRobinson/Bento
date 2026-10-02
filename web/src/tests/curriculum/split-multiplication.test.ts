@@ -1,9 +1,10 @@
 // G's seven required invariants, on the reference problem 47 × 36 and on thousands of seeded problems.
 import { createRng } from "../../curriculum/generators/rng";
-import { splitMultiplication as lesson } from "../../curriculum/lessons/grade5/split-multiplication";
+import { splitMultiplication as lesson } from "../../curriculum/lessons/grade5/g5-mult2";
 import {
   checkInvariants, createSplitMultiplication, generateSplitMultiplication, restoreSplitMultiplication, type SplitMultiplicationProblem,
-} from "../../curriculum/lessons/grade5/split-multiplication/problem";
+} from "../../curriculum/lessons/grade5/g5-mult2/problem";
+import { explainSplitMultiplication } from "../../curriculum/lessons/grade5/g5-mult2/explanation";
 import { numbersIn, toPlainText } from "../../curriculum/schemas/math-text";
 import { areaView } from "../../components/diagrams/AreaModelDiagram";
 
@@ -26,7 +27,7 @@ describe("the reference case 47 × 36 = 47 × (30 + 6)", () => {
     expect(checkInvariants(reference)).toEqual([]);
   });
   it("reads correctly everywhere", () => {
-    const ex = lesson.explain(reference, lesson.answers(reference));
+    const ex = explainSplitMultiplication(reference, lesson.answers(reference));
     expect(toPlainText(ex.statement)).toBe("47 × 36 = 47 × (30 + 6)");
     expect(ex.steps.map(s => s.narration)).toEqual([
       "Split 36 by place value: 30 + 6.",
@@ -51,7 +52,7 @@ describe.each([
 
   it("2. region widths always add to 100% of the total width", () => {
     for (const p of problems) {
-      const d = lesson.explain(p, lesson.answers(p)).diagram;
+      const d = explainSplitMultiplication(p, lesson.answers(p)).diagram;
       expect(near(sum(d.regions.map(r => r.width)), d.horizontal.length)).toBe(true);
       expect(near(sum(d.regions.map(r => r.widthFraction)), 1)).toBe(true);
       // and they tile it: no gaps, no overlaps
@@ -64,7 +65,7 @@ describe.each([
 
   it("3. each region width is proportional to its split value, on one scale for both axes", () => {
     for (const p of problems) {
-      const d = lesson.explain(p, lesson.answers(p)).diagram;
+      const d = explainSplitMultiplication(p, lesson.answers(p)).diagram;
       for (const r of d.regions) {
         expect(near(r.width, r.part * d.unit)).toBe(true);
         expect(near(r.widthFraction, r.part / p.secondFactor)).toBe(true);
@@ -77,7 +78,7 @@ describe.each([
   it("4. partial products equal firstFactor × splitPart", () => {
     for (const p of problems) {
       p.parts.forEach((part, i) => expect(p.partialProducts[i]).toBe(p.firstFactor * part));
-      const d = lesson.explain(p, lesson.answers(p)).diagram;
+      const d = explainSplitMultiplication(p, lesson.answers(p)).diagram;
       d.regions.forEach(r => {
         expect(r.product).toBe(p.firstFactor * r.part);
         expect(r.equation).toEqual({ factors: [p.firstFactor, r.part], product: r.product });
@@ -89,7 +90,7 @@ describe.each([
     for (const p of problems) {
       expect(sum(p.partialProducts)).toBe(p.product);
       expect(p.product).toBe(p.firstFactor * p.secondFactor);
-      const d = lesson.explain(p, lesson.answers(p)).diagram;
+      const d = explainSplitMultiplication(p, lesson.answers(p)).diagram;
       expect(sum(d.total.terms)).toBe(d.total.value);
       expect(d.total.value).toBe(p.product);
     }
@@ -97,7 +98,7 @@ describe.each([
 
   it("6. axis ownership cannot reverse when the strategy is splitSecondFactor", () => {
     for (const p of problems) {
-      const d = lesson.explain(p, lesson.answers(p)).diagram;
+      const d = explainSplitMultiplication(p, lesson.answers(p)).diagram;
       expect(p.strategy).toBe("splitSecondFactor");
       expect(d.vertical.factor).toBe("first");
       expect(d.vertical.value).toBe(p.firstFactor);
@@ -110,7 +111,7 @@ describe.each([
 
   it("7. labels, equations, narration, answers and animation states all come from the same model", () => {
     for (const p of problems) {
-      const answers = lesson.answers(p), ex = lesson.explain(p, answers), d = ex.diagram;
+      const answers = lesson.answers(p), ex = explainSplitMultiplication(p, answers), d = ex.diagram;
       // answers: one step per part, then the sum, each expecting the model's own value
       const expected = answers.steps.map(s => s.slots[0]!.expected);
       expect(expected).toEqual(p.parts.length > 1 ? [...p.partialProducts, p.product] : [...p.partialProducts]);
@@ -188,7 +189,7 @@ describe("the problem model", () => {
 
 describe("labels never collide", () => {
   it("puts a product below its region when it doesn't fit inside", () => {
-    const d = lesson.explain(reference, lesson.answers(reference)).diagram;
+    const d = explainSplitMultiplication(reference, lesson.answers(reference)).diagram;
     expect(d.regions.map(r => r.labelPlacement)).toEqual(["inside", "below"]);
   });
 });

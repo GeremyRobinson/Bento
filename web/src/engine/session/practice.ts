@@ -1,14 +1,15 @@
 // The practice engine: pure functions from one session state to the next.
-// Same rules as the current app (index.html: newRun, startProblem, loadStep, check, hint, pass, showMe, nextProblem).
-import { bandOf, type Band } from "../../curriculum/grades";
+// Same rules as the current app (index.html: newRun, startProblem, loadStep, check, hint, pass, showMe, nextProblem,
+// startTest, startReview, opStep).
+import { bandOf, gradeOf, type Band } from "../../curriculum/grades";
 import type { Rng } from "../../curriculum/generators/rng";
 import { formatNumber, toPlainText } from "../../curriculum/schemas/math-text";
-import { lessonById, requireLesson, LESSONS } from "../../curriculum/registry";
-import type { AnyLesson } from "../../curriculum/schemas/lesson";
+import { lessonById, lessonsInGrade, requireLesson, LESSONS } from "../../curriculum/registry";
+import type { AnswerStep, AnyLesson } from "../../curriculum/schemas/lesson";
 import { canShowMe, canSkip, hintBudget, HINT_WAIT_MS, lessonLength, MAX_LESSON_LENGTH, RUSHED_MS, tierFor, type Tier } from "../adaptive-help/policy";
 import { CATEGORIES, diagnose, nudge, SAY } from "../diagnosis/diagnose";
 import { parseNumber } from "../evaluation/numbers";
-import { checkStep, expectedValues, finalPartsOf, finalStep, runtimeSteps, type RuntimeStep } from "../evaluation/steps";
+import { answerIds, checkStep, expectedValues, finalPartsOf, finalStep, runtimeSteps, type RuntimeStep } from "../evaluation/steps";
 import { levelOf, problemXp, stepPoints } from "../mastery/levels";
 import { lastScore, type Progress } from "../mastery/progress";
 import { PRAISE } from "./praise";
@@ -32,16 +33,55 @@ export function problemOf(it: RunItem): unknown {
   return p;
 }
 
+// ---------------------------------------------------------------- word problems
+
+export const OPS = ["+", "−", "×", "÷"] as const;
+const OP_NAME = { "+": "Add", "−": "Subtract", "×": "Multiply", "÷": "Divide" } as const;
+const OP_WHY = {
+  "+": "Putting amounts together means adding.",
+  "−": "Taking away, or finding how much more, means subtracting.",
+  "×": "Equal groups, or a part of a group, means multiplying.",
+  "÷": "Sharing equally, or splitting into groups, means dividing.",
+} as const;
+
+/** "Read the story": pick the operation first. The answer is the index of the story's operation. */
+export function operationStep(lesson: AnyLesson, p: unknown): AnswerStep {
+  const story = lesson.story!(p), k = OPS.indexOf(story.op);
+  return {
+    id: "story", label: "Read the story", question: "Which operation solves it?", prompt: [],
+    choices: OPS.map(o => `${o} ${OP_NAME[o]}`),
+    slots: [{ id: "c", expected: k }],
+    known: [],
+    check: v => (v.c === k ? { ok: true } : { ok: false, kind: "Picked the wrong operation", message: "Read the story again. Is it putting together, taking away, equal groups, or sharing?", generic: false }),
+    hint: OP_WHY[story.op], explain: OP_WHY[story.op],
+    work: [...lesson.display(p), { t: "muted", v: [{ t: "text", v: ` (${OP_NAME[story.op].toLowerCase()})` }] }],
+  };
+}
+
+/** Every step of an item as practice runs it: the story's operation first when it's a word problem. */
+function fullSteps(it: RunItem): RuntimeStep[] {
+  const lesson = lessonOfItem(it), p = problemOf(it);
+  const model = lesson.answers(p);
+  const lead = it.story && lesson.story ? runtimeSteps({ steps: [operationStep(lesson, p)], finalParts: [-1] }) : [];
+  return [...lead, ...runtimeSteps(model).map((s, k) => ({ ...s, label: `Step ${k + 1 + lead.length} · ${s.base}` }))];
+}
+const leadOf = (it: RunItem) => (it.story && lessonOfItem(it).story ? 1 : 0);
+
 /** Steps for the current problem, derived fresh from its answer model each time. */
 export function stepsOf(s: PracticeSession): RuntimeStep[] {
-  const it = currentItem(s), lesson = lessonOfItem(it);
-  const model = lesson.answers(problemOf(it));
-  return s.collapsed ? [finalStep(finalPartsOf(model.steps, model.finalParts))] : runtimeSteps(model);
+  const it = currentItem(s), full = fullSteps(it);
+  if (!s.collapsed) return full;
+  const lead = leadOf(it), model = lessonOfItem(it).answers(problemOf(it));
+  return [...full.slice(0, lead), finalStep(finalPartsOf(model.steps, model.finalParts))];
 }
 
 export const currentStep = (s: PracticeSession): RuntimeStep | undefined => (s.solved ? undefined : stepsOf(s)[s.step]);
 
-const makeItem = (lesson: AnyLesson, index: number, rng: Rng): RunItem => ({ lessonId: lesson.id, problem: lesson.generate(rng, index) });
+export function makeItem(lesson: AnyLesson, index: number, rng: Rng): RunItem {
+  const it: RunItem = { lessonId: lesson.id, problem: lesson.generate(rng, index) };
+  if (lesson.story && index % 3 === 2) it.story = true;
+  return it;
+}
 
 // ---------------------------------------------------------------- starting
 
@@ -51,6 +91,44 @@ export function startPractice(lessonId: string, progress: Progress, deps: Deps):
   const items = Array.from({ length: n }, (_, i) => makeItem(lesson, i, deps.rng));
   const startTier = tierFor(lastScore(progress, lessonId));
   return newRun({ mode: "practice", key: lesson.id, title: lesson.title, items, startTier }, progress, deps);
+}
+
+export const testKey = (g: number, unit?: string) => (unit ? `unit:${g}:${unit}` : `grade:${g}`);
+
+/** A unit test (up to 10 problems) or a grade check-up (up to 12), mixed from the lessons, no hints, one try per step. */
+export function startTest(key: string, progress: Progress, deps: Deps): PracticeSession {
+  const [kind, gs, unit] = key.split(":"), g = Number(gs);
+  const list = kind === "unit" ? lessonsInGrade(g).filter(l => (l.unit || "Skills") === unit) : lessonsInGrade(g);
+  if (!list.length) throw new Error(`no lessons for test ${key}`);
+  const n = Math.min(kind === "unit" ? 10 : 12, Math.max(6, list.length * 2));
+  const order = deps.rng.shuffle(list);
+  const items = deps.rng.shuffle(Array.from({ length: n }, (_, k) => makeItem(order[k % order.length]!, k, deps.rng)));
+  const title = kind === "unit" ? `${unit} test` : `${gradeOf(g).name} check-up`;
+  return newRun({ mode: "test", key, title, items, startTier: 0, hintsLeft: 0 }, progress, deps);
+}
+
+/** Lessons already scored, weighted to low scores and long gaps since last practice. */
+export function reviewPool(progress: Progress, now: number): { lesson: AnyLesson; weight: number }[] {
+  return LESSONS.filter(l => progress.scores[l.id]).map(l => {
+    const sc = progress.scores[l.id]!, days = (now - (progress.seen[l.id] || sc.date || now)) / 864e5;
+    return { lesson: l, weight: (5 - sc.last) * (1 + days / 3) };
+  });
+}
+
+export const canReview = (progress: Progress, now: number) => reviewPool(progress, now).length >= 2;
+
+/** Today's review: up to 8 problems from scored lessons, at most 2 from each (4 when there are only a few lessons). */
+export function startReview(progress: Progress, deps: Deps): PracticeSession {
+  const pool = reviewPool(progress, deps.now).map(x => ({ ...x, n: 0 }));
+  const each = pool.length >= 4 ? 2 : 4, n = Math.min(8, pool.length * each), items: RunItem[] = [];
+  while (items.length < n) {
+    const live = pool.filter(x => x.n < each), tot = live.reduce((a, x) => a + x.weight, 0);
+    let r = deps.rng.next() * tot, k = 0;
+    while (k < live.length - 1 && r > live[k]!.weight) { r -= live[k]!.weight; k++; }
+    live[k]!.n++;
+    items.push(makeItem(live[k]!.lesson, deps.rng.int(1, 8), deps.rng));
+  }
+  return newRun({ mode: "review", key: "review", title: "Today's review", items: deps.rng.shuffle(items), startTier: 0, hintsLeft: 4 }, progress, deps);
 }
 
 function newRun(o: { mode: PracticeSession["mode"]; key: string; title: string; items: RunItem[]; startTier: Tier; hintsLeft?: number },
@@ -79,14 +157,14 @@ function startProblem(s: PracticeSession, progress: Progress, deps: Deps): Pract
 /** Prepare the current step: collapse to a final answer when allowed, offer plan choices at tier 1, clear the boxes. */
 function loadStep(s: PracticeSession, deps: Deps): PracticeSession {
   let next = { ...s };
-  const full = runtimeSteps(lessonOfItem(currentItem(next)).answers(problemOf(currentItem(next))));
-  if (!next.collapsed && next.skip && next.skipThis && canSkip({ test: isTest(next), tier: next.tier }) && next.step === 0 && full.length > 1) {
+  const it = currentItem(next), lead = leadOf(it), full = fullSteps(it);
+  if (!next.collapsed && next.skip && next.skipThis && canSkip({ test: isTest(next), tier: next.tier }) && next.step === lead && full.length - lead > 1) {
     next = { ...next, collapsed: true };
   }
   next = { ...next, values: {}, misses: 0, hinted: false, lastTry: 0, stepT0: deps.now, feedback: null };
   next.pick = planFor(next, deps.rng);
   const step = currentStep(next);
-  next.active = next.pick || !step ? null : step.slots[0]?.id ?? null;
+  next.active = next.pick || !step || step.choices ? null : answerIds(step.slots)[0] ?? null;
   return next;
 }
 
@@ -94,16 +172,18 @@ function loadStep(s: PracticeSession, deps: Deps): PracticeSession {
 
 function planFor(s: PracticeSession, rng: Rng): PracticeSession["pick"] {
   const steps = stepsOf(s), here = steps[s.step];
-  const later = steps.slice(s.step + 1);
-  if (s.tier !== 1 || !here || here.skipped || !later.length) return null;
+  const later = steps.slice(s.step + 1).filter(t => !t.choices);
+  if (s.tier !== 1 || !here || here.choices || here.skipped || !later.length) return null;
   const right = here.base, options = [right];
   for (const t of rng.shuffle(later)) if (options.length < 3 && !options.includes(t.base)) options.push(t.base);
   if (options.length < 3) {
     const lesson = lessonOfItem(currentItem(s));
     for (const m of rng.shuffle(LESSONS.filter(m => m.grade === lesson.grade && m.unit === lesson.unit && m.id !== lesson.id))) {
       if (options.length >= 3) break;
-      const first = m.answers(m.generate(rng, 1)).steps[0];
-      if (first && !options.includes(first.label)) options.push(first.label);
+      try {
+        const first = m.answers(m.generate(rng, 1)).steps[0];
+        if (first && !options.includes(first.label)) options.push(first.label);
+      } catch { /* a sister lesson that can't make a problem just isn't offered */ }
     }
   }
   return { options: rng.shuffle(options), right, misses: 0 };
@@ -113,18 +193,18 @@ export function pickPlan(s: PracticeSession, index: number): PracticeSession {
   const pk = s.pick, here = currentStep(s);
   if (!pk || !here) return s;
   const choice = pk.options[index];
-  const firstSlot = here.slots[0]?.id ?? null;
+  const firstSlot = answerIds(here.slots)[0] ?? null;
   if (choice === pk.right) {
     return { ...s, pick: null, active: firstSlot, fx: "line", feedback: { type: "good", strong: "Good plan.", text: "Now do it." } };
   }
   const misses = pk.misses + 1;
-  const mistake = {
+  const mistake: Mistake = {
     n: s.i + 1, step: s.step + 1, label: "Planning", lessonId: currentItem(s).lessonId, typed: choice ?? "", want: pk.right,
-    kind: CATEGORIES.plan[0], cat: "plan" as const, msg: CATEGORIES.plan[1], rushed: false,
+    kind: CATEGORIES.plan[0], cat: "plan", msg: CATEGORIES.plan[1], rushed: false,
   };
   if (misses >= 2) {
     return { ...s, pick: null, active: firstSlot, fx: "shake", mistakes: [...s.mistakes, mistake],
-      feedback: { type: "hint", text: `The next step is ${pk.right}. Now do it.` } };
+      feedback: { type: "hint", text: `The next step is **${pk.right}**. Now do it.` } };
   }
   const isLater = stepsOf(s).slice(s.step + 1).some(t => t.base === choice);
   return { ...s, pick: { ...pk, misses }, fx: "shake", mistakes: [...s.mistakes, mistake],
@@ -140,8 +220,8 @@ export function focusSlot(s: PracticeSession, id: string): PracticeSession {
 /** Number pad: digits, "−", ".", "back", and "next" (move to the next box). */
 export function pressKey(s: PracticeSession, key: string): PracticeSession {
   const step = currentStep(s);
-  if (!step || s.pick || !s.active) return s;
-  const ids = step.slots.map(x => x.id);
+  if (!step || s.pick || step.choices || !s.active) return s;
+  const ids = answerIds(step.slots);
   if (key === "next") return { ...s, active: ids[(ids.indexOf(s.active) + 1) % ids.length] ?? s.active };
   const cur = s.values[s.active] ?? "";
   let v = cur;
@@ -153,16 +233,31 @@ export function pressKey(s: PracticeSession, key: string): PracticeSession {
   return { ...s, values: { ...s.values, [s.active]: v } };
 }
 
+/** Tap-to-answer steps check right away, like the current app. */
+export function choose(s: PracticeSession, index: number, progress: Progress, deps: Deps): PracticeSession {
+  const step = currentStep(s);
+  if (!step?.choices) return s;
+  return check({ ...s, values: { c: String(index) } }, progress, deps);
+}
+
 // ---------------------------------------------------------------- checking
 
-const typedText = (values: Record<string, number | null>) =>
-  Object.values(values).filter((x): x is number => x != null).map(formatNumber).join(", ");
+/** How a set of answers reads in reports: a choice's words, a fraction, or numbers. */
+function typedText(step: RuntimeStep, values: Record<string, number | null>): string {
+  if (step.choices && values.c != null) return step.choices[values.c] ?? String(values.c);
+  const keys = Object.keys(values);
+  if (keys.length === 2 && values.n != null && values.d != null) {
+    return values.d === 1 ? formatNumber(values.n) : `${formatNumber(values.n)}/${formatNumber(values.d)}`;
+  }
+  return Object.values(values).filter((x): x is number => x != null).map(formatNumber).join(", ");
+}
 
 export function check(s: PracticeSession, progress: Progress, deps: Deps): PracticeSession {
   const step = currentStep(s);
   if (!step) return s;
   if (s.pick) return { ...s, fx: "feedback", feedback: { type: "hint", text: "First pick the step that comes next." } };
-  const values = Object.fromEntries(step.slots.map(x => [x.id, parseNumber(s.values[x.id])]));
+  const ids = step.choices ? ["c"] : answerIds(step.slots);
+  const values = Object.fromEntries(ids.map(id => [id, parseNumber(s.values[id])]));
   if (Object.values(values).every(x => x == null)) {
     return { ...s, fx: "feedback", feedback: { type: "hint", text: "Tap a box and use the number pad to type your answer." } };
   }
@@ -176,7 +271,7 @@ export function check(s: PracticeSession, progress: Progress, deps: Deps): Pract
   const cat = r.generic ? diagnose(expected, values, earlier) : "concept";
   const mistake: Mistake = {
     n: s.i + 1, step: s.step + 1, label: step.base, lessonId: currentItem(s).lessonId,
-    typed: typedText(values), want: typedText(expected),
+    typed: typedText(step, values), want: typedText(step, expected),
     kind: cat === "concept" ? r.kind : CATEGORIES[cat][0], cat, msg: cat === "concept" ? r.message : CATEGORIES[cat][1], rushed,
   };
   let next: PracticeSession = {
@@ -185,20 +280,20 @@ export function check(s: PracticeSession, progress: Progress, deps: Deps): Pract
   };
 
   if (step.skipped) { // the shortcut missed: do this one the long way
-    next = loadStep({ ...next, skipThis: false, collapsed: false, maxPts: next.maxPts + 1, step: 0 }, deps);
+    next = loadStep({ ...next, skipThis: false, collapsed: false, maxPts: next.maxPts + 1, step: leadOf(currentItem(next)) }, deps);
     return { ...next, fx: "shake", feedback: { type: "bad", strong: "Not quite.", text: "Let's do this one step by step." } };
   }
   if (isTest(next)) {
     const shownValues = Object.fromEntries(Object.entries(expected).map(([k, v]) => [k, formatNumber(v)]));
     const after = pass({ ...next, values: shownValues }, true, progress, deps);
-    return { ...after, feedback: { type: "hint", text: `Not this time. The answer was ${typedText(expected)}.${currentStep(after) ? " Keep going." : ""}` } };
+    return { ...after, feedback: { type: "hint", text: `Not this time. The answer was **${typedText(step, expected)}**.${currentStep(after) ? " Keep going." : ""}` } };
   }
   const band = bandOfSession(next);
   const msg = cat === "concept" ? r.message
     : SAY[cat] ?? `${nudge(expected, values, band)} ${next.hinted ? step.hint : `Read the step again${next.hintsLeft ? ", or tap Hint" : ""}.`}`.trim();
   const lines: string[] = [];
   if (rushed) lines.push("Slow down a little and read the step again.");
-  if (canShowMe({ test: false, misses: next.misses, hinted: next.hinted })) lines.push("Stuck? Tap Show me.");
+  if (canShowMe({ test: false, misses: next.misses, hinted: next.hinted })) lines.push("Stuck? Tap **Show me**.");
   return { ...next, feedback: { type: "bad", strong: "Not yet.", text: msg, lines } };
 }
 
@@ -207,7 +302,7 @@ export function hint(s: PracticeSession, deps: Deps): PracticeSession {
   const step = currentStep(s);
   if (!step || isTest(s)) return s;
   if (s.hinted) return { ...s, fx: "feedback", feedback: { type: "hint", strong: "Hint:", text: step.hint } };
-  if (!s.hintsLeft) return { ...s, fx: "feedback", feedback: { type: "hint", text: "No hints left in this lesson. Give it your best try. Show me opens after two tries." } };
+  if (!s.hintsLeft) return { ...s, fx: "feedback", feedback: { type: "hint", text: "No hints left in this lesson. Give it your best try. **Show me** opens after two tries." } };
   if (!s.misses && deps.now - s.stepT0 < HINT_WAIT_MS) return { ...s, fx: "feedback", feedback: { type: "hint", text: "Give it one try first. The hint opens after you try." } };
   return {
     ...s, hinted: true, hintsLeft: s.hintsLeft - 1, hints: s.hints + 1, prob: { ...s.prob, hints: s.prob.hints + 1 }, fx: "feedback",
@@ -257,7 +352,7 @@ function pass(s: PracticeSession, shown: boolean, progress: Progress, deps: Deps
   next = {
     ...next, solved: true, pick: null, active: null,
     xpEarned: next.xpEarned + xp, clean: next.clean + (clean ? 1 : 0),
-    probs: [...next.probs, { lessonId: it.lessonId, problem: it.problem, work: next.work, hints: pr.hints, wrong: pr.wrong, shown: pr.shown, ms: deps.now - pr.t0 }],
+    probs: [...next.probs, { lessonId: it.lessonId, problem: it.problem, ...(it.story ? { story: true } : {}), work: next.work, hints: pr.hints, wrong: pr.wrong, shown: pr.shown, ms: deps.now - pr.t0 }],
   };
   const lines: string[] = [];
   if (!isTest(next) && (pr.wrong || pr.shown) && next.items.length < MAX_LESSON_LENGTH) {
@@ -266,7 +361,7 @@ function pass(s: PracticeSession, shown: boolean, progress: Progress, deps: Deps
   }
   void progress;
   if (isTest(next)) return { ...next, feedback: { type: "good", strong: `Problem done. +${xp} XP` } };
-  if (shown) return { ...next, feedback: { type: "hint", text: `Here's how: ${step.explain}`, lines: [`+${xp} XP. That one was tricky, and you finished it.`, ...lines] } };
+  if (shown) return { ...next, feedback: { type: "hint", text: `Here's how: ${step.explain}`, lines: [`**+${xp} XP.** That one was tricky, and you finished it.`, ...lines] } };
   if (band === "little") return { ...next, feedback: { type: "good", pop: "big", strong: `You solved it! +${xp} XP`, lines } };
   if (band === "middle" || band === "high") return { ...next, feedback: { type: "good", strong: `Solved. +${xp} XP`, text: clean ? "(no mistakes)" : "", lines } };
   return { ...next, feedback: { type: "good", pop: "star", strong: `Solved! +${xp} XP`, text: clean ? "(no mistakes bonus)" : "", lines } };
@@ -315,12 +410,21 @@ export function finishRun(s: PracticeSession, progress: Progress, now: number): 
 
 /** A saved run can only resume if every lesson in it still exists and every stored problem is still valid. */
 export function canResume(run: PracticeSession | null): run is PracticeSession {
-  if (!run) return false;
+  if (!run || !Array.isArray(run.items) || !run.items.length) return false;
   try {
     return run.items.every(it => lessonById(it.lessonId) && lessonById(it.lessonId)!.restore(it.problem) != null);
   } catch {
     return false;
   }
+}
+
+/** "Build up first": the lesson underneath, suggested after a 0 or 1. */
+export function backFor(id: string): AnyLesson | null {
+  const l = lessonById(id);
+  if (!l) return null;
+  if (l.pre && lessonById(l.pre)) return lessonById(l.pre)!;
+  const g = lessonsInGrade(l.grade), k = g.indexOf(l);
+  return k > 0 && g[k - 1]!.unit === l.unit ? g[k - 1]! : null;
 }
 
 /** Plain text for a math line in the current step, for screen readers and tests. */

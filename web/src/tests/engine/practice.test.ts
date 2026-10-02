@@ -2,7 +2,7 @@ import { createRng } from "../../curriculum/generators/rng";
 import { formatNumber } from "../../curriculum/schemas/math-text";
 import { emptyProgress, type Progress } from "../../engine/mastery/progress";
 import {
-  canResume, check, currentStep, finishRun, focusSlot, hint, isLastProblem, nextProblem, pickPlan, pressKey,
+  canResume, check, choose, currentStep, finishRun, focusSlot, hint, isLastProblem, nextProblem, pickPlan, pressKey,
   showMe, showMeAvailable, startPractice, toggleSkip, type Deps,
 } from "../../engine/session/practice";
 import { expectedValues } from "../../engine/evaluation/steps";
@@ -20,7 +20,10 @@ function type(s: PracticeSession, values: Record<string, number>): PracticeSessi
   }
   return s;
 }
-const solveStep = (s: PracticeSession, p: Progress) => check(type(s, expectedValues(currentStep(s)!)), p, deps());
+function solveStep(s: PracticeSession, p: Progress) {
+  const step = currentStep(s)!;
+  return step.choices ? choose(s, expectedValues(step).c!, p, deps()) : check(type(s, expectedValues(step)), p, deps());
+}
 function solveProblem(s: PracticeSession, p: Progress) {
   while (currentStep(s)) s = solveStep(s, p);
   return s;

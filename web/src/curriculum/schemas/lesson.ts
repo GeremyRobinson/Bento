@@ -4,33 +4,55 @@ import type { Explanation } from "../../explanations/schema";
 
 export type GradeNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-/** One box the student fills in, with the value the answer model expects. */
+/**
+ * Short text for hints and messages. `**bold**` marks emphasis; fractions are written "3/4".
+ * Every number in it comes from the problem model.
+ */
+export type RichText = string;
+
+/** One box the student fills in. `expected: null` means the box should stay empty (e.g. no whole part). */
 export interface AnswerSlot {
   id: string;
-  expected: number;
+  expected: number | null;
 }
 
 /** A wrong answer we can predict from the problem, with the reason it happens. */
 export interface KnownMistake {
-  slot: string;
-  value: number;
+  /** the typed values that trigger it, by slot id */
+  values: Record<string, number>;
   kind: string;
-  message: string;
+  message: RichText;
 }
+
+/** Result of checking one step. Same shape as the current app's check functions. */
+export type StepCheck =
+  | { ok: true }
+  | { ok: false; soft: true; message: RichText }
+  | { ok: false; soft?: false; kind: string; message: RichText; generic: boolean };
 
 /** One step of the derived answer model. Every number in it comes from the canonical problem. */
 export interface AnswerStep {
   id: string;
   label: string;
   /** an optional instruction above the math */
-  question?: string;
+  question?: RichText;
   /** the math with answer boxes in it */
   prompt: MathText;
+  /** a short line under the step */
+  note?: RichText;
   slots: AnswerSlot[];
+  /** tap-to-answer steps: the student picks one; the slot "c" expects the right index */
+  choices?: string[];
+  /**
+   * Predictable slips, checked in order when every box matches nothing right.
+   * Steps whose rules can't be written as values (equivalent fractions, any order, lowest terms)
+   * give `check` instead; it is still a pure function of the problem.
+   */
   known: KnownMistake[];
-  hint: string;
+  check?: (values: Record<string, number | null>) => StepCheck;
+  hint: RichText;
   /** what "Show me" says after filling the answer in */
-  explain: string;
+  explain: RichText;
   /** the finished line that stays on screen once the step is done */
   work: MathText;
 }
@@ -39,6 +61,12 @@ export interface AnswerModel {
   steps: AnswerStep[];
   /** which steps together make the final answer (negative counts from the end); default: the last step */
   finalParts: number[];
+}
+
+/** A word problem told about the same numbers. `op` is the operation the story needs. */
+export interface Story {
+  op: "+" | "−" | "×" | "÷";
+  text: RichText;
 }
 
 /**
@@ -50,14 +78,22 @@ export interface LessonDefinition<P = unknown> {
   grade: GradeNumber;
   unit: string;
   title: string;
-  /** the worked example the learn screen opens on; "New example" generates more */
+  /** the worked example the learn screen opens on; "Another one" generates more */
   reference: P;
+  /** index is the problem's place in the run (the current app makes the first problems easier) */
   generate(rng: Rng, index: number): P;
-  /** validates a stored or imported problem and returns it as a canonical model, or null */
+  /** validates a stored or imported problem (including the current app's saved shape) and returns the canonical model, or null */
   restore(raw: unknown): P | null;
+  /** the problem as the student sees it, above the steps */
   display(problem: P): MathText;
+  /** an optional line under the problem, e.g. "Factor it." */
+  displayNote?(problem: P): RichText;
   answers(problem: P): AnswerModel;
   explain(problem: P, answers: AnswerModel): Explanation;
+  /** some lessons tell every third problem as a story */
+  story?(problem: P): Story;
+  /** the lesson underneath this one, suggested after a score of 0 or 1 */
+  pre?: string;
 }
 
 /** Erases the problem type so lessons of different kinds can live in one registry. */

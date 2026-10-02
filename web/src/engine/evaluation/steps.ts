@@ -1,5 +1,5 @@
-import { slot, text, type MathText } from "../../curriculum/schemas/math-text";
-import type { AnswerModel, AnswerSlot, AnswerStep, KnownMistake } from "../../curriculum/schemas/lesson";
+import { frac, slot, text, type MathText } from "../../curriculum/schemas/math-text";
+import type { AnswerModel, AnswerSlot, AnswerStep, StepCheck } from "../../curriculum/schemas/lesson";
 import { eq } from "./numbers";
 
 /** A step as practice uses it: the answer-model step plus its numbered label and help state. */
@@ -11,21 +11,22 @@ export interface RuntimeStep {
   base: string;
   question?: string;
   prompt: MathText;
+  note?: string;
   slots: AnswerSlot[];
+  choices?: string[];
   hint: string;
   explain: string;
   work: MathText;
   /** true for the final-answer shortcut that stands in for several steps */
   skipped?: boolean;
-  note?: string;
-  /** checks the typed values; for normal steps this is checkAnswerStep */
+  /** the answer-model steps this one checks, with the suffix their box ids carry here */
   parts: { step: AnswerStep; suffix: string }[];
 }
 
-export type CheckResult =
-  | { ok: true }
-  | { ok: false; soft: true; message: string }
-  | { ok: false; soft?: false; kind: string; message: string; generic: boolean };
+export type CheckResult = StepCheck;
+
+/** Box ids the student types into (boxes expected to stay empty still exist, but aren't asked for). */
+export const answerIds = (slots: AnswerSlot[]) => slots.filter(s => s.expected != null).map(s => s.id);
 
 export function runtimeSteps(model: AnswerModel): RuntimeStep[] {
   return model.steps.map((s, k) => ({
@@ -33,6 +34,8 @@ export function runtimeSteps(model: AnswerModel): RuntimeStep[] {
     label: `Step ${k + 1} · ${s.label}`,
     base: s.label,
     ...(s.question ? { question: s.question } : {}),
+    ...(s.note ? { note: s.note } : {}),
+    ...(s.choices ? { choices: s.choices } : {}),
     prompt: s.prompt,
     slots: s.slots,
     hint: s.hint,
@@ -42,13 +45,13 @@ export function runtimeSteps(model: AnswerModel): RuntimeStep[] {
   }));
 }
 
-/** Check one answer-model step against parsed values keyed by slot id. */
+/** Default check: every box equals its expected value (or stays empty when none is expected), then the known slips. */
 export function checkAnswerStep(step: AnswerStep, values: Record<string, number | null>): CheckResult {
-  if (step.slots.every(s => eq(values[s.id], s.expected))) return { ok: true };
-  const single = step.slots.length === 1 ? step.slots[0]! : null;
-  if (single) {
-    const known = step.known.find((k: KnownMistake) => k.slot === single.id && eq(values[single.id], k.value));
-    if (known) return { ok: false, kind: known.kind, message: known.message, generic: false };
+  if (step.check) return step.check(values);
+  const right = step.slots.every(s => (s.expected == null ? values[s.id] == null : eq(values[s.id], s.expected)));
+  if (right) return { ok: true };
+  for (const k of step.known) {
+    if (Object.entries(k.values).every(([id, v]) => eq(values[id], v))) return { ok: false, kind: k.kind, message: k.message, generic: false };
   }
   return { ok: false, kind: step.label, message: `Not quite. ${step.hint}`, generic: true };
 }
@@ -58,37 +61,41 @@ export function checkStep(step: RuntimeStep, values: Record<string, number | nul
   const many = step.parts.length > 1;
   for (const { step: part, suffix } of step.parts) {
     const sub = Object.fromEntries(part.slots.map(s => [s.id, values[s.id + suffix] ?? null]));
-    if (step.skipped && Object.values(sub).some(x => x == null)) return { ok: false, soft: true, message: "Fill in every box." };
+    if (step.skipped && answerIds(part.slots).some(id => sub[id] == null)) return { ok: false, soft: true, message: "Fill in every box." };
     const r = checkAnswerStep(part, sub);
     if (!r.ok) return many && !r.soft ? { ...r, generic: false, kind: `${part.label}: ${r.kind}` } : r;
   }
   return { ok: true };
 }
 
-/** All boxes of a step with their expected values, using the step's own slot ids. */
+/** Boxes of a step that have an answer, with the expected values, using the step's own box ids. */
 export const expectedValues = (step: RuntimeStep): Record<string, number> =>
-  Object.fromEntries(step.parts.flatMap(({ step: s, suffix }) => s.slots.map(x => [x.id + suffix, x.expected])));
+  Object.fromEntries(step.parts.flatMap(({ step: s, suffix }) => s.slots.flatMap(x => (x.expected == null ? [] : [[x.id + suffix, x.expected]]))));
 
 /** The current app's "which steps make the final answer": negative counts from the end. */
 export function finalPartsOf(steps: AnswerStep[], finalParts: number[]): AnswerStep[] {
   return finalParts.map(i => steps[(i + steps.length) % steps.length]!);
 }
 
+/** The boxes of a step on their own: a fraction for a top and bottom, otherwise side by side (as the current app's slotsFor). */
+function boxesOf(step: AnswerStep, suffix: string): MathText {
+  const ids = answerIds(step.slots);
+  if (ids.length === 2 && ids.includes("n") && ids.includes("d")) return [frac([slot("n" + suffix)], [slot("d" + suffix)])];
+  return ids.flatMap((id, i) => (i ? [text(","), slot(id + suffix)] : [slot(id + suffix)]));
+}
+
 /** One "Final answer" step built from the last steps. Each part keeps its own check and mistake messages. */
 export function finalStep(parts: AnswerStep[]): RuntimeStep {
   const many = parts.length > 1;
   const withSuffix = parts.map((step, j) => ({ step, suffix: many ? String(j) : "" }));
-  const prompt: MathText = withSuffix.flatMap(({ step, suffix }) => [
-    ...(many ? [text(`${step.label}: `)] : []),
-    ...step.slots.map(s => slot(s.id + suffix)),
-  ]);
+  const prompt: MathText = withSuffix.flatMap(({ step, suffix }) => [...(many ? [text(`${step.label}: `)] : []), ...boxesOf(step, suffix)]);
   return {
     id: "final",
     label: "Final answer",
     base: "Final answer",
     question: "Type the final answer.",
     prompt,
-    slots: withSuffix.flatMap(({ step, suffix }) => step.slots.map(s => ({ id: s.id + suffix, expected: s.expected }))),
+    slots: withSuffix.flatMap(({ step, suffix }) => step.slots.filter(s => s.expected != null).map(s => ({ id: s.id + suffix, expected: s.expected }))),
     hint: parts.map(p => p.hint).join(" "),
     explain: parts.map(p => p.explain).join(" "),
     work: parts.flatMap((p, i) => (i ? [text("   "), ...p.work] : p.work)),

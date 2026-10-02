@@ -49,3 +49,4 @@
 .foot{display:flex;flex-wrap:wrap;gap:var(--s);justify-content:center;color:var(--muted);font-size:var(--small);margin-top:var(--u)}
 .foot button{color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-weight:var(--w-mid)}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mline-in{display:contents}

@@ -16,7 +16,7 @@ function renderApp() {
 
 /** Works out the answer from the step on screen, like a student would. */
 function answerOnScreen(): string {
-  const ask = document.querySelector(".ask .visually-hidden")!.textContent!.replace(/−/g, "-");
+  const ask = document.querySelector(".ask .mline")!.getAttribute("data-plain")!.replace(/−/g, "-");
   const m = ask.match(/^(-?\d+) ([×+]) (-?\d+)(?: \+ (-?\d+))? = blank$/);
   if (!m) throw new Error(`can't read step: ${ask}`);
   const nums = [m[1], m[3], m[4]].filter(Boolean).map(Number);
@@ -60,6 +60,9 @@ describe("a whole lesson in the browser", () => {
         if (last) break;
         continue;
       }
+      // a word problem starts with "which operation?": the story is equal groups, so multiply
+      const multiply = screen.queryByRole("button", { name: "× Multiply" });
+      if (multiply) { fireEvent.click(multiply); continue; }
       fireEvent.click(within(pad()).getByRole("button", { name: "Erase" }));
       fireEvent.click(within(pad()).getByRole("button", { name: "Erase" }));
       for (const d of answerOnScreen()) fireEvent.click(within(pad()).getByRole("button", { name: d }));

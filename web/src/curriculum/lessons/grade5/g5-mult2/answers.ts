@@ -26,8 +26,7 @@ export function splitMultiplicationAnswers(p: SplitMultiplicationProblem): Answe
       prompt: [num(a), op("×"), num(part), op("="), slot("x")],
       slots: [{ id: "x", expected }],
       known: zeros === 0 ? [] : [{
-        slot: "x",
-        value: a * digit,
+        values: { x: a * digit },
         kind: "Lost the place value",
         message: `That's ${f(a)} × ${f(digit)}. The ${placeName(part)} digit stands for ${f(part)}, so add ${zeros === 1 ? "a zero" : `${zeros} zeros`}.`,
       }],

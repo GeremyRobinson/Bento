@@ -6,6 +6,8 @@ import type { MistakeCategory } from "../diagnosis/diagnose";
 export interface RunItem {
   lessonId: string;
   problem: unknown;
+  /** told as a word problem (every third problem of lessons that have stories) */
+  story?: boolean;
 }
 
 export interface WorkLine {
@@ -43,6 +45,7 @@ export interface Mistake {
 export interface ProblemRecord {
   lessonId: string;
   problem: unknown;
+  story?: boolean;
   work: WorkLine[];
   hints: number;
   wrong: number;

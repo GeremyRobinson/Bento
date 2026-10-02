@@ -1,5 +1,5 @@
 import { formatNumber } from "../../../curriculum/schemas/math-text";
-import type { SplitMultiplicationProblem } from "../../../curriculum/lessons/grade5/split-multiplication/problem";
+import type { SplitMultiplicationProblem } from "../../../curriculum/lessons/grade5/g5-mult2/problem";
 import { DEFAULT_AREA_LAYOUT, type AreaDiagram, type AreaLayout, type AreaRegion } from "./schema";
 
 /** Rough width of a number label in the app's rounded number font. */

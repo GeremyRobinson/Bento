@@ -6,9 +6,9 @@ import { HELP_TIERS, tierFor } from "../engine/adaptive-help/policy";
 import { LEVELS } from "../engine/mastery/levels";
 import { lastScore } from "../engine/mastery/progress";
 import { when } from "../app/format";
-import { AreaModelDiagram } from "../components/diagrams/AreaModelDiagram";
+import { Diagram } from "../components/diagrams/Diagram";
 import { Chevron, HomeIcon } from "../components/primitives/icons";
-import { MathLine } from "../components/primitives/MathLine";
+import { MathLine, Rich } from "../components/primitives/MathLine";
 import { ScoreChip } from "../components/primitives/Score";
 import type { Explanation } from "../explanations/schema";
 
@@ -62,17 +62,19 @@ export function Learn({ lessonId }: { lessonId: string }) {
         <section className="panel learn walk">
           <div className="card">
             <h2 className="label">{ex.heading}</h2>
+            {ex.idea?.map((t, i) => <p key={i} className="idea"><Rich text={t} /></p>)}
             <div className="math"><MathLine math={ex.statement} /></div>
-            <AreaModelDiagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && playing ? last : at} />
+            {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && playing ? last : at} />}
+            {ex.caption && <p className="caption muted"><Rich text={ex.caption} /></p>}
             <ol className="beats" aria-live="polite">
               {ex.steps.map((s, i) => (
                 <li key={s.id} className="beat" data-state={beatState(s.state, at)}>
                   <span className="badge">{i + 1}</span>
-                  <span className="say"><MathLine math={s.math} /><span>{s.narration}</span></span>
+                  <span className="say"><MathLine math={s.math} /><span><Rich text={s.narration} /></span></span>
                 </li>
               ))}
             </ol>
-            {(finished || at === 0) && <p className="note">{finished ? "That's the whole problem. Your turn!" : "Tap Play to watch it split up."}</p>}
+            {(finished || at === 0) && <p className="note">{finished ? "That's the whole problem. Your turn!" : ex.diagram?.kind === "areaModel" ? "Tap Play to watch it split up." : "Tap Play to watch it step by step."}</p>}
           </div>
           <div className="actions" style={{ justifyContent: "space-between" }}>
             <button className="ctl" disabled={at === 0} onClick={() => { setPlaying(false); setAt(a => Math.max(0, a - 1)); }}>Back</button>
@@ -100,7 +102,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
               {ex.steps.map((s, i) => (
                 <button key={s.id} className={s.state === at ? "on" : s.state < at ? "seen" : ""} disabled={s.state === at}
                   onClick={() => { setPlaying(false); setAt(s.state); }}>
-                  <span className="badge">{i + 1}</span><span className="name">{s.narration}</span>
+                  <span className="badge">{i + 1}</span><span className="name"><Rich text={s.narration} /></span>
                 </button>
               ))}
             </div>

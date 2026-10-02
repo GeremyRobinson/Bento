@@ -2,7 +2,7 @@ import { formatNumber as f, num, op, text, type MathText } from "../../../schema
 import type { AnswerModel } from "../../../schemas/lesson";
 import type { AnimationState, Explanation, ExplanationStep } from "../../../../explanations/schema";
 import { buildSplitAreaDiagram } from "../../../../explanations/diagrams/area-model/build";
-import type { AreaLayout } from "../../../../explanations/diagrams/area-model/schema";
+import type { AreaDiagram, AreaLayout } from "../../../../explanations/diagrams/area-model/schema";
 import type { SplitMultiplicationProblem } from "./problem";
 import { placeName } from "../../../generators/place-value";
 
@@ -12,15 +12,16 @@ const words = (values: number[]) => values.map(f).join(" + ");
 /** Value the answer model expects for a step; the explanation must arrive at the same number. */
 function expectedFor(answers: AnswerModel, stepId: string): number {
   const step = answers.steps.find(s => s.id === stepId);
-  if (!step || !step.slots[0]) throw new Error(`answer model has no step ${stepId}`);
-  return step.slots[0].expected;
+  const v = step?.slots[0]?.expected;
+  if (v == null) throw new Error(`answer model has no step ${stepId}`);
+  return v;
 }
 
 /**
  * Narration, equations, highlights and animation states for one problem.
  * Built from the canonical problem and its answer model, never from typed numbers.
  */
-export function explainSplitMultiplication(p: SplitMultiplicationProblem, answers: AnswerModel, layout?: AreaLayout): Explanation {
+export function explainSplitMultiplication(p: SplitMultiplicationProblem, answers: AnswerModel, layout?: AreaLayout): Explanation & { diagram: AreaDiagram } {
   const a = p.firstFactor, b = p.secondFactor;
   const many = p.parts.length > 1;
 

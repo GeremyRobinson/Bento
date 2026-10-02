@@ -251,6 +251,8 @@
 .fr.slots>span:first-child{padding-bottom:6px}
 .mixed{display:inline-flex;align-items:center;gap:var(--s)}
 .note{color:var(--muted);text-align:center;font-size:var(--small);line-height:20px}
+.learn .idea{margin:0 0 8px;line-height:1.45}
+.learn .caption{text-align:center;font-size:var(--small);margin:6px 0 0}
 .feedback{display:flex;gap:12px;align-items:flex-start;padding:12px var(--u);border-radius:var(--r-box);line-height:var(--lh)}
 .feedback .dot{margin-top:calc((var(--lh) - 12px) / 2)}
 .fb-good{background:color-mix(in srgb,var(--ok) 14%,var(--card))}

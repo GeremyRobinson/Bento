@@ -1,10 +1,17 @@
 import type { AnyLesson } from "./schemas/lesson";
-import { splitMultiplication } from "./lessons/grade5/split-multiplication";
+import { CATALOG } from "./catalog";
 
-/** Lessons rebuilt so far, in curriculum order. Later milestones add the rest of the current app's 122. */
-export const LESSONS: AnyLesson[] = [splitMultiplication];
+// Every lesson module registers itself by living at lessons/<grade>/<id>/index.ts and exporting `lesson`.
+const modules = import.meta.glob<{ lesson: AnyLesson }>("./lessons/*/*/index.ts", { eager: true });
+const BY_ID = new Map(Object.values(modules).map(m => [m.lesson.id, m.lesson]));
 
-export const lessonById = (id: string): AnyLesson | undefined => LESSONS.find(l => l.id === id);
+/** Lessons rebuilt so far, in curriculum order (the catalog's). */
+export const LESSONS: AnyLesson[] = CATALOG.flatMap(c => {
+  const l = BY_ID.get(c.id);
+  return l ? [l] : [];
+});
+
+export const lessonById = (id: string): AnyLesson | undefined => BY_ID.get(id);
 
 export function requireLesson(id: string): AnyLesson {
   const l = lessonById(id);
