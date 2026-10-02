@@ -1,4 +1,4 @@
-import { formatNumber as f, m, mark, num, op, text, type MathText } from "../../../schemas/math-text";
+import { br, formatNumber as f, m, mark, num, op, text, type MathText } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
 import { fP, ns, P, poly, v } from "../../algebra-kit/steps";
@@ -61,7 +61,7 @@ export const lesson: LessonDefinition<Composition> = {
   reference: createComposition(1, 1, 2, 0, 3),
   generate: rng => generateComposition(rng),
   restore: restoreComposition,
-  display: p => [...fx(p), text("  "), ...gx(p)],
+  display: p => [...fx(p), br(), ...gx(p)],
   displayNote: p => `Find f(g(${f(p.k)})).`,
   answers: compositionAnswers,
   explain: explainComposition,

@@ -1,13 +1,13 @@
-import { num, op, text, type MathText } from "../../../schemas/math-text";
+import { br, num, op, text, type MathText } from "../../../schemas/math-text";
 import type { AnswerModel } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPlane } from "../../../../explanations/diagrams/plane/build";
 import { expected, f, pt } from "../../_plane/kit";
 import type { SystemProblem } from "./problem";
 
-/** y = 4x  x + y = 15, the two equations side by side */
+/** y = 4x and x + y = 15, one equation per line */
 export const systemMath = ({ k, s }: SystemProblem): MathText =>
-  [text("y"), op("="), num(k), text("x"), text(" "), text("x + y"), op("="), num(s)];
+  [text("y"), op("="), num(k), text("x"), br(), text("x + y"), op("="), num(s)];
 
 export function explainSystem(p: SystemProblem, model: AnswerModel): Explanation {
   const { k, s } = p;

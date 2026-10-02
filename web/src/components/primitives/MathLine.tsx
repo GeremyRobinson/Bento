@@ -30,6 +30,7 @@ export function MathLine({ math, values = {}, active = null, onSlot, className =
       case "mark": return <mark key={i}>{render(tok.v)}</mark>;
       case "muted": return <span key={i} className="muted">{render(tok.v)}</span>;
       case "bold": return <b key={i}>{render(tok.v)}</b>;
+      case "br": return <span key={i} className="br" />;
       case "slot": {
         const v = values[tok.id] ?? "", on = active === tok.id, cls = `slot${tok.small ? " small" : ""}${on ? " active" : ""}`;
         return onSlot ? (

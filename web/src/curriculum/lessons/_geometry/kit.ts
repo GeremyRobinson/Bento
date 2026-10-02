@@ -1,6 +1,6 @@
 // Step builders shared by the geometry and data lessons. They keep the current app's three compact step shapes:
 // one box (ns), several boxes (ms) and a fraction in lowest terms (fs), with the same checks and messages.
-import { answer, formatNumber as f, frac, num, op, slot, text, type MathText, type MathToken, type Operator } from "../../schemas/math-text";
+import { answer, br, formatNumber as f, frac, num, op, slot, text, type MathText, type MathToken, type Operator } from "../../schemas/math-text";
 import type { AnswerModel, AnswerStep, StepCheck } from "../../schemas/lesson";
 
 /** The current app's Pythagorean triples. */
@@ -19,13 +19,14 @@ type Piece = number | string | MathToken | MathText;
  */
 export function mt(strings: TemplateStringsArray, ...vals: Piece[]): MathText {
   const out: MathText = [];
-  const lit = (s: string) => {
-    for (const part of s.split(/\s*([+−×÷=<>≤≥≈→·±])\s*/)) {
+  const lit = (s: string) => s.split("\n").forEach((line, k) => {
+    if (k) out.push(br());
+    for (const part of line.split(/\s*([+−×÷=<>≤≥≈→·±])\s*/)) {
       if (!part) continue;
       if (OPS.has(part)) out.push(op(part as Operator));
       else out.push(text(part));
     }
-  };
+  });
   strings.forEach((s, i) => {
     lit(s);
     if (i < vals.length) {

@@ -18,7 +18,9 @@ export type MathToken =
   | { t: "mark"; v: MathText }
   /** quiet side notes such as "(× 3)" */
   | { t: "muted"; v: MathText }
-  | { t: "bold"; v: MathText };
+  | { t: "bold"; v: MathText }
+  /** a line break, for problems shown as two lines (two equations, two functions) */
+  | { t: "br" };
 
 export type MathText = MathToken[];
 
@@ -27,6 +29,7 @@ export const num = (v: number): MathToken => ({ t: "num", v });
 export const op = (v: Operator): MathToken => ({ t: "op", v });
 export const slot = (id: string, small = false): MathToken => (small ? { t: "slot", id, small } : { t: "slot", id });
 export const answer = (id: string, v: number): MathToken => ({ t: "answer", id, v });
+export const br = (): MathToken => ({ t: "br" });
 const asText = (x: MathText | number | string): MathText =>
   typeof x === "number" ? [num(x)] : typeof x === "string" ? [text(x)] : x;
 export const frac = (n: MathText | number | string, d: MathText | number | string): MathToken => ({ t: "frac", n: asText(n), d: asText(d) });
@@ -61,6 +64,7 @@ export function toPlainText(m: MathText, slotText = "?"): string {
       case "sub": return inner(tok.v);
       case "sqrt": return `√${inner(tok.v)}`;
       case "mark": case "muted": case "bold": return tok.v.map(one).join("");
+      case "br": return "; ";
     }
   };
   const inner = (x: MathText) => x.map(one).join("").replace(/\s+/g, " ").trim();

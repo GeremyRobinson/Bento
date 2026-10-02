@@ -1,4 +1,4 @@
-import { formatNumber as f, m, mark, num, op, text, type MathText } from "../../../schemas/math-text";
+import { br, formatNumber as f, m, mark, num, op, text, type MathText } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
 import { fP, ns, P, v } from "../../algebra-kit/steps";
@@ -21,7 +21,7 @@ export function restoreElimination(raw: unknown): EliminationSystem | null {
 const first = (s: number, y: MathText = [v("y")]): MathText => [v(), op("+"), ...y, op("="), num(s)];
 const second = (d: number, y: MathText = [v("y")]): MathText => [v(), op("−"), ...y, op("="), num(d)];
 /** The two equations, one after the other (the current app put a line break between them). */
-const system = (p: EliminationSystem): MathText => [...first(p.sum), text("  "), ...second(p.difference)];
+const system = (p: EliminationSystem): MathText => [...first(p.sum), br(), ...second(p.difference)];
 
 export function eliminationAnswers({ x, y, sum, difference }: EliminationSystem): AnswerModel {
   return {

@@ -36,11 +36,15 @@
 .beat .say .mline{font-size:var(--work);justify-content:flex-start}
 
 /* math lines built from MathText */
-.mline{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25em;font-variant-numeric:tabular-nums}
-.mline .o{color:var(--muted)}
+/* pieces sit tight (8x, x², 3√2); operators carry their own space, text keeps the spaces written into it */
+.mline{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0;font-variant-numeric:tabular-nums}
+.mline .t{white-space:pre}
+.mline .o{color:var(--muted);margin:0 .3em}
+.mline .fr{margin:0 .15em}
+.mline>.muted,.mline-in>.muted{margin-left:.3em}
+.mline .br{flex-basis:100%;height:.15em}
+.math>.mline:has(.br){flex-wrap:wrap}
 .math>.mline{flex-wrap:nowrap;font-size:min(1em, 8.5vw)}
-.mline .lp{margin-right:-.2em}
-.mline .rp{margin-left:-.2em}
 .mline .ans{font-weight:700}
 .slot .caret{width:2px;height:.9em;background:var(--tint);margin-left:2px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
