@@ -196,15 +196,14 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .whead h2{font-size:var(--fs);font-weight:var(--w-bold);color:color-mix(in srgb,var(--c) 70%,var(--text))}
 .whead span{font-size:var(--small);color:var(--muted);font-weight:var(--w-mid);white-space:nowrap}
 .wbtns{display:grid;gap:8px}
-.gpick{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--card);text-align:left;min-width:0;
+.wpick{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--card);text-align:left;min-width:0;
   box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .2s var(--spring),box-shadow .2s;animation:rise .5s var(--ease) both;animation-delay:calc(var(--j) * .03s + .3s)}
-.gpick:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px color-mix(in srgb,var(--g) 60%,transparent)}
-.gpick:active{transform:scale(.97)}
-.gpick .num{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font:600 22px/1 var(--num);color:#fff;
-  background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--g) 70%,#fff),var(--g) 70%);box-shadow:0 0 0 3px color-mix(in srgb,var(--g) 18%,var(--card)),inset 0 -3px 0 rgba(0,0,0,.12)}
-.gpick .t{display:grid;gap:1px;min-width:0}
-.gpick .t b{font-size:calc(var(--fs) * 1.02);line-height:1.2}
-.gpick .t small{font-size:var(--small);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wpick:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px color-mix(in srgb,var(--g) 60%,transparent)}
+.wpick:active{transform:scale(.97)}
+.wpick .gbadge b{background:var(--tint);color:#fff}
+.wpick .t{display:grid;gap:1px;min-width:0}
+.wpick .t b{font-size:calc(var(--fs) * 1.02);line-height:1.2}
+.wpick .t small{font-size:var(--small);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (min-width:700px){
   .wgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .whero{grid-column:1 / -1}
@@ -1195,7 +1194,7 @@ function welcomeHTML(){
       <div class="wtext"><h1>Welcome to <span>Bento</span></h1><p>Math, one step at a time. Pick your grade to start.</p></div>
       <p class="wnote">You can switch grades any time from the badge at the top.</p></section>
     ${STAGES.map((st, k) => `<section class="wstage" style="--c:${st.col};--i:${k}"><div class="whead"><h2>${st.name}</h2><span>${st.ages}</span></div>
-      <div class="wbtns">${st.grades.map(g => `<button class="gpick" data-grade="${g}" style="--g:${GRADE_COLOR[g]};--j:${n++}"><span class="num">${GRADES[g]}</span><span class="t"><b>${GRADE_NAME[g].split(" · ")[0]}</b><small>${GRADE_SUB[g]}</small></span></button>`).join("")}</div></section>`).join("")}
+      <div class="wbtns">${st.grades.map(g => `<button class="wpick" data-grade="${g}" style="--g:${GRADE_COLOR[g]};--j:${n++}">${gradeBadge(g).html}<span class="t"><b>${GRADE_NAME[g].split(" · ")[0]}</b><small>${GRADE_SUB[g]}</small></span></button>`).join("")}</div></section>`).join("")}
   </div>`;
 }
 // a soft repeating pattern for each grade's hero, in that grade's colour
