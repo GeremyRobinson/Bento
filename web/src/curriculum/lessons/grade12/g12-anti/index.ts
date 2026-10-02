@@ -1,7 +1,7 @@
 import { formatNumber as f, frac, m, mark, num, op, sup, text, type MathText } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
-import { ns, supText, v } from "../../algebra-kit/steps";
+import { ns, poly, supText, v, xp } from "../../algebra-kit/steps";
 import { attempt, readInts, rule } from "../../algebra-kit/restore";
 import { beatExplanation } from "../../../../explanations/diagrams/algebra/chain";
 
@@ -24,6 +24,8 @@ export function restoreAntiderivative(raw: unknown): Antiderivative | null {
   return r && attempt(() => createAntiderivative(r.a, r.n));
 }
 
+/** c·xᵉ as message text: "x⁶" and "−x⁶" for ±1. */
+const termText = (c: number, e: number) => `${c === 1 ? "" : c === -1 ? "−" : f(c)}x${supText(e)}`;
 const coef = (a: number): MathText => (a === 1 ? [] : [num(a)]);
 const integral = ({ a, n }: Antiderivative, e: MathText = [num(n)]): MathText => [text("∫"), ...coef(a), v(), sup(e), text("dx")];
 
@@ -45,13 +47,13 @@ export function explainAntiderivative(p: Antiderivative, model: AnswerModel) {
   return beatExplanation({
     heading: "Up one, divide by the new power",
     statement: integral(p),
-    caption: `Check: the derivative of ${f(c)}x${supText(up)} is ${f(up)} × ${f(c)}x${supText(n)} = ${f(a)}x${supText(n)}.`,
-    alt: `∫ ${f(a)}x${supText(n)} dx: the exponent goes up to ${f(up)}, and ${f(a)} ÷ ${f(up)} = ${f(c)}, so ${f(c)}x${supText(up)} + C.`,
+    caption: `Check: the derivative of ${termText(c, up)} is ${f(up)} × ${termText(c, n)} = ${termText(a, n)}.`,
+    alt: `∫ ${termText(a, n)} dx: the exponent goes up to ${f(up)}, and ${f(a)} ÷ ${f(up)} = ${f(c)}, so ${termText(c, up)} + C.`,
     steps: [
       { id: "problem", narration: `Integrating goes the other way from derivatives.`, math: integral(p, [mark(n)]) },
       { id: "raise", narration: `Raise the exponent by 1: ${f(n)} + 1 = ${f(up)}.`, math: m(n, op("+"), 1, op("="), up), line: [frac([...coef(a), v(), sup([mark(up)])], [mark(up)])], answerStep: "raise", result: up },
       { id: "divide", narration: `Divide by the new exponent: ${f(a)} ÷ ${f(up)} = ${f(c)}. Add + C for any constant.`, math: m(a, op("÷"), up, op("="), c),
-        line: [num(c), v(), sup(up), op("+"), text("C")], answerStep: "divide", result: c },
+        line: [...poly([[c, xp(up)]]), op("+"), text("C")], answerStep: "divide", result: c },
     ],
   });
 }

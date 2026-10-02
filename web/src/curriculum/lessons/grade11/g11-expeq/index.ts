@@ -31,7 +31,7 @@ export function exponentialAnswers({ b, k, c, value }: ExponentialEquation): Ans
   return {
     steps: [
       ns({ id: "base", l: "Same base", a: s => [text(big(value)), op("="), num(b), sup(s)], ans: k, h: `How many ${f(b)}'s multiply to ${big(value)}?` }),
-      ns({ id: "solve", l: "Set exponents equal", a: s => [...exponent(c), op("="), num(k), text(", so"), v(), op("="), ...s], ans: k - c,
+      ns({ id: "solve", l: "Set exponents equal", a: s => [...exponent(c), op("="), num(k), text(", so "), v(), op("="), ...s], ans: k - c,
         h: `Same base means the exponents match. Undo the ${fpm(c)}.`, w: [[k + c, "Wrong direction", `To undo ${fpm(c)}, do the opposite.`]] }),
     ],
     finalParts: [-1],

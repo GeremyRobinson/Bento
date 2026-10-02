@@ -28,7 +28,7 @@ export function eliminationAnswers({ x, y, sum, difference }: EliminationSystem)
     steps: [
       ns({ id: "add", l: "Add the equations", n: "The y's cancel.", a: s => [num(2), v(), op("="), ...s], ans: 2 * x, h: `${f(sum)} + ${fP(difference)}.` }),
       ns({ id: "x", l: "Solve for x", a: s => [v(), op("="), ...s], ans: x, h: `${f(2 * x)} ÷ 2.` }),
-      ns({ id: "y", l: "Find y", a: s => [num(x), op("+"), v("y"), op("="), num(sum), text(","), v("y"), op("="), ...s], ans: y, h: `${f(sum)} − ${fP(x)}.` }),
+      ns({ id: "y", l: "Find y", a: s => [num(x), op("+"), v("y"), op("="), num(sum), text(", "), v("y"), op("="), ...s], ans: y, h: `${f(sum)} − ${fP(x)}.` }),
     ],
     finalParts: [-2, -1],
   };
@@ -47,7 +47,7 @@ export function explainElimination(p: EliminationSystem, model: AnswerModel) {
       { id: "second", narration: `The second has − y. Added together, + y and − y make 0.`, math: second(difference, [mark("y")]) },
       { id: "add", narration: `Add the equations: x + x = 2x and ${f(sum)} + ${fP(difference)} = ${f(twoX)}.`, math: m(2, v(), op("="), sum, op("+"), ...P(difference), op("="), twoX), answerStep: "add", result: twoX },
       { id: "x", narration: `Divide by 2: x = ${f(x)}.`, math: m(v(), op("="), twoX, op("÷"), 2, op("="), x), answerStep: "x", result: x },
-      { id: "y", narration: `Put x = ${f(x)} back into x + y = ${f(sum)}: y = ${f(sum)} − ${fP(x)} = ${f(y)}.`, math: m(x, op("+"), v("y"), op("="), sum, text(", so"), v("y"), op("="), y), answerStep: "y", result: y },
+      { id: "y", narration: `Put x = ${f(x)} back into x + y = ${f(sum)}: y = ${f(sum)} − ${fP(x)} = ${f(y)}.`, math: m(x, op("+"), v("y"), op("="), sum, text(", so "), v("y"), op("="), y), answerStep: "y", result: y },
     ],
   });
 }

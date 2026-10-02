@@ -1,4 +1,4 @@
-import { formatNumber as f, m, num, op, type MathText } from "../../../schemas/math-text";
+import { formatNumber as f, m, num, op, toPlainText, type MathText } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
 import { ns, v } from "../../algebra-kit/steps";
@@ -95,7 +95,7 @@ export function explainOneStep(p: OneStepEquation, model: AnswerModel) {
     steps: [
       { id: "equation", narration: `x has ${undoes} ${f(p.a)} done to it, and the pans balance at ${f(p.rhs)}.`, math: [...lhs(p), op("="), num(p.rhs)] },
       { id: "undo", narration: `To undo ${undoes} ${f(p.a)}, ${opp} ${f(p.a)} on both sides: x = ${f(x)}.`, math: [v(), op("="), num(x)], answerStep: "undo", result: x },
-      { id: "check", narration: `Check: put ${f(x)} back in. ${f(rhs)}, the same as the other side. ✓`, math: [...checkSide(p, x), op("="), num(rhs)], answerStep: "check", result: rhs },
+      { id: "check", narration: `Check: put ${f(x)} back in for x. ${toPlainText(checkSide(p, x))} = ${f(rhs)}, the same as the other side. ✓`, math: [...checkSide(p, x), op("="), num(rhs)], answerStep: "check", result: rhs },
     ],
   });
 }

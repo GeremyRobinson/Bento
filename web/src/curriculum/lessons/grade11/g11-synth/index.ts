@@ -58,7 +58,7 @@ export function explainSynthetic(p: SyntheticDivision, model: AnswerModel) {
       { id: "add1", narration: `Add down the column: ${f(b)} + ${fP(r)} = ${f(q)}.`, math: m(b, op("+"), ...P(r), op("="), mark(q)), answerStep: "add1", result: q },
       { id: "mul2", narration: `Multiply ${f(q)} by ${f(r)}: ${f(qr)}.`, math: m(q, op("×"), ...P(r), op("="), qr), answerStep: "mul2", result: qr },
       { id: "rem", narration: `Add the last column: ${f(c)} + ${fP(qr)} = ${f(rem)}. It divides evenly.`, math: m(c, op("+"), ...P(qr), op("="), mark(rem)), answerStep: "rem", result: rem },
-      { id: "quot", narration: `The bottom row 1, ${f(quot)} means x + ${fP(quot)}, remainder 0.`, math: [v(), op(quot < 0 ? "−" : "+"), num(Math.abs(quot)), text(", remainder"), num(rem)], answerStep: "quot", result: quot },
+      { id: "quot", narration: `The bottom row 1, ${f(quot)} means x + ${fP(quot)}, remainder 0.`, math: [v(), op(quot < 0 ? "−" : "+"), num(Math.abs(quot)), text(", remainder "), num(rem)], answerStep: "quot", result: quot },
     ],
   });
 }
