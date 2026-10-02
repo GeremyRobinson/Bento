@@ -282,18 +282,34 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
   .b-review,.b-stats:last-child{grid-column:1 / -1}
 }
 @media (min-width:900px) and (orientation:landscape){
-  .bhome{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
-  .b-hero{grid-column:1;grid-row:1 / span 2;min-height:0}
+  /* the same 3-column grid as the unit tiles below, so every edge lines up */
+  .bhome{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .b-hero{grid-column:1 / span 2;grid-row:1 / span 2;min-height:0}
   .bhome.tall .b-hero{grid-row:1 / span 3}
-  .bhome>.tile,.bhome>.b-review,.bhome>.b-stats:last-child{grid-column:2}
+  .bhome>.tile,.bhome>.b-review,.bhome>.b-stats:last-child{grid-column:3}
   .b-stats.solo{grid-row:1 / span 2}
   .bhome:not(:has(.b-review)) .b-weak{grid-row:3}
+  .b-stats{grid-template-rows:1fr auto}
+  .b-stats .statgrid{grid-template-columns:minmax(0,1fr)}
+  .b-stats .statgrid .st{display:flex;align-items:center;justify-content:flex-start;gap:var(--u);padding:6px var(--u);text-align:left}
+  .b-stats .statgrid .st+.st{border-left:0;border-top:1px solid var(--rule)}
+  .b-stats .statgrid .v{min-width:64px;justify-content:center}
   .upnext b{font-size:calc(var(--fs) * 1.8)}
 }
 
 /* ---- units and lessons ---- */
 .units{display:grid;gap:var(--u);align-items:start}
-@media (min-width:700px){.units{display:block;columns:3 300px;column-gap:var(--u)}.units>.panel{break-inside:avoid;margin-bottom:var(--u)}}
+@media (min-width:700px){.units{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}.units>.panel{align-content:start}}
+@media (min-width:700px){.units>.panel:last-child:nth-child(odd){grid-column:1 / -1}}
+@media (min-width:900px) and (orientation:landscape){.units{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .units>.panel:last-child:nth-child(odd){grid-column:auto}
+  .units>.panel:last-child:nth-child(3n+1){grid-column:1 / -1}
+  .units>.panel:last-child:nth-child(3n+2){grid-column:span 2}}
+/* a unit stretched across the row lays its lessons out side by side, on the same columns */
+@media (min-width:700px){.units>.panel:last-child:nth-child(odd) .lessons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px) and (orientation:landscape){.units>.panel:last-child:nth-child(odd) .lessons{grid-template-columns:minmax(0,1fr)}
+  .units>.panel:last-child:nth-child(3n+1) .lessons{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .units>.panel:last-child:nth-child(3n+2) .lessons{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .unit{display:flex;justify-content:space-between;align-items:center;gap:var(--s);padding:0 0 0 var(--s);min-height:var(--h)}
 .unit h3{color:var(--tint);font-size:var(--small);line-height:20px;font-weight:var(--w-bold);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wrap[data-band="high"] .unit h3{text-transform:uppercase;color:var(--muted)}
