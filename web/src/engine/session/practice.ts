@@ -228,7 +228,8 @@ export function pressKey(s: PracticeSession, key: string): PracticeSession {
   if (key === "back") v = cur.slice(0, -1);
   else if (key === "−") v = cur.startsWith("−") ? cur.slice(1) : "−" + cur;
   else if (key === ".") v = cur.includes(".") ? cur : (cur === "" || cur === "−" ? cur + "0." : cur + ".");
-  else if (/^\d$/.test(key)) v = cur.length >= 9 ? cur : cur + key;
+  // up to 6 digits, and a lone leading zero is replaced, as in the current app
+  else if (/^\d$/.test(key)) v = cur.replace(/[−.]/g, "").length >= 6 ? cur : (cur === "0" ? "" : cur === "−0" ? "−" : cur) + key;
   else return s;
   return { ...s, values: { ...s.values, [s.active]: v } };
 }

@@ -8,7 +8,7 @@ export function TopBar() {
   const g = progress.grade ?? 5, gxp = progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
   return (
     <header className="top">
-      <button className="brand" onClick={() => go({ name: "home" })} aria-label="Bento home">Bento</button>
+      <button className="brand" onClick={() => go({ name: "welcome" }, "back")} aria-label="Bento home page">Bento</button>
       <button className="gpick" onClick={() => openSheet(true)} aria-label="Change grade">
         <GradeBadge grade={g} gxp={gxp} />
         <span className="gtext"><b>{gradeOf(g).name}</b><small>Level {lvl} · {into}/{LEVEL_XP} XP</small></span>

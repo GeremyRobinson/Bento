@@ -29,20 +29,25 @@ describe("a whole lesson in the browser", () => {
     // home: up next is the rebuilt lesson
     fireEvent.click(screen.getByRole("button", { name: /Up next.*Multiply two-digit numbers/ }));
 
-    // learn: the reference problem, its picture, and narration from the same model
-    expect(document.querySelector(".math")!.textContent).toContain("47 × 36 = 47 × (30 + 6)");
+    // learn: a freshly generated problem (the owner's choice: every picture is random), its picture, and narration
+    // from the same model. The statement, the picture and the narration must all describe the same numbers.
+    const statement = document.querySelector(".math .mline")!.getAttribute("data-plain")!;
+    const sm = statement.match(/^(\d+) × (\d+) = \1 × \((\d+) \+ (\d+)\)$/);
+    expect(sm, statement).not.toBeNull();
+    const [a, b, tens, ones] = sm!.slice(1).map(Number) as [number, number, number, number];
+    expect(tens + ones).toBe(b);
     const pic = screen.getByRole("img");
-    expect(pic.getAttribute("aria-label")).toBe("47 by 36 rectangle, split into 47 by 30 = 1410 and 47 by 6 = 282. Total 1692.");
+    expect(pic.getAttribute("aria-label")).toBe(`${a} by ${b} rectangle, split into ${a} by ${tens} = ${a * tens} and ${a} by ${ones} = ${a * ones}. Total ${a * b}.`);
     expect(pic.getAttribute("data-split")).toBe("false");
     fireEvent.click(screen.getByRole("button", { name: "Show all" }));
     expect(pic.getAttribute("data-split")).toBe("true");
     expect(pic.getAttribute("data-sum")).toBe("true");
     expect(screen.getByText("That's the whole problem. Your turn!")).toBeInTheDocument();
-    expect(screen.getAllByText("Add the parts to fill the whole rectangle: 1692.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(`Add the parts to fill the whole rectangle: ${a * b}.`).length).toBeGreaterThan(0);
 
     // a new example redraws everything from a new problem
     fireEvent.click(screen.getByRole("button", { name: "Another one" }));
-    expect(document.querySelector(".math")!.textContent).not.toContain("47 × 36");
+    expect(document.querySelector(".math .mline")!.getAttribute("data-plain")).not.toBe(statement);
 
     fireEvent.click(screen.getByRole("button", { name: "Start practice ›" }));
 

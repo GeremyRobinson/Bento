@@ -1,4 +1,5 @@
 import { lessonById } from "../../curriculum/registry";
+import { entryById, titleOf } from "../../app/curriculum";
 import { CATEGORIES } from "../../engine/diagnosis/diagnose";
 import { LEVELS } from "../../engine/mastery/levels";
 import type { Mistake, SessionReport } from "../../engine/session/types";
@@ -8,7 +9,7 @@ import { ProblemView } from "../practice/ProblemView";
 import { ScoreChip } from "../primitives/Score";
 
 const explainMistake = (m: { cat: Mistake["cat"]; label: string; msg: string }) =>
-  m.cat === "concept" ? `${m.label}: ${m.msg}` : `${CATEGORIES[m.cat][1]} Tip: ${CATEGORIES[m.cat][2]}`;
+  m.cat === "concept" || !CATEGORIES[m.cat] ? `${m.label}: ${m.msg}` : `${CATEGORIES[m.cat][1]} Tip: ${CATEGORIES[m.cat][2]}`;
 
 /** "What you did" and "For the grown-up": every problem with its worked lines, and every mistake grouped by kind. */
 export function SessionReportView({ rep }: { rep: SessionReport }) {
@@ -19,7 +20,7 @@ export function SessionReportView({ rep }: { rep: SessionReport }) {
   }
   const sorted = [...groups.entries()].sort((a, b) => b[1].n - a[1].n);
   const rushed = rep.mistakes.filter(m => m.rushed).length;
-  const skills = [...new Set(rep.probs.map(p => p.lessonId))].map(id => lessonById(id)?.title).filter(Boolean);
+  const skills = [...new Set(rep.probs.map(p => p.lessonId))].filter(id => entryById(id) || lessonById(id)).map(titleOf);
   return (
     <>
       <section className="panel">
@@ -61,7 +62,7 @@ export function SessionReportView({ rep }: { rep: SessionReport }) {
             <div className="facts mlist" style={{ background: "var(--card)" }}>
               {rep.mistakes.map((m, i) => (
                 <div key={i}><span>
-                  <span className="k">Problem {m.n} · Step {m.step} · {m.label}{rep.mode !== "practice" && lessonById(m.lessonId) ? ` · ${lessonById(m.lessonId)!.title}` : ""}</span>
+                  <span className="k">Problem {m.n} · Step {m.step} · {m.label}{rep.mode !== "practice" && (entryById(m.lessonId) || lessonById(m.lessonId)) ? ` · ${titleOf(m.lessonId)}` : ""}</span>
                   <span>Typed <b className="mono">{m.typed}</b>, answer <b className="mono">{m.want}</b>. {m.kind}{m.rushed ? " (quick retry)" : ""}.</span>
                 </span></div>
               ))}
