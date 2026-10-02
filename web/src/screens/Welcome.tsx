@@ -47,13 +47,17 @@ export function pickShowcase(rng: Rng): (Showcase & { ex: Pictured })[] {
 
 type Pictured = Explanation & { diagram: NonNullable<Explanation["diagram"]> };
 
-/** A fresh problem's explanation picture for a showcase lesson, or null while the lesson isn't rebuilt (or has no picture). */
+/** Long ladders of math lines (five or more) make a tile tall and thin, so showcases pass them over for another lesson. */
+const tooTall = (d: Pictured["diagram"]) => d.kind === "chain" && d.lines.length > 4;
+
+/** A fresh problem's explanation picture for a showcase lesson, or null while the lesson isn't rebuilt (or has no picture that fits a tile). */
 export function showcasePicture(id: string, rng: Rng): Pictured | null {
   const lesson = lessonById(id);
   if (!lesson) return null;
   const tryOne = (p: unknown): Pictured | null => {
     const ex = lesson.explain(p, lesson.answers(p));
-    return ex.diagram ? (ex as Pictured) : null;
+    if (!ex.diagram || tooTall(ex.diagram)) return null;
+    return ex as Pictured;
   };
   try { return tryOne(lesson.generate(rng, 0)); } catch { /* fall back to the worked reference */ }
   try { return tryOne(lesson.reference); } catch { return null; }
