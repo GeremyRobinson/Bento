@@ -8,7 +8,7 @@ import { lastScore } from "../engine/mastery/progress";
 import { when } from "../app/format";
 import { Diagram } from "../components/diagrams/Diagram";
 import { entriesInGrade } from "../app/curriculum";
-import { backFor } from "../engine/session/practice";
+import { BuildUp } from "../components/BuildUp";
 import type { Rng } from "../curriculum/generators/rng";
 import type { AnyLesson } from "../curriculum/schemas/lesson";
 import { Chevron, HomeIcon } from "../components/primitives/icons";
@@ -61,7 +61,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
   const grade = lessonsInGrade(lesson.grade), k = grade.indexOf(lesson);
   const prev = grade[k - 1], next = grade[k + 1];
   const sc = lastScore(progress, lesson.id), rep = reports[lesson.id], tier = tierFor(sc);
-  const back = sc != null && sc <= 1 ? backFor(lesson.id) : null;
+  const low = sc != null && sc <= 1;
   const all = entriesInGrade(lesson.grade), place = all.findIndex(c => c.id === lesson.id);
 
   const step = (d: 1 | -1) => { setPlaying(false); setAt(a => Math.max(0, Math.min(last, a + d))); };
@@ -159,11 +159,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
               <span className="muted">{["It fades as your score grows.", "Score 3 to go to final answers.", "Miss one and the steps come back."][tier]}</span>
             </section>
           )}
-          {back && (
-            <button className="lesson t1 backup" onClick={() => go({ name: "learn", lessonId: back.id }, "back")}>
-              <span className="badge">↩</span><span className="name">Build up first: {back.title}</span><span className="muted">{gradeOf(back.grade).name}</span>
-            </button>
-          )}
+          {low && <BuildUp lessonId={lesson.id} />}
           <span className="visually-hidden">{gradeOf(lesson.grade).name}</span>
         </aside>
       </div>

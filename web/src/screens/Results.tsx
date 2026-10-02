@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { mins, when } from "../app/format";
 import { reduceMotion } from "../app/transition";
-import { bandOf, gradeOf } from "../curriculum/grades";
+import { bandOf } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { LEVELS } from "../engine/mastery/levels";
-import { backFor } from "../engine/session/practice";
+import { BuildUp } from "../components/BuildUp";
 import type { SessionReport } from "../engine/session/types";
 import { SessionReportView } from "../components/reports/SessionReportView";
 
@@ -43,8 +43,7 @@ export function Results() {
   const grade = lesson ? lessonsInGrade(lesson.grade) : [], k = lesson ? grade.indexOf(lesson) : -1, next = grade[k + 1];
   const lastLesson = lessonById(rep.probs[rep.probs.length - 1]?.lessonId ?? "");
   const band = bandOf(lesson?.grade ?? lastLesson?.grade ?? progress.grade ?? 5);
-  // a low score suggests the lesson that builds up to this one
-  const back = rep.mode === "practice" && rep.level <= 1 ? backFor(rep.key) : null;
+  const low = rep.mode === "practice" && rep.level <= 1;
   return (
     <>
       <div className="bar"><span className="grow">{rep.title}: done</span><span className="ctl badged"><span className="badge on">⭐</span><span className="mono">{progress.xp}</span></span></div>
@@ -60,11 +59,7 @@ export function Results() {
             <div><span className="k">{test ? "All steps right" : "No mistakes"}</span><span className="v">{rep.clean}/{rep.total}</span></div>
             <div><span className="k">Time</span><span className="v">{mins(rep.ms)}<small className="muted"> min</small></span></div>
           </div>
-          {back && (
-            <button className="lesson t1 backup" onClick={() => go({ name: "learn", lessonId: back.id })}>
-              <span className="badge">↩</span><span className="name">Build up first: {back.title}</span><span className="muted">{gradeOf(back.grade).name}</span>
-            </button>
-          )}
+          {low && <BuildUp lessonId={rep.key} />}
           <div className="actions">
             {rep.mode === "practice" && next && <button className="ctl go" onClick={() => go({ name: "learn", lessonId: next.id }, "fwd")}>Next lesson</button>}
             {test ? <button className="ctl go" onClick={() => startTest(rep.key)}>Take it again</button>

@@ -117,7 +117,7 @@
 .uprog .mono{color:var(--muted);min-width:3ch;text-align:right}
 .bar2{height:10px;border-radius:999px;background:var(--rule);overflow:hidden}
 .bar2 i{display:block;height:100%;border-radius:inherit;background:var(--tint);min-width:10px;animation:grow 1s var(--ease) .2s both}
-.bar2 i[style^="width:0"]{min-width:0}
+.bar2 i[style^="width:0"],.bar2 i.zero{min-width:0}
 @keyframes grow{from{width:0}}
 @media (max-width:699px){.uprog{display:none}}
 .b-weak .lessons{gap:6px}

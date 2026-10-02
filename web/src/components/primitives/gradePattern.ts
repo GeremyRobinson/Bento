@@ -1,8 +1,8 @@
 import { gradeOf } from "../../curriculum/grades";
 
 // A soft repeating pattern for each grade's hero, in that grade's colour (same shapes as the current app).
-export function gradePattern(g: number): string {
-  const c = gradeOf(g).color, o = .16, sh = [
+export function gradePattern(g: number, color?: string): string {
+  const c = color ?? gradeOf(g).color, o = .16, sh = [
     `<circle cx="20" cy="24" r="10"/><circle cx="80" cy="70" r="16"/><circle cx="100" cy="16" r="6"/>`,
     `<path d="M20 30h20M30 20v20M80 80h20M90 70v20" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`,
     `<path d="M0 40q15 -14 30 0t30 0t30 0t30 0M0 90q15 -14 30 0t30 0t30 0t30 0" fill="none" stroke="${c}" stroke-width="4"/>`,

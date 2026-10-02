@@ -37,7 +37,7 @@ export function Home() {
           <div><h1>{grade.name}</h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
           {units.length > 1 && (
             <div className="uprog">{units.map(u => { const d = doneCount(progress, u.entries); return (
-              <div key={u.name}><span className="k">{u.name}</span><span className="bar2"><i style={{ width: `${(100 * d / u.entries.length).toFixed(1)}%` }} /></span><span className="mono">{d}/{u.entries.length}</span></div>
+              <div key={u.name}><span className="k">{u.name}</span><span className="bar2"><i className={d ? undefined : "zero"} style={{ width: `${(100 * d / u.entries.length).toFixed(1)}%` }} /></span><span className="mono">{d}/{u.entries.length}</span></div>
             ); })}</div>
           )}
           {run ? (

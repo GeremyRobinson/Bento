@@ -44,7 +44,7 @@ function Shot({ id, big, color, k, rng }: { id: string; big: boolean; color: str
     // not rebuilt yet: a quiet tile in the lesson's grade pattern, so the grid keeps its shape
     return (
       <figure className={`lshot pending${big ? " big" : ""}`} style={style} aria-label={`${entry?.title ?? id}, picture coming soon`}>
-        <div className="lpend" style={{ backgroundImage: gradePattern(grade.grade) }}><span className="lpend-mark">{grade.short}</span></div>
+        <div className="lpend" style={{ backgroundImage: gradePattern(grade.grade, color) }}><span className="lpend-mark">{grade.short}</span></div>
         {caption}
       </figure>
     );

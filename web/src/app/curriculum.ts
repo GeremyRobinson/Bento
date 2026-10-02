@@ -4,7 +4,7 @@
 import { CATALOG, type CatalogEntry } from "../curriculum/catalog";
 import { lessonById } from "../curriculum/registry";
 import { lastScore, timesDone, type Progress } from "../engine/mastery/progress";
-import { testKey } from "../engine/session/practice";
+import { backFor, testKey } from "../engine/session/practice";
 
 export type Entry = CatalogEntry;
 
@@ -31,6 +31,19 @@ export function gradeAverage(p: Progress, g: number): number | null {
 }
 
 export const doneCount = (p: Progress, entries: Entry[]) => entries.filter(c => timesDone(p, c.id) > 0).length;
+
+/**
+ * "Build up first": the engine's backFor rule (the lesson's `pre`, else the lesson before it in the same unit),
+ * read over the whole catalog so the suggestion is the current app's even while that lesson is being rebuilt.
+ */
+export function buildUpFor(id: string): Entry | null {
+  const ported = backFor(id);
+  const c = entryById(id);
+  if (!c) return ported ? entryById(ported.id) ?? null : null;
+  if (c.pre && entryById(c.pre)) return entryById(c.pre)!;
+  const g = entriesInGrade(c.grade), k = g.indexOf(c);
+  return k > 0 && g[k - 1]!.unit === c.unit ? g[k - 1]! : ported ? entryById(ported.id) ?? null : null;
+}
 
 /** A unit test or grade check-up can start once at least one of its lessons is rebuilt. */
 export const testReady = (g: number, unit?: string) =>
