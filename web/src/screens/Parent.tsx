@@ -48,7 +48,7 @@ export function Parent() {
           <p className="muted" style={{ padding: "0 5px" }}>4 Advanced · 3 Proficient · 2 Approaching · 1 Beginning · 0 Not yet. Based on how many steps were right on the first try. Hints count half.</p>
         </section>
         <section className="panel">
-          <div className="head"><h2>Mistake patterns</h2><span className="muted">last {plural(progress.log.length, "session")}</span></div>
+          <div className="head"><h2>Mistake patterns</h2>{progress.log.length > 0 && <span className="muted">last {plural(progress.log.length, "session")}</span>}</div>
           {top.length ? (
             <div className="facts" style={{ background: "var(--card)" }}>
               {top.map(([k, n]) => { const m = first[k]; return (

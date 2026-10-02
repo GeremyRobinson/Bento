@@ -390,3 +390,4 @@
 .yearlink{font:inherit;color:inherit;letter-spacing:inherit;border-radius:12px;margin:-2px -6px;padding:2px 6px;transition:background .15s}
 .yearlink:hover{background:color-mix(in srgb,var(--card) 60%,transparent)}
 .yearlink span{opacity:.45;font-weight:600}
+@media (min-width:900px) and (orientation:landscape){.bar .pbtn{visibility:hidden}}

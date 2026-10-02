@@ -15,9 +15,9 @@
 .lsec{display:grid;justify-items:center;gap:6px;text-align:center;padding:calc(var(--u) * 2) var(--u) 0}
 .lsec h2{font:700 clamp(28px,4.5vw,44px)/1.1 var(--sans);letter-spacing:-.03em}
 .lsec p{max-width:520px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.02)}
-.lshots{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
-@media (min-width:700px){.lshots{grid-template-columns:repeat(2,minmax(0,1fr))}.lshot.big{grid-column:1 / -1}}
-@media (min-width:960px){.lshots{grid-template-columns:repeat(3,minmax(0,1fr))}.lshot.big{grid-column:span 2;grid-row:span 2}}
+.lshots{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr);grid-auto-flow:row dense}
+@media (min-width:700px){.lshots{grid-template-columns:repeat(2,minmax(0,1fr))}.lshot.big,.lshot.wide{grid-column:1 / -1}}
+@media (min-width:960px){.lshots{grid-template-columns:repeat(3,minmax(0,1fr))}.lshot.big{grid-column:span 2;grid-row:span 2}.lshot.wide{grid-column:span 2}}
 .lshot{margin:0;background:var(--card);border-radius:var(--r-panel);padding:var(--u);display:grid;grid-template-rows:1fr auto;gap:var(--s);cursor:pointer;box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) both;animation-delay:calc(var(--i) * 60ms)}
 .lshot .viz{align-self:center;align-content:center}
 .lshot .viz-cap,.lshot .replay{display:none}

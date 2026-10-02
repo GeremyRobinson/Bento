@@ -13,7 +13,7 @@ import {
 
 /** One problem at a time: the problem and the finished lines on one side, the step, feedback and keypad on the other. */
 export function Practice() {
-  const { progress, go, act, finish } = useApp();
+  const { progress, go, act, finish, quit } = useApp();
   const s = progress.run;
 
   // a physical keyboard works too: digits, minus, point, Backspace, Tab for the next box, Enter to check
@@ -58,8 +58,9 @@ export function Practice() {
     <>
       <div className="bar">
         <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
-        <button className="ctl" onClick={() => go(mixed ? { name: "home" } : { name: "learn", lessonId: lesson.id }, "back")}
-          aria-label={mixed ? "Quit" : "Back to the lesson"}>{mixed ? "Quit" : "Lesson"}</button>
+        {mixed
+          ? <button className="ctl" onClick={quit}>Quit</button>
+          : <button className="ctl" onClick={() => go({ name: "learn", lessonId: lesson.id }, "back")} aria-label="Back to the lesson">Lesson</button>}
         <span className="steps" aria-label={`Problem ${s.i + 1} of ${n}`}>
           {s.items.map((_, i) => <span key={i} className={`dot ${i < s.i ? "ok" : i === s.i ? "busy" : ""}`} />)}
         </span>

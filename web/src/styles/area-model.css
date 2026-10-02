@@ -60,3 +60,8 @@
 .mline mark{background:color-mix(in srgb,var(--acc) 26%,transparent);color:inherit;border-radius:6px;padding:0 .12em}
 .label.formula{text-transform:none!important}
 .learn .math>.mline{flex-wrap:wrap;row-gap:.1em}
+/* each step of the walk-through is a button that jumps the picture to it */
+.beat{padding:0}
+.beat>button{display:flex;align-items:center;gap:var(--u);width:100%;padding:10px var(--u);border-radius:inherit;text-align:left;color:inherit;font:inherit}
+.beat>button:not([disabled]):hover{background:color-mix(in srgb,var(--tint) 8%,transparent)}
+.beat>button[disabled]{cursor:default;opacity:1}

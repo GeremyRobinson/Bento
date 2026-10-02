@@ -33,6 +33,8 @@ interface AppState extends AppData {
   /** apply one engine step to the run in progress */
   act(step: (s: PracticeSession, progress: Progress, deps: Deps) => PracticeSession | null): void;
   finish(): void;
+  /** ends a test, check-up or review without scoring it, and goes home */
+  quit(): void;
   exportBackup(): string;
   importBackup(json: string): Promise<void>;
   deps(): Deps;
@@ -160,6 +162,7 @@ export function AppProvider(props: {
         const next = step(p.run, p, deps());
         return next ? { ...p, run: next } : p;
       }),
+      quit: () => withTransition(() => { setProgress(p => ({ ...p, run: null })); show({ name: "home" }); }, "back"),
       finish: () => {
         const run = data.progress.run;
         if (!run) return;

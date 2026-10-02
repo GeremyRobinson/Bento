@@ -3,22 +3,38 @@ import { useApp } from "../app/AppState";
 import { entryById } from "../app/curriculum";
 import { CATALOG } from "../curriculum/catalog";
 import { GRADES, gradeOf } from "../curriculum/grades";
-import { lessonById } from "../curriculum/registry";
+import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { GradeBadge } from "../components/primitives/Score";
-import { gradePattern } from "../components/primitives/gradePattern";
 import type { Explanation } from "../explanations/schema";
 
-/** The lessons shown on the landing page, with the tile colour each one takes (the current app's SHOWCASE). */
-export const SHOWCASE: { id: string; big: boolean; color: string }[] = [
-  { id: "g8-pyth", big: true, color: "#3b82f6" },
-  { id: "g4-equiv", big: false, color: "#10b981" },
-  { id: "g12-tangent", big: false, color: "#8b5cf6" },
-  { id: "g8-translate", big: false, color: "#f2683c" },
-  { id: "g12-defint", big: false, color: "#0ea5e9" },
-  { id: "g8-slope", big: false, color: "#ec4899" },
+/** Tile sizes for the landing grid. Each pattern fills a 3 × 3 grid, so whichever is drawn, the bento stays square. */
+type Size = "big" | "wide" | "one";
+const PATTERNS: Size[][] = [
+  ["big", "one", "one", "one", "one", "one"],
+  ["big", "wide", "one", "one", "one"],
+  ["wide", "wide", "wide", "one", "one", "one"],
 ];
+
+export interface Showcase { id: string; size: Size; color: string }
+
+/**
+ * A fresh landing grid on every visit: a random layout, and one random lesson from each of a few random grades,
+ * each showing a picture drawn from its own random problem.
+ */
+export function pickShowcase(rng: Rng): (Showcase & { ex: Pictured })[] {
+  const sizes = rng.shuffle(rng.pick(PATTERNS));
+  const out: (Showcase & { ex: Pictured })[] = [];
+  for (const g of rng.shuffle(GRADES.map(x => x.grade))) {
+    if (out.length === sizes.length) break;
+    for (const l of rng.shuffle(lessonsInGrade(g))) {
+      const ex = showcasePicture(l.id, rng);
+      if (ex) { out.push({ id: l.id, size: sizes[out.length]!, color: gradeOf(g).color, ex }); break; }
+    }
+  }
+  return out;
+}
 
 type Pictured = Explanation & { diagram: NonNullable<Explanation["diagram"]> };
 
@@ -34,25 +50,14 @@ export function showcasePicture(id: string, rng: Rng): Pictured | null {
   try { return tryOne(lesson.reference); } catch { return null; }
 }
 
-function Shot({ id, big, color, k, rng }: { id: string; big: boolean; color: string; k: number; rng: Rng }) {
+function Shot({ id, size, color, ex, k }: Showcase & { ex: Pictured; k: number }) {
   const entry = entryById(id), grade = gradeOf(entry?.grade ?? 5);
-  const ex = useMemo(() => showcasePicture(id, rng), [id, rng]);
   const [replay, setReplay] = useState(0);
   const style = { "--tint": color, "--acc": "#f59e0b", "--i": k } as CSSProperties;
-  const caption = <figcaption><span className="lchip">{grade.name.split(" · ")[0]}</span>{entry?.title ?? id}</figcaption>;
-  if (!ex) {
-    // not rebuilt yet: a quiet tile in the lesson's grade pattern, so the grid keeps its shape
-    return (
-      <figure className={`lshot pending${big ? " big" : ""}`} style={style} aria-label={`${entry?.title ?? id}, picture coming soon`}>
-        <div className="lpend" style={{ backgroundImage: gradePattern(grade.grade, color) }}><span className="lpend-mark">{grade.short}</span></div>
-        {caption}
-      </figure>
-    );
-  }
   return (
-    <figure className={`lshot${big ? " big" : ""}`} style={style} onClick={() => setReplay(r => r + 1)}>
+    <figure className={`lshot ${size}`} style={style} onClick={() => setReplay(r => r + 1)}>
       <PlayingDiagram ex={ex} replay={replay} />
-      {caption}
+      <figcaption><span className="lchip">{grade.name.split(" · ")[0]}</span>{entry?.title ?? id}</figcaption>
     </figure>
   );
 }
@@ -60,7 +65,7 @@ function Shot({ id, big, color, k, rng }: { id: string; big: boolean; color: str
 /** The first screen on a new device: what Bento is, real lesson pictures, and the grade choice built in. */
 export function Welcome() {
   const { progress, chooseGrade, deps, go } = useApp();
-  const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const shots = useMemo(() => pickShowcase(deps().rng), []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="land">
       <nav className="lnav"><b>Bento</b>
@@ -80,7 +85,7 @@ export function Welcome() {
         </div>
       </section>
       <section className="lsec"><h2>See it first.</h2><p>Every lesson opens with a picture that moves, so the idea makes sense before the numbers show up.</p></section>
-      <section className="lshots">{SHOWCASE.map((s, k) => <Shot key={s.id} {...s} k={k} rng={rng} />)}</section>
+      <section className="lshots">{shots.map((s, k) => <Shot key={s.id} {...s} k={k} />)}</section>
       <section className="lsec"><h2>One step at a time.</h2><p>Big problems get split into small moves. Each one is checked the moment you enter it.</p></section>
       <section className="lpair">
         <article className="lf"><span className="lk">Solve it</span>

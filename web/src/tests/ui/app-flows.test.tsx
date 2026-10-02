@@ -4,7 +4,6 @@ import { CATALOG, COMING_SOON } from "../../curriculum/catalog";
 import { lessonById, lessonsInGrade } from "../../curriculum/registry";
 import type { Progress } from "../../engine/mastery/progress";
 import type { SessionReport } from "../../engine/session/types";
-import { SHOWCASE } from "../../screens/Welcome";
 import { answerWrong, failRun, renderApp, solveRun, tap } from "./helpers";
 
 const LESSON = "Multiply two-digit numbers";
@@ -16,15 +15,12 @@ describe("first launch: landing → grade → home", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Math that finally clicks." })).toBeInTheDocument();
     expect(screen.getByText(`Counting to calculus. ${CATALOG.length} lessons, unit tests and a check-up for every grade.`)).toBeInTheDocument();
 
-    // one tile per showcase lesson: a real picture once the lesson is rebuilt, a quiet placeholder until then
-    const tiles = document.querySelectorAll(".lshots figure");
-    expect(tiles).toHaveLength(SHOWCASE.length);
-    SHOWCASE.forEach((s, i) => {
-      const tile = tiles[i]!, entry = CATALOG.find(c => c.id === s.id)!;
-      expect(tile.textContent).toContain(entry.title);
-      if (lessonById(s.id)) expect(tile.querySelector("svg[role=img]")).not.toBeNull();
-      else expect(tile.classList.contains("pending")).toBe(true);
-    });
+    // a random bento: five or six tiles from different grades, each with a real picture and its grade on it
+    const tiles = [...document.querySelectorAll(".lshots figure")];
+    expect(tiles.length).toBeGreaterThanOrEqual(5);
+    const shown = tiles.map(t => t.querySelector(".lchip")!.textContent);
+    expect(new Set(shown).size).toBe(tiles.length);
+    for (const t of tiles) expect(t.firstElementChild!.tagName).not.toBe("FIGCAPTION");
 
     // thirteen grade buttons; picking one goes home
     const grades = within(document.querySelector(".lgrades") as HTMLElement).getAllByRole("button");

@@ -7,7 +7,7 @@ import { LEVELS } from "../engine/mastery/levels";
 import { lastScore } from "../engine/mastery/progress";
 import { when } from "../app/format";
 import { Diagram } from "../components/diagrams/Diagram";
-import { entriesInGrade } from "../app/curriculum";
+import { entriesInGrade, isReady } from "../app/curriculum";
 import { BuildUp } from "../components/BuildUp";
 import type { Rng } from "../curriculum/generators/rng";
 import type { AnyLesson } from "../curriculum/schemas/lesson";
@@ -63,6 +63,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
   const sc = lastScore(progress, lesson.id), rep = reports[lesson.id], tier = tierFor(sc);
   const low = sc != null && sc <= 1;
   const all = entriesInGrade(lesson.grade), place = all.findIndex(c => c.id === lesson.id);
+  const unit = all.filter(c => (c.unit || "") === (all[place]?.unit || ""));
 
   const step = (d: 1 | -1) => { setPlaying(false); setAt(a => Math.max(0, Math.min(last, a + d))); };
   // arrow keys and a sideways swipe move through the explanation, like the current app's lesson cards
@@ -91,7 +92,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
         <span className="dots-nav" aria-label={`Part ${at + 1} of ${last + 1}`}>
           {ex.timeline.map((_, i) => <span key={i} className={`dot ${i < at ? "ok" : i === at ? "busy" : ""}`} />)}
         </span>
-        <button className="ctl" onClick={() => startLesson(lesson.id)}>Practice</button>
+        <button className="ctl pbtn" onClick={() => startLesson(lesson.id)}>Practice</button>
       </div>
       <div className="bar">
         <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "back")} aria-label="Previous lesson"><Chevron dir="left" /></button>
@@ -109,8 +110,10 @@ export function Learn({ lessonId }: { lessonId: string }) {
             <ol className="beats" aria-live="polite">
               {ex.steps.map((s, i) => (
                 <li key={s.id} className="beat" data-state={beatState(s.state, at)}>
-                  <span className="badge">{i + 1}</span>
-                  <span className="say"><MathLine math={s.math} /><span><Rich text={s.narration} /></span></span>
+                  <button disabled={s.state === at} onClick={() => { setPlaying(false); setAt(s.state); }} aria-label={`Go to step ${i + 1}`}>
+                    <span className="badge">{i + 1}</span>
+                    <span className="say"><MathLine math={s.math} /><span><Rich text={s.narration} /></span></span>
+                  </button>
                 </li>
               ))}
             </ol>
@@ -139,12 +142,15 @@ export function Learn({ lessonId }: { lessonId: string }) {
           <section className="tile lmap">
             <span className="k">{lesson.unit || gradeOf(lesson.grade).name} · lesson {place + 1} of {all.length}</span>
             <div className="outline">
-              {ex.steps.map((s, i) => (
-                <button key={s.id} className={s.state === at ? "on" : s.state < at ? "seen" : ""} disabled={s.state === at}
-                  onClick={() => { setPlaying(false); setAt(s.state); }}>
-                  <span className="badge">{i + 1}</span><span className="name"><Rich text={s.narration} /></span>
-                </button>
-              ))}
+              {unit.map(c => {
+                const n = all.indexOf(c) + 1, here = c.id === lesson.id, s = lastScore(progress, c.id);
+                return (
+                  <button key={c.id} className={here ? "on" : s != null ? "seen" : ""} disabled={here || !isReady(c.id)}
+                    onClick={() => go({ name: "learn", lessonId: c.id }, all.indexOf(c) < place ? "back" : "fwd")}>
+                    <span className="badge">{n}</span><span className="name">{c.title}</span>
+                  </button>
+                );
+              })}
             </div>
             <button className="ctl go" onClick={() => startLesson(lesson.id)}>Start practice ›</button>
           </section>
