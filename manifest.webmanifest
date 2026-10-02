@@ -1,6 +1,6 @@
 {
-  "name": "Mathbook",
-  "short_name": "Mathbook",
+  "name": "Bento",
+  "short_name": "Bento",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fbfbfd",

@@ -1,10 +1,11 @@
-# Mathbook
+# Bento
 
-A Duolingo-style math app for kindergarten through 12th grade, built for an iPad. She solves each problem one step at a time instead of on paper, and the app explains the specific mistake when a step is wrong.
+Bento is a Duolingo-style math app for kindergarten through 12th grade, built for an iPad. She solves each problem one step at a time instead of on paper, and the app explains the specific mistake when a step is wrong.
 
 ## What's in it
 
 - **Grades K–12** with a grade picker. Grades 5–12 have the full year: 115 lessons grouped into units (fractions, decimals, ratios, integers, equations, functions, geometry, trig, logs, limits, derivatives, integrals and more). 4th grade has 8 lessons across whole numbers, fractions, decimals and measurement; K–3 have one lesson each so far. Any lesson can be picked, so she can skip ahead or go back.
+- **Bento layout:** every screen is a grid of tiles that fills the iPad. The home screen puts what to do next in the big tile (with progress bars for each unit), and today's review, scores and lessons to practice again beside it. Lessons show the picture card next to an outline of the lesson and the current help level. Results and the grown-up page sit side by side when the iPad is sideways.
 - **A theme for each grade:** every grade has its own colours and background pattern, and a grade badge in the header fills with XP earned in that grade (a level every 300 XP). Tap it to switch grades. Size and tone also change by age: K–2 is the biggest, with ten frames and base-ten blocks; 9–12 is close to plain System One.
 - **Explain first:** each lesson opens with idea cards and an animated picture (number lines, area models, balances, graphs, triangles and more), then a worked example revealed one step at a time with the reason for each step.
 - **Smooth motion:** screens fade and slide into each other, wrong answers shake, results count up. Reduced-motion settings are respected.
