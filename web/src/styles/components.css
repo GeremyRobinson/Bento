@@ -309,7 +309,7 @@
 @keyframes barHi{to{fill:var(--acc)}}
 .viz-svg .fulcrum{fill:var(--muted)} .viz-svg .beam{stroke:var(--text);stroke-width:5;stroke-linecap:round}
 .viz-svg .tile{stroke-width:2} .viz-svg .tile.x{fill:var(--tint);stroke:var(--tint)} .viz-svg .tile.n{fill:var(--card);stroke:var(--acc)}
-.viz-svg .marble{stroke:var(--card);stroke-width:2} .viz-svg .marble.red{fill:#ef4444} .viz-svg .marble.blue{fill:#3b82f6} .viz-svg .marble.ring{stroke:var(--text);stroke-width:3}
+.viz-svg .marble{stroke:var(--card);stroke-width:2} .viz-svg .marble.red{fill:#ef4444} .viz-svg .marble.blue{fill:#3b82f6} .viz-svg .marble.green{fill:#22c55e} .viz-svg .marble.ring{stroke:var(--text);stroke-width:3}
 .viz-svg .marble.c0{fill:var(--c0)} .viz-svg .marble.c1{fill:var(--c1)} .viz-svg .marble.c2{fill:var(--c2)}
 .viz-svg .tri{stroke:var(--card);stroke-width:2} .viz-svg .tri.c0{fill:color-mix(in srgb,var(--c0) 45%,var(--card))} .viz-svg .tri.c1{fill:color-mix(in srgb,var(--c1) 45%,var(--card))} .viz-svg .tri.c2{fill:color-mix(in srgb,var(--c2) 45%,var(--card))}
 .viz-svg .shadeA{fill:color-mix(in srgb,var(--tint) 35%,transparent)} .viz-svg .shadeB{fill:color-mix(in srgb,var(--acc) 35%,transparent)} .viz-svg .both{fill:var(--tint)}
