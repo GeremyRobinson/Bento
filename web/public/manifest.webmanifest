@@ -1,0 +1,16 @@
+{
+  "name": "Bento",
+  "short_name": "Bento",
+  "description": "Math, one step at a time. Kindergarten to 12th grade.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbfbfd",
+  "theme_color": "#3b82f6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

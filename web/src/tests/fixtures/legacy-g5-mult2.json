@@ -1,0 +1,489 @@
+{
+ "source": "index.html on main, recorded with Playwright",
+ "cases": [
+  {
+   "a": 47,
+   "b": 36,
+   "show": "47 × 36",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "47 × 30 =",
+     "answer": 1410,
+     "hint": "Do 47 × 3, then add a zero.",
+     "explain": "Do 47 × 3, then add a zero. That makes 1410.",
+     "work": "47 × 30 = 1410",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 47 × 3. The tens digit stands for 30, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 47 × 3, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "47 × 6 =",
+     "answer": 282,
+     "hint": "47 × 6.",
+     "explain": "47 × 6. That makes 282.",
+     "work": "47 × 6 = 282",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 47 × 6.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 47 × 6.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "1410 + 282 =",
+     "answer": 1692,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 1692.",
+     "work": "1410 + 282 = 1692",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 12,
+   "b": 12,
+   "show": "12 × 12",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "12 × 10 =",
+     "answer": 120,
+     "hint": "Do 12 × 1, then add a zero.",
+     "explain": "Do 12 × 1, then add a zero. That makes 120.",
+     "work": "12 × 10 = 120",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 12 × 1. The tens digit stands for 10, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 12 × 1, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "12 × 2 =",
+     "answer": 24,
+     "hint": "12 × 2.",
+     "explain": "12 × 2. That makes 24.",
+     "work": "12 × 2 = 24",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 12 × 2.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 12 × 2.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "120 + 24 =",
+     "answer": 144,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 144.",
+     "work": "120 + 24 = 144",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 98,
+   "b": 99,
+   "show": "98 × 99",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "98 × 90 =",
+     "answer": 8820,
+     "hint": "Do 98 × 9, then add a zero.",
+     "explain": "Do 98 × 9, then add a zero. That makes 8820.",
+     "work": "98 × 90 = 8820",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 98 × 9. The tens digit stands for 90, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 98 × 9, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "98 × 9 =",
+     "answer": 882,
+     "hint": "98 × 9.",
+     "explain": "98 × 9. That makes 882.",
+     "work": "98 × 9 = 882",
+     "placeSlip": null,
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 98 × 9.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "8820 + 882 =",
+     "answer": 9702,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 9702.",
+     "work": "8820 + 882 = 9702",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 25,
+   "b": 41,
+   "show": "25 × 41",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "25 × 40 =",
+     "answer": 1000,
+     "hint": "Do 25 × 4, then add a zero.",
+     "explain": "Do 25 × 4, then add a zero. That makes 1000.",
+     "work": "25 × 40 = 1000",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 25 × 4. The tens digit stands for 40, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 25 × 4, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "25 × 1 =",
+     "answer": 25,
+     "hint": "25 × 1.",
+     "explain": "25 × 1. That makes 25.",
+     "work": "25 × 1 = 25",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 25 × 1.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 25 × 1.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "1000 + 25 =",
+     "answer": 1025,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 1025.",
+     "work": "1000 + 25 = 1025",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 63,
+   "b": 17,
+   "show": "63 × 17",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "63 × 10 =",
+     "answer": 630,
+     "hint": "Do 63 × 1, then add a zero.",
+     "explain": "Do 63 × 1, then add a zero. That makes 630.",
+     "work": "63 × 10 = 630",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 63 × 1. The tens digit stands for 10, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 63 × 1, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "63 × 7 =",
+     "answer": 441,
+     "hint": "63 × 7.",
+     "explain": "63 × 7. That makes 441.",
+     "work": "63 × 7 = 441",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 63 × 7.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 63 × 7.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "630 + 441 =",
+     "answer": 1071,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 1071.",
+     "work": "630 + 441 = 1071",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 88,
+   "b": 95,
+   "show": "88 × 95",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "88 × 90 =",
+     "answer": 7920,
+     "hint": "Do 88 × 9, then add a zero.",
+     "explain": "Do 88 × 9, then add a zero. That makes 7920.",
+     "work": "88 × 90 = 7920",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 88 × 9. The tens digit stands for 90, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 88 × 9, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "88 × 5 =",
+     "answer": 440,
+     "hint": "88 × 5.",
+     "explain": "88 × 5. That makes 440.",
+     "work": "88 × 5 = 440",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 88 × 5.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 88 × 5.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "7920 + 440 =",
+     "answer": 8360,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 8360.",
+     "work": "7920 + 440 = 8360",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 34,
+   "b": 58,
+   "show": "34 × 58",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "34 × 50 =",
+     "answer": 1700,
+     "hint": "Do 34 × 5, then add a zero.",
+     "explain": "Do 34 × 5, then add a zero. That makes 1700.",
+     "work": "34 × 50 = 1700",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 34 × 5. The tens digit stands for 50, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 34 × 5, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "34 × 8 =",
+     "answer": 272,
+     "hint": "34 × 8.",
+     "explain": "34 × 8. That makes 272.",
+     "work": "34 × 8 = 272",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 34 × 8.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 34 × 8.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "1700 + 272 =",
+     "answer": 1972,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 1972.",
+     "work": "1700 + 272 = 1972",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  },
+  {
+   "a": 71,
+   "b": 23,
+   "show": "71 × 23",
+   "steps": [
+    {
+     "label": "Multiply by the tens",
+     "prompt": "71 × 20 =",
+     "answer": 1420,
+     "hint": "Do 71 × 2, then add a zero.",
+     "explain": "Do 71 × 2, then add a zero. That makes 1420.",
+     "work": "71 × 20 = 1420",
+     "placeSlip": {
+      "kind": "Lost the place value",
+      "msg": "That's 71 × 2. The tens digit stands for 20, so add a zero.",
+      "generic": false
+     },
+     "offByOne": {
+      "kind": "Multiply by the tens",
+      "msg": "Not quite. Do 71 × 2, then add a zero.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Multiply by the ones",
+     "prompt": "71 × 3 =",
+     "answer": 213,
+     "hint": "71 × 3.",
+     "explain": "71 × 3. That makes 213.",
+     "work": "71 × 3 = 213",
+     "placeSlip": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 71 × 3.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Multiply by the ones",
+      "msg": "Not quite. 71 × 3.",
+      "generic": true
+     }
+    },
+    {
+     "label": "Add the parts",
+     "prompt": "1420 + 213 =",
+     "answer": 1633,
+     "hint": "Add the two partial products.",
+     "explain": "Add the two partial products. That makes 1633.",
+     "work": "1420 + 213 = 1633",
+     "placeSlip": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     },
+     "offByOne": {
+      "kind": "Add the parts",
+      "msg": "Not quite. Add the two partial products.",
+      "generic": true
+     }
+    }
+   ]
+  }
+ ]
+}

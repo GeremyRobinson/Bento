@@ -1,0 +1,16 @@
+/* Design tokens: colours, type and easing. Ported from the current app; light by default, dark follows the device unless data-theme is set. */
+/* Bento. One layout, one spacing grid, one motion language; each grade brings its own colours and pattern.
+   Grid: every size is a multiple of 4px. Nested corners are concentric: inner radius = outer radius − the padding between them. */
+:root{
+  --text:#1b1d22; --muted:#717786; --faint:#c9ccd4; --rule:#e4e6eb; --page:#fbfbfd; --well:#f1f2f6; --card:#fff; --hover:#e8eaf0;
+  --ok:#1fbf5f; --busy:#f5a524; --err:#ef4444; --on-tint:#fff;
+  --sans:"Nunito","Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --num:"Fredoka","Nunito","Avenir Next",ui-rounded,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.45,.64,1);
+  --c0:#3b82f6; --c1:#f2683c; --c2:#8b5cf6; --acc:#f59e0b;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}}
+:root[data-theme="dark"]{--text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}
+
