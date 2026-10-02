@@ -30,3 +30,26 @@ export const GRADES: GradeDefinition[] = [
 
 export const bandOf = (g: number): Band => (g <= 2 ? "little" : g <= 5 ? "kid" : g <= 8 ? "middle" : "high");
 export const gradeOf = (g: number): GradeDefinition => GRADES[g] ?? GRADES[5]!;
+
+/** Bento's product lines: grades grouped the way people think about school, each with its own canvas. */
+export interface Line {
+  id: "early" | "core" | "middle" | "high" | "ap";
+  name: string;
+  /** one line about what the line is for */
+  tagline: string;
+  grades: GradeNumber[];
+  color: string;
+  /** not open yet: shown in the lineup so people know it's coming */
+  soon?: string[];
+}
+
+export const LINES: Line[] = [
+  { id: "early", name: "Bento Early", tagline: "Count, touch and play. Kindergarten to 2nd grade.", grades: [0, 1, 2], color: "#f59e0b" },
+  { id: "core", name: "Bento Core", tagline: "Multiply, divide, fractions and decimals. 3rd to 5th grade.", grades: [3, 4, 5], color: "#3b82f6" },
+  { id: "middle", name: "Bento Middle", tagline: "Ratios, integers, equations and functions. 6th to 8th grade.", grades: [6, 7, 8], color: "#0f766e" },
+  { id: "high", name: "Bento High", tagline: "Algebra, geometry, precalculus and calculus. 9th to 12th grade.", grades: [9, 10, 11, 12], color: "#7c3aed" },
+  { id: "ap", name: "Bento AP", tagline: "College-level courses, built for the exam.", grades: [], color: "#111827",
+    soon: ["AP Precalculus", "AP Calculus AB", "AP Calculus BC", "AP Statistics"] },
+];
+
+export const lineOf = (g: number): Line => LINES.find(l => l.grades.includes(g as GradeNumber)) ?? LINES[1]!;

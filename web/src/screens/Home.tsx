@@ -1,7 +1,7 @@
 import { useApp } from "../app/AppState";
 import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
 import { COMING_SOON } from "../curriculum/catalog";
-import { gradeOf } from "../curriculum/grades";
+import { gradeOf, lineOf } from "../curriculum/grades";
 import { lastScore, timesDone } from "../engine/mastery/progress";
 import { TopBar } from "../components/TopBar";
 import { BigRing, ScoreChip } from "../components/primitives/Score";
@@ -31,7 +31,7 @@ export function Home() {
       <TopBar />
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="hero t0 b-hero"><div className="pat" style={{ backgroundImage: gradePattern(g) }} />
-          <div><h1><button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} title="See the year">{grade.name}<span aria-hidden> ›</span></button></h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
+          <div><span className="hline">{lineOf(g).name}</span><h1><button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} title="See the year">{grade.name}<span aria-hidden> ›</span></button></h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
           {units.length > 1 && (
             <div className="uprog">{units.map(u => { const d = doneCount(progress, u.entries); return (
               <div key={u.name}><span className="k">{u.name}</span><span className="bar2"><i className={d ? undefined : "zero"} style={{ width: `${(100 * d / u.entries.length).toFixed(1)}%` }} /></span><span className="mono">{d}/{u.entries.length}</span></div>

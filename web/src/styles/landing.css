@@ -6,9 +6,9 @@
 .lhero{display:grid;justify-items:center;gap:calc(var(--u) + 4px);text-align:center;padding:calc(var(--u) * 3) var(--u) var(--u);animation:rise .7s var(--ease) both}
 .lhero h1{font:700 clamp(38px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;text-wrap:balance}
 .lhero p{max-width:540px;font-size:calc(var(--fs) * 1.1);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
-.lpick{margin-top:var(--s);display:grid;justify-items:center;gap:10px;background:var(--well);border-radius:var(--r-panel);padding:var(--u) calc(var(--u) - 4px) calc(var(--u) - 4px)}
+.lpick{max-width:100%;margin-top:var(--s);display:grid;justify-items:center;gap:10px;background:var(--well);border-radius:var(--r-panel);padding:var(--u) calc(var(--u) - 4px) calc(var(--u) - 4px)}
 .lpick>span{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted);letter-spacing:.01em}
-.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 2px;max-width:900px}
+.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 2px;max-width:1000px}
 .lg{padding:4px;border-radius:999px;transition:transform .2s var(--spring),background .15s;animation:pop .45s var(--spring) both;animation-delay:calc(.2s + var(--j) * 30ms)}
 .lg:hover{background:var(--card);transform:translateY(-2px)}
 .lg:active{transform:scale(.94)}
@@ -83,3 +83,10 @@
 @media (min-width:700px){.yunit.solo{grid-column:1 / -1;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:none;align-items:center}}
 .yunit li.soon button{color:var(--muted)}
 .yunit li button small{margin-left:auto;font-size:var(--small);color:var(--muted);font-weight:var(--w-mid)}
+/* the landing grade picker, grouped by product line */
+.lgrades{gap:6px 18px;align-items:flex-start}
+.lgroup{display:grid;justify-items:center;gap:2px}
+.lgname{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
+.lgbtns{display:flex;gap:2px}
+.lgsoon{width:54px;height:54px;margin:4px;border-radius:50%;display:grid;place-items:center;align-content:center;background:linear-gradient(135deg,#0b0d12,#2a2140);color:#f5d08a;font:800 16px/1 var(--num)}
+.lgsoon small{font:700 9px/1 var(--sans);color:#b9bdc9;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}

@@ -1,11 +1,11 @@
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import { useApp } from "../app/AppState";
-import { doneCount, entriesInGrade } from "../app/curriculum";
 import { readSettings, speak, playTone, type Settings } from "../app/settings";
-import { GRADES, gradeOf } from "../curriculum/grades";
+import { gradeOf } from "../curriculum/grades";
 import { LEVEL_XP } from "../engine/mastery/levels";
+import { GradeLineup } from "../components/GradeLineup";
 import { HomeIcon } from "../components/primitives/icons";
-import { BigRing, GradeBadge, gradeLevel } from "../components/primitives/Score";
+import { BigRing, gradeLevel } from "../components/primitives/Score";
 
 function Toggle({ label, note, on, set }: { label: string; note: string; on: boolean; set: (v: boolean) => void }) {
   return (
@@ -71,17 +71,7 @@ export function Me() {
         </section>
 
         <Tile title="Your grades" className="mgrades">
-          <div className="gradegrid">
-            {GRADES.map(gd => {
-              const list = entriesInGrade(gd.grade), done = doneCount(progress, list), x = progress.gxp[gd.grade] ?? 0;
-              return (
-                <button key={gd.grade} className={`gcell${gd.grade === g ? " on" : ""}`} style={{ "--tint": gd.color } as CSSProperties} onClick={() => chooseGrade(gd.grade)}>
-                  <GradeBadge grade={gd.grade} gxp={x} />
-                  <span className="gtext"><b>{gd.grade === 0 ? "K" : gd.name.replace(" grade", "").split(" · ")[0]}</b><small>Lv {gradeLevel(x).lvl} · {done}/{list.length}</small></span>
-                </button>
-              );
-            })}
-          </div>
+          <GradeLineup onPick={chooseGrade} />
         </Tile>
 
         <Tile title="See and hear" k="Accessibility" className="macc">

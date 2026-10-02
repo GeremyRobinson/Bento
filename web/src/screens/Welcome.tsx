@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { entryById } from "../app/curriculum";
 import { CATALOG } from "../curriculum/catalog";
-import { GRADES, gradeOf } from "../curriculum/grades";
+import { GRADES, LINES, gradeOf } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
@@ -86,10 +86,15 @@ export function Welcome() {
         <h1>Math that finally clicks.</h1>
         <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
         <div className="lpick"><span>Pick your grade to start</span>
-          <div className="lgrades">{GRADES.map(g => (
-            <button key={g.grade} className="lg" style={{ "--tint": g.color, "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
-              <GradeBadge grade={g.grade} gxp={progress.gxp[g.grade] ?? 0} />
-            </button>
+          <div className="lgrades">{LINES.map(line => (
+            <div key={line.id} className={`lgroup lgroup-${line.id}`}>
+              <span className="lgname">{line.name.replace("Bento ", "")}</span>
+              <div className="lgbtns">{line.grades.length ? line.grades.map(n => { const g = gradeOf(n); return (
+                <button key={g.grade} className="lg" style={{ "--tint": g.color, "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
+                  <GradeBadge grade={g.grade} gxp={progress.gxp[g.grade] ?? 0} />
+                </button>
+              ); }) : <span className="lgsoon" title={line.soon?.join(", ")}>AP<small>soon</small></span>}</div>
+            </div>
           ))}</div>
         </div>
       </section>
