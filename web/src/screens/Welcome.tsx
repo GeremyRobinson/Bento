@@ -9,22 +9,28 @@ import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { GradeBadge } from "../components/primitives/Score";
 import type { Explanation } from "../explanations/schema";
 
-/** Tile sizes for the landing grid. Each pattern fills a 3 × 3 grid, so whichever is drawn, the bento stays square. */
+/**
+ * Layouts for the landing grid, in the order the tiles are placed. Each one fills three columns by three rows
+ * exactly, so whichever is drawn, the bento stays a clean rectangle with no gaps.
+ */
 type Size = "big" | "wide" | "one";
-const PATTERNS: Size[][] = [
+const LAYOUTS: Size[][] = [
   ["big", "one", "one", "one", "one", "one"],
-  ["big", "wide", "one", "one", "one"],
-  ["wide", "wide", "wide", "one", "one", "one"],
+  ["one", "big", "one", "one", "one", "one"],
+  ["big", "one", "one", "wide", "one"],
+  ["one", "big", "one", "one", "wide"],
+  ["wide", "one", "one", "wide", "wide", "one"],
+  ["one", "wide", "wide", "one", "one", "wide"],
 ];
 
-export interface Showcase { id: string; size: Size; color: string }
+export interface Showcase { id: string; size: Size; color: string; tail?: boolean }
 
 /**
  * A fresh landing grid on every visit: a random layout, and one random lesson from each of a few random grades,
  * each showing a picture drawn from its own random problem.
  */
 export function pickShowcase(rng: Rng): (Showcase & { ex: Pictured })[] {
-  const sizes = rng.shuffle(rng.pick(PATTERNS));
+  const sizes = rng.pick(LAYOUTS);
   const out: (Showcase & { ex: Pictured })[] = [];
   for (const g of rng.shuffle(GRADES.map(x => x.grade))) {
     if (out.length === sizes.length) break;
@@ -33,6 +39,9 @@ export function pickShowcase(rng: Rng): (Showcase & { ex: Pictured })[] {
       if (ex) { out.push({ id: l.id, size: sizes[out.length]!, color: gradeOf(g).color, ex }); break; }
     }
   }
+  // in two columns, single tiles pair up; an odd one out takes the whole row instead of leaving a gap
+  const ones = out.filter(o => o.size === "one");
+  if (ones.length % 2) ones[ones.length - 1]!.tail = true;
   return out;
 }
 
@@ -50,12 +59,12 @@ export function showcasePicture(id: string, rng: Rng): Pictured | null {
   try { return tryOne(lesson.reference); } catch { return null; }
 }
 
-function Shot({ id, size, color, ex, k }: Showcase & { ex: Pictured; k: number }) {
+function Shot({ id, size, color, ex, k, tail }: Showcase & { ex: Pictured; k: number }) {
   const entry = entryById(id), grade = gradeOf(entry?.grade ?? 5);
   const [replay, setReplay] = useState(0);
   const style = { "--tint": color, "--acc": "#f59e0b", "--i": k } as CSSProperties;
   return (
-    <figure className={`lshot ${size}`} style={style} onClick={() => setReplay(r => r + 1)}>
+    <figure className={`lshot ${size}${tail ? " tail" : ""}`} style={style} onClick={() => setReplay(r => r + 1)}>
       <PlayingDiagram ex={ex} replay={replay} />
       <figcaption><span className="lchip">{grade.name.split(" · ")[0]}</span>{entry?.title ?? id}</figcaption>
     </figure>
