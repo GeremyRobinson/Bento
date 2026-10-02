@@ -1,6 +1,6 @@
 import type { Rng } from "../generators/rng";
 import type { MathText } from "./math-text";
-import type { Explanation } from "../../explanations/schema";
+import type { DiagramModel, Explanation } from "../../explanations/schema";
 
 export type GradeNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
@@ -90,6 +90,8 @@ export interface LessonDefinition<P = unknown> {
   displayNote?(problem: P): RichText;
   /** counters under the problem in practice, built from its numbers (the current app's dots, ten frames and base-ten blocks) */
   displayCounters?(problem: P): Counters;
+  /** an optional picture shown with the problem, e.g. the dots to count (the current app's dots and ten frames) */
+  picture?(problem: P): DiagramModel;
   answers(problem: P): AnswerModel;
   explain(problem: P, answers: AnswerModel): Explanation;
   /** some lessons tell every third problem as a story */

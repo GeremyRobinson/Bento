@@ -1,0 +1,78 @@
+// Arithmetic sequences (the current app's G11_SEQ): aₙ = a₁ + (n − 1)d, told as jumps along a number line.
+import { answer, formatNumber as f, num, op, sub, text, type MathText } from "../../../schemas/math-text";
+import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
+import { beats, type Explanation } from "../../../../explanations/schema";
+import { buildNumberLine, fitRange, type Hop } from "../../../../explanations/diagrams/number-line/build";
+import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+
+/** first term a1, common difference d, and the term number n to find */
+export interface SequenceProblem { a1: number; d: number; n: number }
+
+export function createSequence(a1: number, d: number, n: number): SequenceProblem {
+  wholeIn("a1", a1, 1, 20); wholeIn("d", d, 2, 9); wholeIn("n", n, 10, 30);
+  return { a1, d, n };
+}
+
+const term = (n: number): MathText => [text("a"), sub(n)];
+
+function answers({ a1, d, n }: SequenceProblem): AnswerModel {
+  const climb = (n - 1) * d;
+  return {
+    steps: [
+      oneBox({ id: "d", label: "Common difference", note: "How much does each term go up?", prompt: s => [text("d"), op("="), s], ans: d,
+        wrong: [[a1, "Common difference", `That's the first term. d is the jump: ${a1 + d} − ${a1}.`], [a1 + d, "Common difference", `That's the second term. Subtract: ${a1 + d} − ${a1}.`]],
+        hint: `${a1 + d} − ${a1}.`, explain: `Each term goes up by ${d}.` }),
+      oneBox({ id: "jumps", label: "Count the jumps", question: `From term 1 to term ${n}, how many jumps?`, prompt: s => [s], ans: n - 1,
+        wrong: [[n, "Off by one", `Term 1 is where you start, so it's ${n} − 1 jumps.`]],
+        hint: `${n} − 1.`, explain: `${n} − 1 = ${n - 1} jumps.`, work: [answer("x", n - 1), text(" jumps")] }),
+      oneBox({ id: "climb", label: "Total climb", prompt: s => [num(n - 1), op("×"), num(d), op("="), s], ans: climb,
+        hint: `${n - 1} jumps of ${d}.`, explain: `${n - 1} × ${d} = ${climb}.` }),
+      oneBox({ id: "term", label: "Add the first term", prompt: s => [...term(n), op("="), num(a1), op("+"), num(climb), op("="), s], ans: a1 + climb,
+        hint: "Start at the first term and add the climb.", explain: `${a1} + ${climb} = ${a1 + climb}.`, work: [...term(n), op("="), answer("x", a1 + climb)] }),
+    ],
+    finalParts: [-1],
+  };
+}
+
+function explain(p: SequenceProblem, model: AnswerModel): Explanation {
+  const { a1, n } = p, d = expectedOf(model, "d"), jumps = expectedOf(model, "jumps"), climb = expectedOf(model, "climb"), an = expectedOf(model, "term");
+  // every jump from term 1 to term n, so each one is at least 460 / 29 pixels wide whatever d is
+  const hops: Hop[] = Array.from({ length: jumps }, (_, i): Hop => ({
+    from: a1 + i * d, to: a1 + (i + 1) * d, beat: i < 3 ? 0 : 1, start: i === 0,
+    ...(i < 3 ? { label: `+${d}`, delay: 0.5 * i } : { delay: Math.round(0.08 * (i - 3) * 100) / 100 }),
+  }));
+  return {
+    heading: "aₙ = a₁ + (n − 1)d",
+    idea: ["Start at the first term and jump by the same amount each time. To reach term n you make n − 1 jumps."],
+    statement: [...term(n), op("="), num(a1), op("+"), text("("), num(n), op("−"), num(1), text(")"), op("×"), num(d)],
+    diagram: buildNumberLine({
+      ...fitRange([a1, an], { maxTicks: 20, pad: 0, minStep: 1 }),
+      hops,
+      spans: [{ from: a1, to: an, beat: 2, label: `${jumps} × ${d} = ${climb}` }],
+      marks: [{ v: an, label: `term ${n}: ${an}`, beat: 3, cls: "dota" }],
+      alt: `Number line: from ${a1}, ${jumps} jumps of ${d} reach ${an}.`,
+    }),
+    caption: `Jump by ${d} each time: ${jumps} jumps from ${a1} reach ${an}.`,
+    timeline: beats(4),
+    steps: [
+      { id: "d", narration: `Each term goes up by the same amount: ${a1 + d} − ${a1} = ${d}.`, math: [text("d"), op("="), num(d)], state: 0, answerStep: "d", result: d },
+      { id: "jumps", narration: `Term 1 is where you start, so reaching term ${n} takes ${n} − 1 = ${jumps} jumps.`, math: [num(n), op("−"), num(1), op("="), num(jumps)], state: 1, answerStep: "jumps", result: jumps },
+      { id: "climb", narration: `${jumps} jumps of ${d} climb ${jumps} × ${d} = ${climb}.`, math: [num(jumps), op("×"), num(d), op("="), num(climb)], state: 2, answerStep: "climb", result: climb },
+      { id: "term", narration: `Start at the first term and add the climb: ${a1} + ${climb} = ${f(an)}.`, math: [...term(n), op("="), num(a1), op("+"), num(climb), op("="), num(an)], state: 3, answerStep: "term", result: an },
+    ],
+  };
+}
+
+export const lesson: LessonDefinition<SequenceProblem> = {
+  id: "g11-seq",
+  grade: 11,
+  unit: "Sequences",
+  title: "Arithmetic sequences",
+  reference: createSequence(5, 4, 20), // 5, 9, 13, 17, … term 20 = 81, the current app's example
+  generate: rng => createSequence(rng.int(1, 20), rng.int(2, 9), rng.int(10, 30)),
+  restore: raw => restoreVia(raw, ["a1", "d", "n"] as const, v => createSequence(v.a1, v.d, v.n)),
+  display: ({ a1, d }) => [0, 1, 2, 3].flatMap((k): MathText => [...(k ? [text(", ")] : []), num(a1 + k * d)]).concat([text(", …")]),
+  displayNote: p => `Find term number ${p.n}.`,
+  answers,
+  explain,
+};
