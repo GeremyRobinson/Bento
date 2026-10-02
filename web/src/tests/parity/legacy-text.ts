@@ -24,11 +24,12 @@ export function legacyText(m: MathText): string {
 /** Message text without emphasis markers; fractions written n/d match the recorded (n)/(d). */
 export const legacyRich = (s: string) => s.replace(/\*\*/g, "").replace(/(\d+)\/(\d+)/g, "($1)/($2)");
 
-/** Compare ignoring spacing, the minus sign's form and superscript styles: what differs then is real. */
+/** Compare ignoring spacing, the minus sign's form and superscript/subscript styles: what differs then is real. */
 export function squash(s: string): string {
   const sup: Record<string, string> = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "−" };
   return s
     .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g, x => `^(${[...x].map(c => sup[c]).join("")})`)
+    .replace(/[₀₁₂₃₄₅₆₇₈₉]+/g, x => `_(${[...x].map(c => String(c.charCodeAt(0) - 0x2080)).join("")})`)
     .replace(/\((\d+)\)\/\((\d+)\)/g, "$1/$2")
     .replace(/-/g, "−")
     .replace(/\s+/g, "")

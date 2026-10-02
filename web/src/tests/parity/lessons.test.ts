@@ -15,9 +15,10 @@ const fixtures = import.meta.glob<Fixture>("../fixtures/legacy/*.json", { eager:
 const byId = new Map(Object.entries(fixtures).filter(([k]) => !k.endsWith("_catalog.json")).map(([, f]) => [f.meta.id, f]));
 
 const pending = CATALOG.filter(c => !lessonById(c.id));
-describe("lessons still to rebuild", () => {
+if (pending.length) describe("lessons still to rebuild", () => {
   for (const c of pending) it.todo(c.id);
 });
+it("rebuilds every lesson of the current app", () => expect(pending.map(c => c.id)).toEqual([]));
 
 describe.each(CATALOG.filter(c => lessonById(c.id)).map(c => c.id))("%s matches the current app", id => {
   const lesson = lessonById(id)!, fx = byId.get(id)!, dev = DEVIATIONS[id] ?? {};
