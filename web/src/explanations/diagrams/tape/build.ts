@@ -11,7 +11,7 @@ const FS = { label: 15, total: 17, each: 12, bracket: 15 };
 const EPS = 1e-9;
 
 /** Rough width of text in the picture fonts. */
-export const textWidth = (s: string, size: number) => s.length * size * 0.6;
+export const textWidth = (s: string, size: number) => s.length * size * 0.62;
 const FRAC = /^(\d+|\?|x)\/(\d+)$/;
 
 type Layer = { count: number; from: number; until?: number };
@@ -64,7 +64,7 @@ export function layoutTape(spec: TapeSpec): TapeLayout {
   let unit = (W - M - x0) / unitsWide;
   for (const r of rows) {
     const tw = Math.max(0, ...(r.total ?? []).map(t => wOf(t, FS.total)));
-    if (tw) unit = Math.min(unit, (W - M - x0 - 10 - tw) / ((r.start ?? 0) + r.length));
+    if (tw) unit = Math.min(unit, (W - M - x0 - 14 - tw) / ((r.start ?? 0) + r.length));
   }
   const rowTops: number[] = [];
   let y = M;
@@ -122,16 +122,22 @@ export function buildTape(spec: TapeSpec): SceneDiagram {
     for (const fill of row.fills ?? []) {
       const run = within(fill.from ?? 0, fill.until, row);
       if (!run) continue;
-      const lay = layerAt(layers, run.from), pu = span(lay), pw = pu * unit, ins = inset(pw);
-      const appearsWithRow = run.from === (row.from ?? 0);
-      let k = 0;
-      for (let i = 0; i < lay.count; i++) {
-        const p0 = start + i * pu, p1 = p0 + pu, lo = Math.max(fill.a, p0), hi = Math.min(fill.b, p1);
-        if (hi - lo < EPS) continue;
-        const xa = X(lo) + (Math.abs(lo - p0) < EPS ? ins : 0), xb = X(hi) - (Math.abs(hi - p1) < EPS ? ins : 0);
-        push({ type: "rect", x: r1(xa), y: top, w: r1(Math.max(0.5, xb - xa)), h, rx: r1(Math.min(7, (xb - xa) / 3, h / 4)),
-          cls: fill.tone === "cut" ? "seg on cut" : "seg on", ...(fill.tone === "acc" ? { vars: { "--tint": "var(--acc)" } } : {}),
-          enter: appearsWithRow ? "pop" : "fade", delay: r1(k++ * Math.min(0.06, 0.6 / lay.count) * 100) / 100, ...when(run.from, run.until) });
+      // one set of rects per cut that shows while the fill does, so a re-cut bar keeps its gaps
+      for (const lay of layers) {
+        const from = Math.max(run.from, lay.from);
+        const until = run.until == null ? lay.until : lay.until == null ? run.until : Math.min(run.until, lay.until);
+        if (until != null && until < from) continue;
+        const pu = span(lay), pw = pu * unit, ins = inset(pw);
+        const enter = from === (row.from ?? 0) || from === lay.from ? "pop" : "fade";
+        let k = 0;
+        for (let i = 0; i < lay.count; i++) {
+          const p0 = start + i * pu, p1 = p0 + pu, lo = Math.max(fill.a, p0), hi = Math.min(fill.b, p1);
+          if (hi - lo < EPS) continue;
+          const xa = X(lo) + (Math.abs(lo - p0) < EPS ? ins : 0), xb = X(hi) - (Math.abs(hi - p1) < EPS ? ins : 0);
+          push({ type: "rect", x: r1(xa), y: top, w: r1(Math.max(0.5, xb - xa)), h, rx: r1(Math.min(7, (xb - xa) / 3, h / 4)),
+            cls: fill.tone === "cut" ? "seg on cut" : "seg on", ...(fill.tone === "acc" ? { vars: { "--tint": "var(--acc)" } } : {}),
+            enter, delay: r1(k++ * Math.min(0.06, 0.6 / lay.count) * 100) / 100, ...when(from, until) });
+        }
       }
       if (fill.tone === "cut") {
         push({ type: "line", x1: r1(X(fill.a) + 4), y1: top + h - 5, x2: r1(X(fill.b) - 4), y2: top + 5, cls: "ln2", enter: "draw", delay: 0.4, ...when(run.from, run.until) });
@@ -165,7 +171,7 @@ export function buildTape(spec: TapeSpec): SceneDiagram {
       if (!run) continue;
       const lay = layerAt(layers, run.from), pu = span(lay), pw = pu * unit;
       const shown = Array.from({ length: lay.count }, (_, i) => i).filter(i => !e.only || e.only(i));
-      const fits = h >= 18 && shown.every(i => textWidth(e.text(i), FS.each) + 6 <= pw);
+      const fits = h >= 18 && shown.every(i => textWidth(e.text(i), FS.each) + 8 <= pw);
       if (!fits) continue;
       for (const i of shown) {
         const c = start + (i + 0.5) * pu;
