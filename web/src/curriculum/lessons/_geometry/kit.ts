@@ -138,6 +138,13 @@ export function fracText(n: number, d: number): string {
   return d / g === 1 ? f(n / g) : `${f(n / g)}/${f(d / g)}`;
 }
 
+/** 4, 6, 8 as math: numbers joined by ", " text, or by an operator such as "+". */
+export const listOf = (v: number[], sep: ", " | Operator = ", "): MathText =>
+  v.flatMap((x, i) => (i ? [sep === ", " ? text(", ") : op(sep), num(x)] : [num(x)]));
+
+/** "2π/3", "π/6", "3π/2" */
+export const piText = (n: number, d: number) => `${n === 1 ? "" : n}π${d === 1 ? "" : `/${d}`}`;
+
 /** Reads a number field from a stored problem. */
 export const numberField = (r: Record<string, unknown>, k: string): number | null => (typeof r[k] === "number" && Number.isFinite(r[k]) ? (r[k] as number) : null);
 
