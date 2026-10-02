@@ -35,7 +35,9 @@ Why web first: it runs on the iPad today, you can change a problem and she sees 
 | 11th grade · Algebra 2 | **Sequences:** Arithmetic sequences, Geometric sequences<br>**Exponents and logs:** Evaluating logarithms, Exponential equations, Rational exponents<br>**Polynomials:** Evaluate a polynomial, Synthetic division<br>**Functions:** Inverse functions, Composing functions, Vertex of a parabola, Radical equations<br>**Complex numbers:** Multiplying complex numbers<br>**Probability:** Combinations |
 | 12th grade · Precalc & Calculus | **Trigonometry:** Degrees to radians, Radians to degrees, Unit circle values<br>**Limits:** Limits by factoring<br>**Derivatives:** Power rule, Derivative of a polynomial, Chain rule, Slope of a tangent line<br>**Integrals:** Antiderivatives, Definite integrals<br>**Vectors and series:** Arithmetic series, Vector length, Dot product |
 
-**K–4** have one playable lesson each so far (adding within 10, make a ten, regrouping, breaking apart, partial products). Their "Coming next" lists: K counting, comparing, subtracting, shapes; 1st place value, subtracting within 20, time, length; 2nd subtracting with regrouping, skip counting, money; 3rd division facts, fractions on a number line, area, rounding; 4th long division, equivalent fractions, decimals, angles.
+**4th grade** has 8 lessons: Multiply big numbers, Dividing with remainders, Equivalent fractions, Adding like fractions, Fraction times a whole number, Tenths and hundredths, Area and perimeter, Angles add up. Coming next: comparing fractions, factors and multiples, line plots, converting measurements.
+
+**K–3** have one playable lesson each so far (adding within 10, make a ten, regrouping, breaking apart). Their "Coming next" lists: K counting, comparing, subtracting, shapes; 1st place value, subtracting within 20, time, length; 2nd subtracting with regrouping, skip counting, money; 3rd division facts, fractions on a number line, area, rounding.
 
 Adding a lesson means writing three things: a problem generator, its steps (each with the right answer and the common wrong ones), and one or two intro cards. The step engine, number pad, saving and mistake summary are shared.
 
@@ -84,7 +86,16 @@ After two misses on one step, a **"Show me"** button walks through that step so 
 - **Summaries**: after every lesson or test, "What you did" lists every problem with the finished steps, and "For the grown-up" shows the score, mistake patterns with a tip for each, and every mistake (what was typed, the right answer, what kind of slip). The last summary for each lesson opens from its intro screen.
 - **For the grown-up page** (home screen): scores by grade, mistake patterns across recent sessions, hints used, guessing, lessons that need more practice, and recent sessions.
 
-## 7. A look for each grade
+## 7. Making it stick (added after the first review)
+
+- **Help fades in every grade:** new or 0–1 = every step named; 2 = she picks the next step from 3 choices before each step; 3–4 = final answer only, and a miss brings the steps back for that problem. A "Show steps" button lets her choose steps anyway.
+- **Daily review:** about 8 problems from finished lessons (any grade), weighted toward low scores and long gaps; it counts toward the streak.
+- **Word problems:** every third problem in 19 lessons is a story; step 1 is choosing the operation.
+- **Build up first:** a score of 0–1 suggests the lesson underneath (4th grade fills the gaps under 5th).
+- **Smarter "Not yet":** unrecognised answers get too big / too small, or which boxes are already right.
+- **Next big update:** stickers. Tickets earned by learning (never bought), gold tickets from strong tests and mastered skills that pull only rare or shiny stickers, a sticker machine and sticker book. Built but switched off (`REWARDS` in index.html) until G approves the art from the "Sticker animal designs" thread.
+
+## 8. A look for each grade
 
 One app shell that never changes (header, grade sheet, number pad, scores, reports), and inside it each grade carries its own theme.
 
@@ -96,13 +107,15 @@ One app shell that never changes (header, grade sheet, number pad, scores, repor
 - **Alignment system:** every size is a multiple of 4px, nested corners are concentric, and numbers in pills, badges and answer boxes are optically centred. Fonts are built into the file so it looks the same offline.
 - **Home-screen ready:** an app icon and manifest, so "Add to Home Screen" on the iPad opens it full screen like an app.
 
-## 8. Build order
+## 9. Build order
 
 1. ✅ Prototype: grade picker, lesson picker, saved progress and resume, a sideways (landscape) iPad layout, and a kid-friendly System One style.
 2. ✅ Full year for grades 5–12, unit tests and grade check-ups, 0–4 scores, limited hints, detailed mistake reports, adaptive practice length.
 3. ✅ A look for each age band, pictures for K–2, and "Skip steps" for mastered 9–12 skills.
 4. ✅ Ship polish: a theme per grade, grade XP header, explanations with animated pictures and worked examples, screen transitions, alignment system, home-screen icon.
-5. Try it with her for a week. Note where she gets stuck or bored.
-6. Fill in the full year for K–4.
-7. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
-8. Optional: move to Swift once the lessons are settled.
+5. ✅ Learning fixes: fading help, daily review, word problems, 4th grade, build-up suggestions.
+6. Next big update: stickers and tickets.
+7. Try it with her for a week. Note where she gets stuck or bored.
+8. Fill in the full year for K–3.
+9. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
+10. Optional: move to Swift once the lessons are settled.
