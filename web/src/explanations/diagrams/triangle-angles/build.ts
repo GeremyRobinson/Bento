@@ -23,11 +23,12 @@ const shown = (l: { from?: number; until?: number }) => ({ ...(l.from ? { from: 
 export function buildTriangleAngles(s: TriangleAnglesSpec): SceneDiagram {
   const A = s.left, B = s.right, C = 180 - A - B;
   if (!(A > 0 && B > 0 && C > 0)) throw new Error("the angles must leave room for a third");
-  // base 1, apex by the law of sines, then scaled to fit a 340 × 200 box
+  // base 1, apex by the law of sines, then scaled to fit a 340 × 240 box
   const side = Math.sin((B * Math.PI) / 180) / Math.sin(((A + B) * Math.PI) / 180);
   const apex1 = polar([0, 0], side, A);
   const xs = [0, 1, apex1[0]], ys = [0, apex1[1]];
-  const u = Math.min(340 / (Math.max(...xs) - Math.min(...xs)), 200 / (Math.max(...ys) - Math.min(...ys)));
+  // a tall thin triangle still gets a base wide enough for the two corner labels
+  const u = Math.max(130, Math.min(340 / (Math.max(...xs) - Math.min(...xs)), 240 / (Math.max(...ys) - Math.min(...ys))));
   const P1: Pt = [0, 0], P2: Pt = [u, 0], P3: Pt = [apex1[0] * u, apex1[1] * u];
   const items: Draft[] = [poly([P1, P2, P3], "ln fillsoft", { enter: "draw" })];
 

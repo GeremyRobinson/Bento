@@ -63,7 +63,7 @@ export function buildRightTriangle(spec: RightTriangleSpec): SceneDiagram {
     const gap = 16;
     for (const top of s.top) {
       const shown = { ...(top.sup ? { sup: top.sup } : {}), ...beat({ from: top.from ?? s.from, ...(top.until != null ? { until: top.until } : {}) }), enter: "rise" as const };
-      if (roomy) items.push(t(centre[0], centre[1] - gap, top.text, top.cls ?? "xs", shown));
+      if (roomy) items.push(t(centre[0], centre[1] - gap, top.text, top.cls ?? "sm", shown));
       else if (k === "a") items.push(t(centre[0] - side / 2 - 8, centre[1], top.text, `${top.cls ?? "sm"} end`, shown));
       else items.push(t(centre[0], centre[1] + side / 2 + 14, top.text, top.cls ?? "sm", shown));
     }

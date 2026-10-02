@@ -37,7 +37,7 @@ export function buildAngle(s: AngleSpec): SceneDiagram {
     const k = 16;
     items.push(path([{ c: "M", p: [k, 0] }, { c: "L", p: [k, -k] }, { c: "L", p: [0, -k] }], "ax thin", { from: s.wholeBeat, enter: "fade" }));
   }
-  const noteAt: Pt = total === 180 ? [0, -R - 34] : [R * 0.45, -R - 30];
+  const noteAt: Pt = total === 180 ? [0, -R - 74] : [R * 0.45, -R - 74];
   items.push(t(noteAt[0], noteAt[1], s.wholeNote, "sm", { from: s.wholeBeat, until: s.missingBeat - 1, enter: "rise" }));
   items.push(t(noteAt[0], noteAt[1], `${part}° + ${rest}° = ${total}°`, "lbl acc", { from: s.missingBeat, enter: "rise", delay: 0.6 }));
   items.push(path(arc(O, 58, part, total), "ln2", { from: s.missingBeat, enter: "draw" }));
