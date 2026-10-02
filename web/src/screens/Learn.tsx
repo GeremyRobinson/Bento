@@ -7,6 +7,10 @@ import { LEVELS } from "../engine/mastery/levels";
 import { lastScore } from "../engine/mastery/progress";
 import { when } from "../app/format";
 import { Diagram } from "../components/diagrams/Diagram";
+import { entriesInGrade } from "../app/curriculum";
+import { backFor } from "../engine/session/practice";
+import type { Rng } from "../curriculum/generators/rng";
+import type { AnyLesson } from "../curriculum/schemas/lesson";
 import { Chevron, HomeIcon } from "../components/primitives/icons";
 import { MathLine, Rich } from "../components/primitives/MathLine";
 import { ScoreChip } from "../components/primitives/Score";
@@ -14,6 +18,17 @@ import type { Explanation } from "../explanations/schema";
 
 const PLAY_MS = 1800;
 const reduceMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** A freshly generated problem for the lesson; the reference problem only if generating fails. */
+export function firstExample(lesson: AnyLesson, rng: Rng): unknown {
+  try {
+    const p = lesson.generate(rng, 0);
+    lesson.explain(p, lesson.answers(p));
+    return p;
+  } catch {
+    return lesson.reference;
+  }
+}
 
 /** Which beat a timeline position belongs to: done, playing now, or still to come. */
 export const beatState = (beatAt: number, at: number) => (beatAt < at ? "done" : beatAt === at ? "now" : "later");
@@ -25,10 +40,13 @@ export const beatState = (beatAt: number, at: number) => (beatAt < at ? "done" :
 export function Learn({ lessonId }: { lessonId: string }) {
   const { progress, reports, go, startLesson, deps } = useApp();
   const lesson = requireLesson(lessonId);
-  const [example, setExample] = useState<unknown>(lesson.reference);
+  // every visit opens on a fresh problem; the reference problem is only the fallback
+  const fresh = () => firstExample(lesson, deps().rng);
+  const [example, setExample] = useState<unknown>(fresh);
+  const [shownFor, setShownFor] = useState(lesson.id);
   const [at, setAt] = useState(0);
   const [playing, setPlaying] = useState(false);
-  useEffect(() => { setExample(lesson.reference); setAt(0); setPlaying(false); }, [lesson]);
+  if (shownFor !== lesson.id) { setShownFor(lesson.id); setExample(fresh()); setAt(0); setPlaying(false); }
 
   const ex: Explanation = useMemo(() => lesson.explain(example, lesson.answers(example)), [lesson, example]);
   const last = ex.timeline.length - 1, finished = at >= last;
@@ -43,20 +61,42 @@ export function Learn({ lessonId }: { lessonId: string }) {
   const grade = lessonsInGrade(lesson.grade), k = grade.indexOf(lesson);
   const prev = grade[k - 1], next = grade[k + 1];
   const sc = lastScore(progress, lesson.id), rep = reports[lesson.id], tier = tierFor(sc);
+  const back = sc != null && sc <= 1 ? backFor(lesson.id) : null;
+  const all = entriesInGrade(lesson.grade), place = all.findIndex(c => c.id === lesson.id);
+
+  const step = (d: 1 | -1) => { setPlaying(false); setAt(a => Math.max(0, Math.min(last, a + d))); };
+  // arrow keys and a sideways swipe move through the explanation, like the current app's lesson cards
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "ArrowRight") step(1); else if (e.key === "ArrowLeft") step(-1);
+    };
+    let touch: { x: number; y: number } | null = null;
+    const onStart = (e: TouchEvent) => { if (e.touches.length === 1) touch = { x: e.touches[0]!.clientX, y: e.touches[0]!.clientY }; };
+    const onEnd = (e: TouchEvent) => {
+      if (!touch) return;
+      const dx = e.changedTouches[0]!.clientX - touch.x, dy = e.changedTouches[0]!.clientY - touch.y; touch = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+    };
+    addEventListener("keydown", onKey);
+    document.addEventListener("touchstart", onStart, { passive: true });
+    document.addEventListener("touchend", onEnd, { passive: true });
+    return () => { removeEventListener("keydown", onKey); document.removeEventListener("touchstart", onStart); document.removeEventListener("touchend", onEnd); };
+  });
 
   return (
     <>
       <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" })} aria-label="Home"><HomeIcon /></button>
+        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
         <span className="dots-nav" aria-label={`Part ${at + 1} of ${last + 1}`}>
           {ex.timeline.map((_, i) => <span key={i} className={`dot ${i < at ? "ok" : i === at ? "busy" : ""}`} />)}
         </span>
         <button className="ctl" onClick={() => startLesson(lesson.id)}>Practice</button>
       </div>
       <div className="bar">
-        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id })} aria-label="Previous lesson"><Chevron dir="left" /></button>
+        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "back")} aria-label="Previous lesson"><Chevron dir="left" /></button>
         <span className="grow" style={{ textAlign: "center" }}>{lesson.title}</span>
-        <button className="ctl circ" disabled={!next} onClick={() => next && go({ name: "learn", lessonId: next.id })} aria-label="Next lesson"><Chevron dir="right" /></button>
+        <button className="ctl circ" disabled={!next} onClick={() => next && go({ name: "learn", lessonId: next.id }, "fwd")} aria-label="Next lesson"><Chevron dir="right" /></button>
       </div>
       <div className="blearn">
         <section className="panel learn walk">
@@ -77,11 +117,11 @@ export function Learn({ lessonId }: { lessonId: string }) {
             {(finished || at === 0) && <p className="note">{finished ? "That's the whole problem. Your turn!" : ex.diagram?.kind === "areaModel" ? "Tap Play to watch it split up." : "Tap Play to watch it step by step."}</p>}
           </div>
           <div className="actions" style={{ justifyContent: "space-between" }}>
-            <button className="ctl" disabled={at === 0} onClick={() => { setPlaying(false); setAt(a => Math.max(0, a - 1)); }}>Back</button>
+            <button className="ctl" disabled={at === 0} onClick={() => step(-1)}>Back</button>
             <span className="actions">
               {finished ? (
                 <>
-                  <button className="ctl" onClick={() => { setExample(lesson.generate(deps().rng, 0)); setAt(0); }}>Another one</button>
+                  <button className="ctl" onClick={() => { setExample(fresh()); setAt(0); }}>Another one</button>
                   <button className="ctl go" onClick={() => startLesson(lesson.id)}>Start practice</button>
                 </>
               ) : (
@@ -97,7 +137,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
         </section>
         <aside className="lside">
           <section className="tile lmap">
-            <span className="k">{lesson.unit} · lesson {k + 1} of {grade.length}</span>
+            <span className="k">{lesson.unit || gradeOf(lesson.grade).name} · lesson {place + 1} of {all.length}</span>
             <div className="outline">
               {ex.steps.map((s, i) => (
                 <button key={s.id} className={s.state === at ? "on" : s.state < at ? "seen" : ""} disabled={s.state === at}
@@ -118,6 +158,11 @@ export function Learn({ lessonId }: { lessonId: string }) {
               <span className="k">Help in practice</span><b>{HELP_TIERS[tier]}</b>
               <span className="muted">{["It fades as your score grows.", "Score 3 to go to final answers.", "Miss one and the steps come back."][tier]}</span>
             </section>
+          )}
+          {back && (
+            <button className="lesson t1 backup" onClick={() => go({ name: "learn", lessonId: back.id }, "back")}>
+              <span className="badge">↩</span><span className="name">Build up first: {back.title}</span><span className="muted">{gradeOf(back.grade).name}</span>
+            </button>
           )}
           <span className="visually-hidden">{gradeOf(lesson.grade).name}</span>
         </aside>

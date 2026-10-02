@@ -1,12 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createRng, randomSeed, type Rng } from "../curriculum/generators/rng";
 import { emptyProgress, type Progress } from "../engine/mastery/progress";
-import { finishRun, startPractice, type Deps } from "../engine/session/practice";
+import { canReview, finishRun, startPractice, startReview, startTest, type Deps } from "../engine/session/practice";
 import type { PracticeSession, SessionReport } from "../engine/session/types";
 import { makeBackup, readBackup } from "../persistence/backup";
 import { loadAll } from "../persistence/load";
 import type { Store } from "../persistence/db";
 import { parseRoute, routeHash, type Route } from "./routes";
+import { withTransition, type Dir } from "./transition";
 
 export interface AppData {
   progress: Progress;
@@ -18,10 +19,17 @@ interface AppState extends AppData {
   /** the report of the run that just finished, for the results screen */
   lastReport: SessionReport | null;
   sheetOpen: boolean;
-  go(route: Route): void;
+  /** move to a screen; dir slides the cross-fade forward or back */
+  go(route: Route, dir?: Dir): void;
   openSheet(open: boolean): void;
+  /** pick a grade (from the sheet or the landing page); the landing page then gives way to home */
   chooseGrade(grade: number): void;
   startLesson(lessonId: string): void;
+  /** a unit test ("unit:5:Fractions") or a grade check-up ("grade:5") */
+  startTest(key: string): void;
+  /** today's review, mixed from lessons already scored */
+  startReview(): void;
+  canReview(): boolean;
   /** apply one engine step to the run in progress */
   act(step: (s: PracticeSession, progress: Progress, deps: Deps) => PracticeSession | null): void;
   finish(): void;
@@ -40,6 +48,9 @@ export function useApp(): AppState {
 
 const SAVE_DELAY_MS = 250;
 
+/** First time on this device (nothing saved and no grade picked): the landing page instead of home. */
+export const firstRoute = (p: Progress, r: Route): Route => (!p.chosen && !p.xp && !p.done && r.name === "home" ? { name: "welcome" } : r);
+
 /**
  * Loads saved data (IndexedDB, or the current app's localStorage save on the first run),
  * holds it in React state, and writes changes back shortly after they happen.
@@ -47,7 +58,10 @@ const SAVE_DELAY_MS = 250;
  */
 export function AppProvider(props: { children: ReactNode; initial?: AppData; store?: Store | null; now?: () => number; rng?: Rng }) {
   const [data, setData] = useState<AppData | null>(props.initial ?? null);
-  const [route, setRoute] = useState<Route>(() => parseRoute(typeof location === "undefined" ? "" : location.hash));
+  const [route, setRoute] = useState<Route>(() => {
+    const r = parseRoute(typeof location === "undefined" ? "" : location.hash);
+    return props.initial ? firstRoute(props.initial.progress, r) : r;
+  });
   const [lastReport, setLastReport] = useState<SessionReport | null>(null);
   const [sheetOpen, openSheet] = useState(false);
   const store = useRef<Store | null>(props.store ?? null);
@@ -61,6 +75,7 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
       if (!live) return;
       store.current = r.store;
       setData({ progress: r.progress, reports: r.reports });
+      setRoute(rt => firstRoute(r.progress, rt));
     });
     return () => { live = false; };
   }, [props.initial]);
@@ -86,18 +101,19 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
   }, [flush]);
 
   useEffect(() => {
-    const onHash = () => setRoute(parseRoute(location.hash));
+    const onHash = () => withTransition(() => setRoute(parseRoute(location.hash)), "back");
     addEventListener("hashchange", onHash);
     return () => removeEventListener("hashchange", onHash);
   }, []);
 
-  const go = useCallback((r: Route) => {
+  const show = useCallback((r: Route) => {
     setRoute(r);
     const h = routeHash(r);
     // sandboxed frames can refuse history changes; the app keeps working from its own state
     try { if (location.hash !== h) history.pushState(null, "", h); } catch { /* ignore */ }
     try { scrollTo(0, 0); } catch { /* ignore */ }
   }, []);
+  const go = useCallback((r: Route, dir: Dir = "") => withTransition(() => show(r), dir), [show]);
 
   const deps = useCallback((): Deps => ({ now: now(), rng: rng.current }), [now]);
 
@@ -105,13 +121,31 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
 
   const value = useMemo<AppState | null>(() => {
     if (!data) return null;
+    // after a reload the results screen shows the newest saved report
+    const latest = lastReport ?? (data.progress.log[0] ? data.reports[data.progress.log[0].key] ?? null : null);
     return {
-      ...data, route, lastReport, sheetOpen, go, openSheet, deps,
-      chooseGrade: g => { setProgress(p => ({ ...p, grade: g, chosen: true })); openSheet(false); },
-      startLesson: id => {
+      ...data, route, lastReport: latest, sheetOpen, go, openSheet, deps,
+      chooseGrade: g => withTransition(() => {
+        setProgress(p => ({ ...p, grade: g, chosen: true }));
+        openSheet(false);
+        if (route.name === "welcome") show({ name: "home" });
+      }),
+      startLesson: id => withTransition(() => {
         setProgress(p => ({ ...p, run: startPractice(id, p, deps()) }));
-        go({ name: "practice" });
+        show({ name: "practice" });
+      }),
+      startTest: key => withTransition(() => {
+        setProgress(p => ({ ...p, run: startTest(key, p, deps()) }));
+        show({ name: "practice" });
+      }),
+      startReview: () => {
+        if (!canReview(data.progress, now())) return;
+        withTransition(() => {
+          setProgress(p => ({ ...p, run: startReview(p, deps()) }));
+          show({ name: "practice" });
+        });
       },
+      canReview: () => canReview(data.progress, now()),
       act: step => setProgress(p => {
         if (!p.run) return p;
         const next = step(p.run, p, deps());
@@ -121,10 +155,12 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
         const run = data.progress.run;
         if (!run) return;
         const r = finishRun(run, data.progress, now());
-        setData(d => (d ? { progress: r.progress, reports: { ...d.reports, [r.report.key]: r.report } } : d));
         void store.current?.putReport(r.report).catch(() => {});
-        setLastReport(r.report);
-        go({ name: "results" });
+        withTransition(() => {
+          setData(d => (d ? { progress: r.progress, reports: { ...d.reports, [r.report.key]: r.report } } : d));
+          setLastReport(r.report);
+          show({ name: "results" });
+        });
       },
       exportBackup: () => JSON.stringify(makeBackup(data.progress, data.reports, now())),
       importBackup: async json => {
@@ -133,7 +169,7 @@ export function AppProvider(props: { children: ReactNode; initial?: AppData; sto
         setData({ progress: b.progress, reports: b.reports });
       },
     };
-  }, [data, route, lastReport, sheetOpen, go, deps, now]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data, route, lastReport, sheetOpen, go, show, deps, now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!value) return null;
   return <Ctx.Provider value={value}>{props.children}</Ctx.Provider>;

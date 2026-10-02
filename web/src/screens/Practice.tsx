@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useApp } from "../app/AppState";
+import { withTransition } from "../app/transition";
 import { HomeIcon } from "../components/primitives/icons";
 import { MathLine, Rich } from "../components/primitives/MathLine";
 import { ProblemView } from "../components/practice/ProblemView";
@@ -20,6 +21,12 @@ export function Practice() {
     if (!s) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // tap-to-answer steps and planning: 1–4 pick a choice
+      const st = currentStep(s);
+      if (s.pick || st?.choices) {
+        if (/^[1-4]$/.test(e.key)) document.querySelectorAll<HTMLButtonElement>("#app .choice")[Number(e.key) - 1]?.click();
+        return;
+      }
       const map: Record<string, string> = { Backspace: "back", "-": "−", ".": ".", Tab: "next" };
       const key = /^\d$/.test(e.key) ? e.key : map[e.key];
       if (key) { e.preventDefault(); act(st => pressKey(st, key)); }
@@ -44,14 +51,14 @@ export function Practice() {
   const tapOnly = !!s.pick || !!step?.choices;
   function onNext() {
     if (s && isLastProblem(s)) finish();
-    else act((st, p, d) => nextProblem(st, p, d));
+    else withTransition(() => act((st, p, d) => nextProblem(st, p, d)), "fwd");
   }
 
   return (
     <>
       <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" })} aria-label="Home"><HomeIcon /></button>
-        <button className="ctl" onClick={() => go(mixed ? { name: "home" } : { name: "learn", lessonId: lesson.id })}
+        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
+        <button className="ctl" onClick={() => go(mixed ? { name: "home" } : { name: "learn", lessonId: lesson.id }, "back")}
           aria-label={mixed ? "Quit" : "Back to the lesson"}>{mixed ? "Quit" : "Lesson"}</button>
         <span className="steps" aria-label={`Problem ${s.i + 1} of ${n}`}>
           {s.items.map((_, i) => <span key={i} className={`dot ${i < s.i ? "ok" : i === s.i ? "busy" : ""}`} />)}
