@@ -13,5 +13,7 @@ export default defineConfig(({ mode }) => ({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],
+    // the UI flows click through whole lessons in jsdom, which takes a few seconds on a busy machine
+    testTimeout: 30000,
   },
 }));
