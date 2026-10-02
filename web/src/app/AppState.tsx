@@ -1,3 +1,4 @@
+import { applySettings, readSettings, type Settings } from "./settings";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createRng, randomSeed, type Rng } from "../curriculum/generators/rng";
 import { emptyProgress, type Progress } from "../engine/mastery/progress";
@@ -35,6 +36,8 @@ interface AppState extends AppData {
   finish(): void;
   /** ends a test, check-up or review without scoring it, and goes home */
   quit(): void;
+  /** change accessibility and comfort settings */
+  setSettings(patch: Partial<Settings>): void;
   exportBackup(): string;
   importBackup(json: string): Promise<void>;
   deps(): Deps;
@@ -66,6 +69,8 @@ export function AppProvider(props: {
   const [data, setData] = useState<AppData | null>(props.initial ?? null);
   const { onData } = props;
   useEffect(() => { if (data) onData?.(data); }, [data, onData]);
+  // settings live on <html>, so every screen and the transitions follow them
+  useEffect(() => { if (data) applySettings(readSettings(data.progress.settings)); }, [data?.progress.settings]); // eslint-disable-line react-hooks/exhaustive-deps
   const [route, setRoute] = useState<Route>(() => {
     const r = parseRoute(typeof location === "undefined" ? "" : location.hash);
     return props.initial ? firstRoute(props.initial.progress, r) : r;
@@ -174,6 +179,7 @@ export function AppProvider(props: {
           show({ name: "results" });
         });
       },
+      setSettings: patch => setProgress(p => ({ ...p, settings: { ...readSettings(p.settings), ...patch } })),
       exportBackup: () => JSON.stringify(makeBackup(data.progress, data.reports, now())),
       importBackup: async json => {
         const b = readBackup(json);

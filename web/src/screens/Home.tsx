@@ -1,4 +1,3 @@
-import { useRef, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
 import { COMING_SOON } from "../curriculum/catalog";
@@ -65,7 +64,6 @@ export function Home() {
           </div>
           <div className="actions">
             {testReady(g) && <button className="ctl go" onClick={() => startTest(testKey(g))}>Grade check-up</button>}
-            <button className="ctl" onClick={() => go({ name: "parent" })}>For the grown-up</button>
           </div>
         </section>
         {weak.length > 0 && (
@@ -105,32 +103,8 @@ export function Home() {
           </section>
         )}
       </div>
-      <BackupFoot />
     </>
   );
 }
 
-/** Save or restore everything on this device as one file. */
-function BackupFoot() {
-  const { exportBackup, importBackup } = useApp();
-  const file = useRef<HTMLInputElement>(null);
-  const save = () => {
-    const url = URL.createObjectURL(new Blob([exportBackup()], { type: "application/json" }));
-    const a = Object.assign(document.createElement("a"), { href: url, download: `bento-backup-${new Date().toISOString().slice(0, 10)}.json` });
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-  const load = async (f: File | undefined) => {
-    if (!f) return;
-    try { await importBackup(await f.text()); } catch (e) { alert((e as Error).message); }
-    if (file.current) file.current.value = "";
-  };
-  return (
-    <footer className="foot" style={{ "--tint": "var(--muted)" } as CSSProperties}>
-      <button onClick={save}>Save a backup</button>
-      <button onClick={() => file.current?.click()}>Restore a backup</button>
-      <input ref={file} type="file" accept="application/json,.json" hidden onChange={e => void load(e.target.files?.[0])} />
-    </footer>
-  );
-}
 

@@ -17,7 +17,9 @@ import { ScoreChip } from "../components/primitives/Score";
 import type { Explanation } from "../explanations/schema";
 
 const PLAY_MS = 1800;
-const reduceMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+import { reduceMotion } from "../app/transition";
+import { readSettings, speak } from "../app/settings";
+import { toPlainText } from "../curriculum/schemas/math-text";
 
 /** A freshly generated problem for the lesson; the reference problem only if generating fails. */
 export function firstExample(lesson: AnyLesson, rng: Rng): unknown {
@@ -50,6 +52,14 @@ export function Learn({ lessonId }: { lessonId: string }) {
 
   const ex: Explanation = useMemo(() => lesson.explain(example, lesson.answers(example)), [lesson, example]);
   const last = ex.timeline.length - 1, finished = at >= last;
+  // read aloud: the problem first, then each step as it plays
+  const readAloud = readSettings(progress.settings).readAloud;
+  useEffect(() => {
+    if (!readAloud) return;
+    const beat = ex.steps.find(s => s.state === at);
+    const text = at === 0 ? `${ex.heading}. ${toPlainText(ex.statement)}` : beat ? `${toPlainText(beat.math)}. ${beat.narration.replace(/[*_]/g, "")}` : "";
+    if (text) speak(text);
+  }, [at, ex, readAloud]);
 
   useEffect(() => {
     if (!playing) return;

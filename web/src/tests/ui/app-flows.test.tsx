@@ -64,7 +64,8 @@ describe("home", () => {
       expect(!!within(head as HTMLElement).queryByRole("button", { name: /Unit test/ })).toBe(lessonsInGrade(5).some(l => l.unit === u));
     }
     expect(screen.getByRole("button", { name: "Grade check-up" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "For the grown-up" })).toBeInTheDocument();
+    // the grown-up page, accessibility and backups live in the personal hub
+    expect(screen.getByRole("button", { name: /^Me:/ })).toBeInTheDocument();
     // no review until two lessons are scored
     expect(screen.queryByText("Today's review")).toBeNull();
   });
@@ -192,7 +193,8 @@ describe("report, grown-up page and back to basics", () => {
       mistakes: [{ n: 1, step: 1, label: "Multiply by the tens", lessonId: "g5-mult2", typed: "141", want: "1410", kind: "Lost the place value", cat: "concept", msg: "The tens digit stands for 30, so add a zero.", rushed: true }],
     };
     renderApp(progress, { "g5-mult2": report });
-    tap("For the grown-up");
+    fireEvent.click(screen.getByRole("button", { name: /^Me:/ }));
+    tap("Open the report ›");
     for (const h of ["Scores by grade", "Mistake patterns", "Needs more practice", "Recent sessions"]) {
       expect(screen.getByRole("heading", { level: 2, name: h })).toBeInTheDocument();
     }
@@ -224,4 +226,20 @@ describe("report, grown-up page and back to basics", () => {
     expect((build as HTMLButtonElement).disabled).toBe(!lessonById(pre.id));
     expect(screen.getByRole("button", { name: "Practice again" })).toBeInTheDocument();
   }, 60000);
+});
+
+describe("the personal hub", () => {
+  it("shows progress and grades, and its settings land on the page", () => {
+    renderApp({ grade: 5, chosen: true, xp: 40, streak: 3 });
+    fireEvent.click(screen.getByRole("button", { name: "Me: 3 day streak, 40 XP" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Your Bento" })).toBeInTheDocument();
+    expect(document.querySelectorAll(".mgrades .gcell")).toHaveLength(13);
+    fireEvent.click(screen.getByRole("switch", { name: /High contrast/ }));
+    expect(screen.getByRole("switch", { name: /High contrast/ })).toHaveAttribute("aria-checked", "true");
+    expect(document.documentElement.dataset.contrast).toBe("true");
+    fireEvent.click(screen.getByRole("radio", { name: "Largest" }));
+    expect(document.documentElement.dataset.text).toBe("largest");
+    fireEvent.click(screen.getByRole("switch", { name: /Less motion/ }));
+    expect(document.documentElement.dataset.motion).toBe("reduce");
+  });
 });

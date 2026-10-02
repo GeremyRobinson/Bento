@@ -8,7 +8,9 @@ export type Route =
   | { name: "practice" }
   | { name: "results" }
   | { name: "report"; key: string }
-  | { name: "parent" };
+  | { name: "parent" }
+  /** the personal hub: grades, progress, the grown-up page, accessibility and backups */
+  | { name: "me" };
 
 const decode = (s: string) => { try { return decodeURIComponent(s); } catch { return s; } };
 
@@ -22,6 +24,7 @@ export function parseRoute(hash: string): Route {
     case "results": return { name: "results" };
     case "report": return parts[1] ? { name: "report", key: parts[1] } : { name: "home" };
     case "grown-up": return { name: "parent" };
+    case "me": return { name: "me" };
     default: return { name: "home" };
   }
 }
@@ -36,8 +39,9 @@ export function routeHash(r: Route): string {
     case "results": return "#/results";
     case "report": return `#/report/${encodeURIComponent(r.key)}`;
     case "parent": return "#/grown-up";
+    case "me": return "#/me";
   }
 }
 
 /** Screens that take the chosen grade's look rather than a lesson's (the current app's "home" group). */
-export const isTopLevel = (r: Route) => r.name === "welcome" || r.name === "home" || r.name === "intro" || r.name === "parent";
+export const isTopLevel = (r: Route) => r.name === "welcome" || r.name === "home" || r.name === "intro" || r.name === "parent" || r.name === "me";

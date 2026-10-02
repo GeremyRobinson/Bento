@@ -2,7 +2,8 @@ import { flushSync } from "react-dom";
 
 export type Dir = "" | "fwd" | "back";
 
-export const reduceMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+export { motionOff as reduceMotion } from "./settings";
+import { motionOff as reduceMotion } from "./settings";
 
 type VTDocument = Document & { startViewTransition?: (cb: () => void) => unknown };
 

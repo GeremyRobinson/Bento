@@ -1,3 +1,4 @@
+import { defaultSettings, type Settings } from "../../app/settings";
 import type { Level } from "./levels";
 import type { PracticeSession } from "../session/types";
 
@@ -51,11 +52,13 @@ export interface Progress {
   run: PracticeSession | null;
   /** grades whose opening page has been shown */
   intros: number[];
+  /** accessibility and comfort settings for this device */
+  settings: Settings;
 }
 
 export const emptyProgress = (): Progress => ({
   version: 1, grade: null, chosen: false, xp: 0, gxp: {}, streak: 0, last: "", done: 0,
-  lessons: {}, scores: {}, tests: {}, log: [], seen: {}, reviews: {}, run: null, intros: [],
+  lessons: {}, scores: {}, tests: {}, log: [], seen: {}, reviews: {}, run: null, intros: [], settings: defaultSettings(),
 });
 
 export const lastScore = (p: Progress, id: string) => p.scores[id]?.last ?? null;

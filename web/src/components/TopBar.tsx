@@ -5,6 +5,11 @@ import { LEVEL_XP } from "../engine/mastery/levels";
 import { currentItem, lessonOfItem } from "../engine/session/practice";
 import { GradeBadge, gradeLevel } from "./primitives/Score";
 
+/** A simple person: a head and shoulders. */
+const MeIcon = () => (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="8.5" r="3.6" /><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" /></svg>
+);
+
 export function TopBar() {
   const { progress, openSheet, go } = useApp();
   const g = progress.grade ?? 5, gxp = progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
@@ -25,8 +30,11 @@ export function TopBar() {
           <span className="rshort">Resume ›</span>
         </button>
       )}
-      <span className="chip" title="Days in a row"><i>🔥</i><span className="mono">{progress.streak}</span><span className="w">day{progress.streak === 1 ? "" : "s"}</span></span>
-      <span className="chip xp" title="All XP"><i>⭐</i><span className="mono">{progress.xp}</span><span className="w">XP</span></span>
+      <button className="mebtn" onClick={() => go({ name: "me" }, "fwd")} aria-label={`Me: ${progress.streak} day streak, ${progress.xp} XP`}>
+        <span className="mestat"><i aria-hidden>🔥</i><span className="mono">{progress.streak}</span></span>
+        <span className="mestat"><i aria-hidden>⭐</i><span className="mono">{progress.xp}</span></span>
+        <span className="meav" aria-hidden><MeIcon /></span>
+      </button>
     </header>
   );
 }

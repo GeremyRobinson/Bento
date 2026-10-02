@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { playTone, readSettings, speak } from "../app/settings";
 import { useApp } from "../app/AppState";
 import { withTransition } from "../app/transition";
 import { HomeIcon } from "../components/primitives/icons";
@@ -15,6 +16,26 @@ import {
 export function Practice() {
   const { progress, go, act, finish, quit } = useApp();
   const s = progress.run;
+  const prefs = readSettings(progress.settings);
+
+  // sounds: a soft tone when a step comes out right or a try is wrong
+  const counts = useRef({ work: s?.work.length ?? 0, miss: s?.mistakes.length ?? 0, key: `${s?.i}` });
+  useEffect(() => {
+    if (!s) return;
+    const c = counts.current, key = `${s.i}`;
+    if (prefs.sounds && c.key === key) {
+      if (s.mistakes.length > c.miss) playTone("wrong");
+      else if (s.work.length > c.work) playTone("right");
+    }
+    counts.current = { work: s.work.length, miss: s.mistakes.length, key };
+  }, [s?.work.length, s?.mistakes.length, s?.i]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // read aloud: each new problem is read out, as on screen
+  useEffect(() => {
+    if (!s || !prefs.readAloud) return;
+    const t = setTimeout(() => speak(document.querySelector("#app .card")?.textContent ?? ""), 350);
+    return () => clearTimeout(t);
+  }, [s?.i, prefs.readAloud]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // a physical keyboard works too: digits, minus, point, Backspace, Tab for the next box, Enter to check
   useEffect(() => {
