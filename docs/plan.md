@@ -16,29 +16,26 @@ Why web first: it runs on the iPad today, you can change a problem and she sees 
 
 - **Grades K–12**, picked on the home screen. Each grade's units follow its standards (map below).
 - Each unit has **3–5 short lessons** (5–10 minutes).
-- Each lesson = **a short "learn" intro** (2–3 cards with a picture) **then 5–8 practice problems**.
+- Each lesson = **a short "learn" intro** (1–3 cards) **then 8 practice problems**. Each problem with a mistake adds one more, up to 12. A lesson scored 0 or 1 last time starts with 10.
 - **Every lesson is open**, so she can skip ahead or go back. A lesson she struggled with can come back as review later.
 - Rewards kids like without punishing mistakes: XP per problem, a bonus for no-mistake problems, a daily streak. (Skip Duolingo's "hearts". Losing lives for wrong answers teaches kids to fear mistakes, and mistakes are where the explaining happens.)
 
 ### Curriculum map, K–12
 
-✅ = playable now. The rest show as "Coming next" in the app.
+**Grades 5–12 have the full year** (115 lessons in all), grouped into units with a unit test each:
 
-| Grade | Playable now | Coming next |
-|---|---|---|
-| K | ✅ Adding within 10 (count on) | Counting to 100, comparing numbers, subtracting within 10, shapes |
-| 1 | ✅ Make a ten to add | Place value, subtracting within 20, telling time, measuring length |
-| 2 | ✅ Adding with regrouping | Subtracting with regrouping, skip counting, money, time to 5 minutes |
-| 3 | ✅ Multiply by breaking apart | Division facts, fractions on a number line, area, rounding |
-| 4 | ✅ Multiply big numbers (partial products) | Long division, equivalent fractions, decimals, angles |
-| 5 | ✅ Adding fractions, ✅ subtracting fractions, ✅ mixed | Mixed numbers, multiplying fractions, decimals, volume, coordinate plane |
-| 6 | ✅ Dividing fractions | Ratios and rates, percents, negative numbers, area of triangles |
-| 7 | ✅ Two-step equations | Proportions, integers, circles, probability |
-| 8 | ✅ Pythagorean theorem | Slope, systems of equations, exponent rules, volume of cones and spheres |
-| 9 · Algebra 1 | ✅ Factoring quadratics | Slope-intercept form, systems, exponent rules, quadratic formula |
-| 10 · Geometry | ✅ Distance between points | Similar triangles, trig ratios, area of circles, proofs |
-| 11 · Algebra 2 | ✅ Arithmetic sequences | Logarithms, complex numbers, polynomial division, geometric sequences |
-| 12 · Precalc & Calculus | ✅ Derivatives: power rule | Unit circle, limits, chain rule, integrals |
+| Grade | Units and lessons |
+|---|---|
+| 5th grade | **Whole numbers:** Multiply two-digit numbers, Long division, Order of operations<br>**Decimals:** Multiply by 10, 100, 1000, Rounding decimals, Adding decimals, Multiplying decimals, Dividing by a decimal<br>**Fractions:** Adding fractions, Subtracting fractions, Adding and subtracting, Multiplying fractions, Mixed numbers to fractions, Fraction of a number, Dividing by a unit fraction<br>**Measurement:** Volume of a box, Converting units |
+| 6th grade | **Ratios and percents:** Equivalent ratios, Unit rates, Percent of a number, Find the whole<br>**Number system:** Dividing fractions, Factor out the GCF, Least common multiple, Distance on a number line<br>**Expressions and equations:** Exponents and order, Evaluate expressions, One-step equations<br>**Geometry:** Area of a triangle, Area of a trapezoid<br>**Statistics:** Find the mean |
+| 7th grade | **Proportions and percents:** Solve a proportion, Scale drawings, Discounts, tax and tips, Percent change<br>**Integers:** Adding integers, Subtracting integers, Multiplying and dividing integers<br>**Expressions and equations:** Two-step equations, Distribute and combine<br>**Geometry:** Circumference, Area of a circle, Complementary and supplementary<br>**Probability:** Probability |
+| 8th grade | **Exponents and roots:** Exponent rules, Scientific notation, Square and cube roots<br>**Linear equations:** Variables on both sides, Systems by substitution<br>**Functions and slope:** Slope from two points, Slope-intercept form, Evaluate a function<br>**Geometry:** Pythagorean theorem, Find a missing leg, Volume of a cylinder, Volume of a cone, Translations, Angles in a triangle |
+| 9th grade · Algebra 1 | **Equations:** Multi-step equations, Systems by elimination<br>**Linear functions:** Line through two points<br>**Exponents:** Zero and negative exponents, Exponential growth, Simplify square roots<br>**Polynomials and quadratics:** Factoring quadratics, Add and subtract polynomials, Multiply binomials, Factor out the GCF, Solve by factoring, The quadratic formula<br>**Data:** Find the median |
+| 10th grade · Geometry | **Coordinate geometry:** Midpoint, Perpendicular slopes, Distance between points, Equation of a circle<br>**Angles and triangles:** Angles in a polygon, Exterior angle, Similar triangles<br>**Right triangles and trig:** Special right triangles, Sine, cosine and tangent<br>**Circles:** Area of a sector, Arc length<br>**Area and volume:** Surface area of a box, Volume of a pyramid |
+| 11th grade · Algebra 2 | **Sequences:** Arithmetic sequences, Geometric sequences<br>**Exponents and logs:** Evaluating logarithms, Exponential equations, Rational exponents<br>**Polynomials:** Evaluate a polynomial, Synthetic division<br>**Functions:** Inverse functions, Composing functions, Vertex of a parabola, Radical equations<br>**Complex numbers:** Multiplying complex numbers<br>**Probability:** Combinations |
+| 12th grade · Precalc & Calculus | **Trigonometry:** Degrees to radians, Radians to degrees, Unit circle values<br>**Limits:** Limits by factoring<br>**Derivatives:** Power rule, Derivative of a polynomial, Chain rule, Slope of a tangent line<br>**Integrals:** Antiderivatives, Definite integrals<br>**Vectors and series:** Arithmetic series, Vector length, Dot product |
+
+**K–4** have one playable lesson each so far (adding within 10, make a ten, regrouping, breaking apart, partial products). Their "Coming next" lists: K counting, comparing, subtracting, shapes; 1st place value, subtracting within 20, time, length; 2nd subtracting with regrouping, skip counting, money; 3rd division facts, fractions on a number line, area, rounding; 4th long division, equivalent fractions, decimals, angles.
 
 Adding a lesson means writing three things: a problem generator, its steps (each with the right answer and the common wrong ones), and one or two intro cards. The step engine, number pad, saving and mistake summary are shared.
 
@@ -78,11 +75,20 @@ The key idea: **check each step against the common wrong answers**, not just "ri
 
 After two misses on one step, a **"Show me"** button walks through that step so she isn't stuck. At the end, a **"for the grown-up"** list shows which mistakes came up, so you know what to practice together.
 
-## 6. Build order
+## 6. Hints, scores, tests and reports
 
-1. ✅ Prototype: one playable lesson per grade K–12 (three for 5th grade), grade picker, lesson picker, saved progress and resume, a sideways (landscape) iPad layout, and a kid-friendly System One style.
-2. Try it with her for a week. Note where she gets stuck or bored.
-3. Add the rest of Unit 1 (subtracting, mixed numbers), reusing the same step engine.
-4. Add Unit 2 (multi-digit multiplication with partial products as the steps).
+- **Hints are limited**: about one per two problems, and a hint opens only after a first try (or 15 seconds). "Show me" opens after two misses, or one miss after a hint.
+- **Mistake recognition** beyond each step's known wrong answers: sign mix-ups, off by one, place value or decimal point, digits in the wrong order, reusing an earlier step's number, small arithmetic slips, swapped boxes, flipped fractions, and quick repeat tries that look like guessing.
+- **0–4 proficiency score**, like a standards-based report card: 4 Advanced (90%+ of steps right on the first try), 3 Proficient (75%+), 2 Approaching (50%+), 1 Beginning (25%+), 0 Not yet. A step after a hint or one miss counts half; after two misses a quarter; "Show me" counts zero.
+- **Tests**: a unit test for every unit (6–10 problems mixed across its lessons) and a grade check-up (12 problems). No hints, one try per step; a miss shows the answer and moves on. Scored 0–4.
+- **Summaries**: after every lesson or test, "What you did" lists every problem with the finished steps, and "For the grown-up" shows the score, mistake patterns with a tip for each, and every mistake (what was typed, the right answer, what kind of slip). The last summary for each lesson opens from its intro screen.
+- **For the grown-up page** (home screen): scores by grade, mistake patterns across recent sessions, hints used, guessing, lessons that need more practice, and recent sessions.
+
+## 7. Build order
+
+1. ✅ Prototype: grade picker, lesson picker, saved progress and resume, a sideways (landscape) iPad layout, and a kid-friendly System One style.
+2. ✅ Full year for grades 5–12, unit tests and grade check-ups, 0–4 scores, limited hints, detailed mistake reports, adaptive practice length.
+3. Try it with her for a week. Note where she gets stuck or bored.
+4. Fill in the full year for K–4.
 5. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
 6. Optional: move to Swift once the lessons are settled.

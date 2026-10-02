@@ -136,7 +136,8 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .math{font-family:var(--num);font-weight:500;font-size:var(--math);line-height:1.2;display:flex;align-items:center;justify-content:center;gap:.35em;flex-wrap:wrap;padding:var(--u) 0}
 
 /* practice */
-.steps{display:flex;gap:var(--s);align-items:center;flex:1;justify-content:center}
+.steps{display:flex;gap:var(--s);align-items:center;flex:1;justify-content:center;min-width:0;flex-wrap:wrap}
+@media (max-width:480px){.steps{gap:4px}.steps .dot{width:10px;height:10px}}
 .work{display:grid;border-radius:var(--r-box);background:var(--well)}
 .work:empty{display:none}
 .workline{display:flex;align-items:center;gap:var(--u);padding:var(--s) var(--u);font-family:var(--num);font-size:24px;line-height:1.2;flex-wrap:wrap;min-width:0}
@@ -161,8 +162,30 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .tray{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s);max-width:460px;width:100%;margin:0 auto}
 .tray button{height:var(--key);border-radius:999px;background:var(--card);font-family:var(--num);font-weight:500;font-size:30px;transition:background .15s,transform .12s}
 .tray button:hover{background:var(--tint-soft)}
+.tray .wide{grid-column:span 2;font-family:var(--sans);font-size:var(--fs);font-weight:700}
 .tray button:active{transform:scale(.94);background:var(--tint-soft)}
 .actions{display:flex;gap:var(--s);justify-content:center;flex-wrap:wrap}
+
+/* units, scores, summaries */
+.unit{display:flex;justify-content:space-between;align-items:center;gap:var(--s);padding:var(--s) var(--s) 0;flex-wrap:wrap}
+.unit:not(:first-child){margin-top:var(--s)}
+.unit h3{color:var(--tint);font-size:15px}
+.unit .ctl{height:40px}
+.score{display:inline-flex;align-items:center;gap:6px;flex:none;font-family:var(--num);font-weight:600;white-space:nowrap}
+.score b{min-width:32px;height:32px;border-radius:999px;display:inline-grid;place-items:center;font-weight:600;color:#fff;background:var(--sc)}
+.score span{font-family:var(--sans);font-weight:800;font-size:15px;color:var(--sc)}
+.s4{--sc:var(--ok)} .s3{--sc:#3b82f6} .s2{--sc:var(--busy)} .s1{--sc:var(--err)} .s0{--sc:#9aa0ad}
+.bento .of{font-size:.5em;color:var(--muted)}
+.probs{display:grid;gap:var(--s)}
+.probs details.card{padding:var(--s) var(--u)}
+.probs details.card:not([open]){gap:0}
+.probs summary{display:flex;align-items:center;gap:var(--u);cursor:pointer;min-height:var(--h);font-weight:800;list-style:none}
+.probs summary::-webkit-details-marker{display:none}
+.probs summary .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.probs summary .muted{font-size:15px}
+.probs .math{--math:32px}
+.facts .pattern,.mlist>div{align-items:flex-start}
+.facts .pattern>span:first-child,.mlist>div>span{display:grid;gap:2px;min-width:0}
 @media (max-width:480px){ :root{--fs:17px;--math:40px;--key:56px;--h:44px} .ask{font-size:32px} .slot{font-size:32px;height:54px;min-width:68px} .lesson{min-height:56px} .lesson .badge{min-width:40px;height:40px;font-size:18px} .bento .v{font-size:26px} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
@@ -181,7 +204,19 @@ const fr = (n,d) => `<span class="fr"><span>${n}</span><span>${d}</span></span>`
 let save = {xp:0, streak:0, last:"", done:0, lessons:{}};
 try { save = Object.assign(save, JSON.parse(localStorage.getItem("stepmath") || "{}")); } catch(e){}
 if (save.done && !save.lessons.add) save.lessons.add = save.done; // older saves
-function persist(){ try { localStorage.setItem("stepmath", JSON.stringify(save)); } catch(e){} }
+// lesson summaries live under their own key and are written only when a run finishes, so typing stays fast
+try { save.reports = JSON.parse(localStorage.getItem("stepmath-reports") || "null") || save.reports || {}; } catch(e){}
+function persist(all){
+  const {reports, ...rest} = save;
+  try { localStorage.setItem("stepmath", JSON.stringify(rest)); } catch(e){}
+  if (!all) return;
+  try { localStorage.setItem("stepmath-reports", JSON.stringify(reports || {})); }
+  catch(e){ // storage full: keep the 25 newest summaries
+    const keep = Object.entries(reports || {}).sort((a,b) => b[1].date - a[1].date).slice(0, 25);
+    save.reports = Object.fromEntries(keep);
+    try { localStorage.setItem("stepmath-reports", JSON.stringify(save.reports)); } catch(e2){}
+  }
+}
 
 // ---- problem generator: a/b + c/d or a/b − c/d ----
 function makeProblem(i, op){
@@ -323,14 +358,24 @@ function simplifyStep(S, L, label){
     };
 }
 
+// ---- numbers: the pad types "−" and "." ----
+const round6 = x => Math.round(x*1e6)/1e6;
+const fmt = x => { const r = round6(x); return (r < 0 ? "−" : "") + String(Math.abs(r)); };
+const eq = (a,b) => a != null && b != null && Math.abs(a-b) < 1e-6;
+function parseNum(str){
+  if (str == null || str === "" || str === "−") return null;
+  const n = Number(String(str).replace("−","-"));
+  return Number.isFinite(n) ? n : null;
+}
+
 // ---- shared step builders ----
 // one-box step: the right answer plus known wrong answers, each with its own explanation
 function numStep({label, ask, note="", ans, wrong=[], hint, explain, work}){
   return { label, ask: () => ask(slot("x")), note,
     check: v => {
-      if (v.x === ans) return {ok:true};
-      for (const [val, kind, msg] of wrong) if (v.x === val) return {kind, msg};
-      return {kind: label, msg:`Not quite. ${hint}`};
+      if (eq(v.x, ans)) return {ok:true};
+      for (const [val, kind, msg] of wrong) if (eq(v.x, val)) return {kind, msg};
+      return {kind: label, msg:`Not quite. ${hint}`, generic:true};
     },
     hint, answer:{x:ans}, explain, work };
 }
@@ -597,9 +642,28 @@ const COMING = [
 ];
 
 // ---- state ----
-const LESSON_LEN = 5;
-let st = null; // practice state
-let view = "home", learnIdx = 0;
+const LESSON_LEN = 8, MAX_LEN = 12;   // a lesson grows by one problem after each miss, up to MAX_LEN
+let st = null; // the run in progress: a lesson's practice or a test
+let view = "home", learnIdx = 0, reportKey = null;
+for (const k of ["scores","tests","reports"]) save[k] = save[k] || {};
+save.log = save.log || [];
+
+// ---- 0 to 4 proficiency, like a standards-based report card ----
+const LEVELS = ["Not yet", "Beginning", "Approaching", "Proficient", "Advanced"];
+const levelOf = pct => pct >= .9 ? 4 : pct >= .75 ? 3 : pct >= .5 ? 2 : pct >= .25 ? 1 : 0;
+const scoreChip = (n, words) => n == null ? "" : `<span class="score s${n}" title="${n}: ${LEVELS[n]}"><b>${n}</b>${words ? `<span>${LEVELS[n]}</span>` : ""}</span>`;
+const idx = id => LESSONS.findIndex(l => l.id === id);
+const lastScore = id => save.scores[id] ? save.scores[id].last : null;
+const testKey = (g, unit) => unit ? `unit:${g}:${unit}` : `grade:${g}`;
+function unitsOf(g){
+  const out = [];
+  for (const i of inGrade(g)){ const u = LESSONS[i].unit || "Skills"; let x = out.find(o => o.name === u); if (!x) out.push(x = {name:u, list:[]}); x.list.push(i); }
+  return out;
+}
+function gradeLevel(g){
+  const s = inGrade(g).map(i => lastScore(LESSONS[i].id)).filter(x => x != null);
+  return s.length ? s.reduce((a,b)=>a+b,0)/s.length : null;
+}
 
 function slot(id, cls=""){
   const v = st && st.vals[id];
@@ -610,13 +674,14 @@ function slot(id, cls=""){
 let lastKey = "";
 function render(){
   const app = $("#app");
-  const key = view + cur + (view === "learn" ? learnIdx : view === "practice" ? st.i : "");
-  const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML() : doneHTML();
+  const key = view + cur + (view === "learn" ? learnIdx : view === "practice" ? st.i : view === "report" ? reportKey : "");
+  const html = view === "home" ? homeHTML() : view === "learn" ? learnHTML() : view === "practice" ? practiceHTML()
+    : view === "report" ? reportViewHTML() : view === "parent" ? parentHTML() : doneHTML();
   if (view === "practice") saveRun();
-  app.className = "wrap t" + (view === "home" ? 0 : tintOf(cur));
+  app.className = "wrap t" + (["home","parent"].includes(view) ? 0 : tintOf(cur));
   app.innerHTML = html;
   const on = app.querySelector(".grades .on"); if (on) on.scrollIntoView({inline:"center", block:"nearest"});
-  if (key !== lastKey){ app.querySelectorAll(".panel,.card").forEach((el,i)=>{ el.classList.add("rise"); el.style.animationDelay = i*60+"ms"; }); lastKey = key; }
+  if (key !== lastKey){ app.querySelectorAll(".panel,.card").forEach((el,i)=>{ el.classList.add("rise"); el.style.animationDelay = Math.min(i,8)*60+"ms"; }); lastKey = key; window.scrollTo(0,0); }
 }
 
 function statsHTML(){
@@ -624,11 +689,15 @@ function statsHTML(){
 }
 
 function homeHTML(){
-  const g = save.grade, list = inGrade(g);
+  const g = save.grade, list = inGrade(g), units = unitsOf(g);
   const next = list.find(i => !lessonDone(LESSONS[i].id));
-  const run = save.run && LESSONS[runIndex()];
+  const r = save.run, ri = r ? idx(r.items ? r.items[r.i].id : r.id) : -1;
+  const done = list.filter(i => lessonDone(LESSONS[i].id)).length, avg = gradeLevel(g);
+  const weak = list.filter(i => lastScore(LESSONS[i].id) != null && lastScore(LESSONS[i].id) <= 1);
+  const gt = save.tests[testKey(g)];
+  let k = 0;
   return `<div class="bar"><span class="ctl grow" style="background:none">Step-by-Step Math</span>${statsHTML()}</div>
-  ${run ? `<section class="panel t${tintOf(runIndex())}"><button class="lesson" data-act="resume"><span class="badge on">${GRADES[run.grade]}</span><span class="name">Keep going: ${run.title}</span><span class="muted">problem <span class="mono">${save.run.i+1}/${LESSON_LEN}</span></span></button></section>` : ""}
+  ${ri >= 0 ? `<section class="panel t${tintOf(ri)}"><button class="lesson" data-act="resume"><span class="badge on">${GRADES[LESSONS[ri].grade]}</span><span class="name">Keep going: ${r.title || LESSONS[ri].title}</span><span class="muted">problem <span class="mono">${r.i+1}/${r.items ? r.items.length : r.problems.length}</span></span></button></section>` : ""}
   <section class="panel">
     <div class="head"><h2>Choose your grade</h2></div>
     <div class="grades" role="tablist" aria-label="Grade">${GRADES.map((n,i)=>`<button role="tab" class="${i===g?"on":""}" data-grade="${i}" aria-selected="${i===g}">${n}</button>`).join("")}</div>
@@ -636,10 +705,23 @@ function homeHTML(){
   <section class="panel">
     <div class="head"><h2>${GRADE_NAME[g]}</h2><span class="muted">${list.length} lesson${list.length===1?"":"s"}</span></div>
     <div class="split"><div class="lessons col">
-      ${list.map((i,k)=>{ const l = LESSONS[i], n = lessonDone(l.id); return `<button class="lesson t${k%3}" data-lesson="${i}"><span class="badge ${n?"on":""}">${k+1}</span><span class="name">${l.title}</span><span class="dot ${n?"ok":i===next?"busy":""}"></span><span class="muted">${n ? `done ×<span class="mono">${n}</span>` : i===next ? "up next" : "open"}</span></button>`; }).join("")}
+      ${units.map(u => { const tk = testKey(g, u.name), t = save.tests[tk]; return `
+      ${units.length > 1 || u.name !== "Skills" ? `<div class="unit"><h3>${u.name}</h3><button class="ctl" data-test="${tk}">${t ? scoreChip(t.last) : ""}Unit test</button></div>` : ""}
+      ${u.list.map(i => { const l = LESSONS[i], n = lessonDone(l.id), sc = lastScore(l.id); k++; return `<button class="lesson t${(k-1)%3}" data-lesson="${i}"><span class="badge ${n?"on":""}">${k}</span><span class="name">${l.title}</span>${sc != null ? scoreChip(sc) : `<span class="dot ${i===next?"busy":""}"></span>`}<span class="muted">${sc != null && sc <= 1 ? "practice more" : n ? `done ×<span class="mono">${n}</span>` : i===next ? "up next" : "open"}</span></button>`; }).join("")}`; }).join("")}
     </div>
-    <div class="col"><div class="head"><h2 class="label" style="border:0;padding:0">Coming next</h2></div>
-    <div class="facts" style="background:var(--card)">${COMING[g].map(t=>`<div><span>${t}</span><span class="k">soon</span></div>`).join("")}</div></div></div>
+    <div class="col">
+      <div class="head"><h2 class="label" style="border:0;padding:0">Your progress</h2></div>
+      <div class="facts" style="background:var(--card)">
+        <div><span>Lessons done</span><span class="v">${done}/${list.length}</span></div>
+        <div><span>Average score</span><span class="v">${avg == null ? "—" : `${avg.toFixed(1)} of 4`}</span></div>
+        <div><span>Grade check-up</span><span class="v">${gt ? scoreChip(gt.last, true) : "not taken"}</span></div>
+      </div>
+      ${weak.length ? `<div class="head"><h2 class="label" style="border:0;padding:0">Practice these again</h2></div>
+      <div class="lessons">${weak.map(i => `<button class="lesson t1" data-lesson="${i}">${scoreChip(lastScore(LESSONS[i].id))}<span class="name">${LESSONS[i].title}</span></button>`).join("")}</div>` : ""}
+      <div class="actions" style="justify-content:flex-start"><button class="ctl go" data-test="${testKey(g)}">Take the grade check-up</button><button class="ctl" data-go="parent">For the grown-up</button></div>
+      ${g < 5 ? `<div class="head"><h2 class="label" style="border:0;padding:0">Coming next</h2></div>
+      <div class="facts" style="background:var(--card)">${COMING[g].map(t=>`<div><span>${t}</span><span class="k">soon</span></div>`).join("")}</div>` : ""}
+    </div></div>
   </section>`;
 }
 
@@ -676,25 +758,1114 @@ const LEARN_MIX = [
       <div class="prose"><p>This lesson mixes plus and minus problems. The first three steps are exactly the same. At step 4, look at the sign before you add or take away.</p></div>` }
 ];
 
+// ---- compact builders for the grade 5–12 lessons ----
+// one box; the work line is the same sentence with the answer filled in
+function ns({l, q:prompt, a, ans, h, w=[], n=""}){
+  return numStep({label:l, ask: s => (prompt ? q(prompt) : "") + a(s), note:n, ans, wrong:w, hint:h,
+    explain:`${h} That makes ${fmt(ans)}.`, work: () => a(`<b>${fmt(ans)}</b>`)});
+}
+// several boxes at once; anyOrder when the boxes can be swapped (two roots, two factors)
+function ms({l, q:prompt, a, ans, h, w=[], n="", anyOrder=false}){
+  const ids = Object.keys(ans);
+  const sorted = x => [...x].sort((p,r)=>p-r);
+  const same = (x, y) => anyOrder ? sorted(x).every((t,i)=>eq(t, sorted(y)[i])) : x.every((t,i)=>eq(t, y[i]));
+  return { label:l, note:n, hint:h,
+    ask: () => (prompt ? q(prompt) : "") + a(Object.fromEntries(ids.map(id => [id, slot(id)]))),
+    check: v => {
+      if (ids.some(id => v[id] == null)) return {soft:true, msg:"Fill in every box."};
+      const vals = ids.map(id => v[id]), want = ids.map(id => ans[id]);
+      if (same(vals, want)) return {ok:true};
+      for (const [bad, kind, msg] of w) if (same(vals, ids.map(id => bad[id]))) return {kind, msg};
+      return {kind:l, msg:`Not quite. ${h}`, generic:true};
+    },
+    answer: ans, explain: h,
+    work: () => a(Object.fromEntries(ids.map(id => [id, `<b>${fmt(ans[id])}</b>`]))) };
+}
+const fslots = () => `<span class="fr slots"><span>${slot("n")}</span><span>${slot("d")}</span></span>`;
+// a fraction answer in lowest terms (improper is fine); a minus sign goes on top
+function fs({l, q:prompt, a, N, D, h, w=[], n=""}){
+  const g = gcd(Math.abs(N), Math.abs(D)), sg = Math.sign(N) * Math.sign(D);
+  const RN = sg * Math.abs(N) / g, RD = Math.abs(D) / g;
+  return { label:l, note: n || "Write it in lowest terms.", hint:h,
+    ask: () => (prompt ? q(prompt) : "") + a(fslots()),
+    check: v => {
+      if (v.n == null || v.d == null) return {soft:true, msg:"Fill in the top and the bottom."};
+      if (v.d === 0) return {soft:true, msg:"The bottom can't be 0."};
+      for (const [bn, bd, kind, msg] of w) if (eq(v.n, bn) && eq(v.d, bd)) return {kind, msg};
+      if (!eq(v.n * RD, RN * v.d)) return {kind:l, msg:`Not quite. ${h}`, generic:true};
+      if (v.d < 0) return {soft:true, msg:"Right amount! Put the minus sign on the top number."};
+      if (gcd(Math.abs(v.n), v.d) > 1) return {kind:"Not fully simplified", msg:`Same amount, but it can be simplified: both numbers divide by ${gcd(Math.abs(v.n), v.d)}.`};
+      return {ok:true};
+    },
+    answer:{n:RN, d:RD}, explain:h,
+    work: () => a(`<b>${RD === 1 ? fmt(RN) : fr(fmt(RN), RD)}</b>`) };
+}
+const M = (html, note) => `<div class="math">${html}</div>${note ? `<p class="note">${note}</p>` : ""}`;
+const card = (h, math, ...ps) => [{h, body:`${math ? `<div class="math">${math}</div>` : ""}<div class="prose">${ps.map(p => `<p>${p}</p>`).join("")}</div>`}];
+const fmtP = x => x < 0 ? `(${fmt(x)})` : fmt(x);              // negatives in parentheses
+const sgn = (c, first) => c < 0 ? (first ? "−" : " − ") : (first ? "" : " + ");
+// a polynomial from [coefficient, "x²"] pairs, skipping zero terms
+const poly = terms => terms.filter(([c]) => c !== 0).map(([c, v], i) => `${sgn(c, i === 0)}${Math.abs(c) === 1 && v ? "" : Math.abs(c)}${v}`).join("") || "0";
+const nz = (lo, hi) => { let x; do { x = rand(lo, hi); } while (x === 0); return x; };
+const big = n => n.toLocaleString("en-US");
+const L = (id, grade, unit, title, def) => ({id, grade, unit, title, ...def});
+
+// ---- 5th grade ----
+const G5 = [
+L("g5-mult2", 5, "Whole numbers", "Multiply two-digit numbers", {
+  make: () => { let b; do { b = rand(12,98); } while (b % 10 === 0); return {a: rand(12,98), b}; },
+  show: ({a,b}) => M(`${a} × ${b}`),
+  steps: ({a,b}) => { const T = b - b%10, O = b%10; return [
+    ns({l:"Multiply by the tens", a:s=>`${a} × ${T} = ${s}`, ans:a*T, h:`Do ${a} × ${T/10}, then add a zero.`,
+      w:[[a*T/10,"Lost the place value",`That's ${a} × ${T/10}. The tens digit stands for ${T}, so add a zero.`]]}),
+    ns({l:"Multiply by the ones", a:s=>`${a} × ${O} = ${s}`, ans:a*O, h:`${a} × ${O}.`}),
+    ns({l:"Add the parts", a:s=>`${a*T} + ${a*O} = ${s}`, ans:a*b, h:`Add the two partial products.`})
+  ]; },
+  learn: card("Split the second number", "47 × 36", "36 is 30 + 6. Multiply 47 × 30 = 1410 and 47 × 6 = 282.", "Then add them: 1410 + 282 = 1692.")
+}),
+L("g5-divide", 5, "Whole numbers", "Long division", {
+  make: () => { const dv = Math.random() < .5 ? rand(3,9) : rand(11,25); let qt; do { qt = rand(12,99); } while (qt % 10 === 0); return {dv, qt, n: dv*qt}; },
+  show: ({dv,n}) => M(`${n} ÷ ${dv}`),
+  steps: ({dv,qt,n}) => { const T = qt - qt%10, O = qt%10, left = n - dv*T; return [
+    ns({l:"Tens first", q:`How many tens of ${dv} fit into ${n}? Write it like 30.`, a:s=>`${dv} × ${s} ≤ ${n}`, ans:T,
+      h:`Try ${dv} × 10, ${dv} × 20, … and stop before you go past ${n}.`,
+      w:[[T-10,"Not the most tens",`${dv} × ${T} still fits, so you can use more tens.`],[T/10,"Forgot it's tens",`${T/10} tens is written ${T}.`],[T+10,"Too many tens",`${dv} × ${T+10} = ${dv*(T+10)}, which is more than ${n}.`]]}),
+    ns({l:"Subtract", a:s=>`${n} − ${dv*T} = ${s}`, ans:left, h:`${dv} × ${T} = ${dv*T}. Take that away from ${n}.`}),
+    ns({l:"Divide what's left", a:s=>`${left} ÷ ${dv} = ${s}`, ans:O, h:`How many ${dv}s make ${left}?`}),
+    ns({l:"Add the parts", a:s=>`${n} ÷ ${dv} = ${s}`, ans:qt, h:`${T} + ${O}.`, w:[[T/10+O,"Forgot it's tens",`The first part was ${T}, not ${T/10}.`]]})
+  ]; },
+  learn: card("Divide in chunks", "864 ÷ 12", "How many tens of 12 fit? 12 × 70 = 840. That leaves 864 − 840 = 24.", "24 ÷ 12 = 2. So the answer is 70 + 2 = 72.")
+}),
+L("g5-order", 5, "Whole numbers", "Order of operations", {
+  make: () => { const c = rand(5,12); return {a: rand(2,9), b: rand(2,9), c, d: rand(1, c-1)}; },
+  show: ({a,b,c,d}) => M(`${a} + ${b} × (${c} − ${d})`),
+  steps: ({a,b,c,d}) => [
+    ns({l:"Parentheses first", a:s=>`${c} − ${d} = ${s}`, ans:c-d, h:`Work inside the parentheses first.`}),
+    ns({l:"Multiply next", a:s=>`${b} × ${c-d} = ${s}`, ans:b*(c-d), h:`Multiplication comes before addition.`,
+      w:[[(a+b)*(c-d),"Worked left to right","Multiply before you add. Do only " + b + " × " + (c-d) + " here."]]}),
+    ns({l:"Add last", a:s=>`${a} + ${b*(c-d)} = ${s}`, ans:a+b*(c-d), h:`Now add.`})
+  ],
+  learn: card("Parentheses, then × and ÷, then + and −", "3 + 4 × (6 − 2)", "Parentheses first: 6 − 2 = 4. Then multiply: 4 × 4 = 16. Then add: 3 + 16 = 19.", "Going left to right would give 28, which is wrong.")
+}),
+L("g5-pow10", 5, "Decimals", "Multiply by 10, 100, 1000", {
+  make: () => ({x: rand(101,9999)/100, k: rand(1,3)}),
+  show: ({x,k}) => M(`${fmt(x)} × ${10**k}`),
+  steps: ({x,k}) => { const m = 10**k, ans = round6(x*m); return [
+    ns({l:"Count the zeros", q:`How many zeros does ${m} have?`, a:s=>s, ans:k, h:`Count the 0s in ${m}.`}),
+    ns({l:"Move the decimal point", q:`Move the point ${k} place${k>1?"s":""} to the right.`, a:s=>`${fmt(x)} × ${m} = ${s}`, ans,
+      h:"Each zero moves the point one place to the right.",
+      w:[[round6(x*m/10),"Moved the point too few places","Move it one place for each zero."],[round6(x*m*10),"Moved the point too far","Move it one place for each zero, no more."],[round6(x/m),"Moved the point the wrong way",`Multiplying by ${m} makes the number bigger, so the point moves right.`]]})
+  ]; },
+  learn: card("Each zero moves the point", "3.47 × 100 = 347", "100 has two zeros, so the decimal point moves two places to the right.", "Multiplying by 10, 100 or 1000 always makes the number bigger.")
+}),
+L("g5-round", 5, "Decimals", "Rounding decimals", {
+  make: () => ({N: rand(1001,99999), p: rand(1,2)}),  // the number is N / 1000
+  show: ({N,p}) => M(fmt(N/1000), `Round to the nearest ${p === 1 ? "tenth" : "hundredth"}.`),
+  steps: ({N,p}) => { const name = p === 1 ? "tenths" : "hundredths", unit = 10**(3-p);
+    const digit = Math.floor(N/unit) % 10, next = Math.floor(N/(unit/10)) % 10;
+    const T = Math.floor(N/unit) / 10**p, R = Math.round(N/unit) / 10**p;
+    return [
+    ns({l:`Find the ${name} place`, q:`Which digit is in the ${name} place?`, a:s=>s, ans:digit, h:`The ${name} place is ${p} digit${p>1?"s":""} after the point.`}),
+    ns({l:"Look next door", q:"Which digit is just to its right?", a:s=>s, ans:next, h:"Look one place further right."}),
+    ns({l:"Round", q:`5 or more rounds up. 4 or less stays.`, a:s=>`${fmt(N/1000)} ≈ ${s}`, ans:R, h:`The next digit is ${next}.`,
+      w: R === T ? [[round6(T + 10**-p),"Rounded up when it should stay",`${next} is 4 or less, so the digit stays the same.`]] : [[T,"Didn't round up",`${next} is 5 or more, so round up.`]]})
+  ]; },
+  learn: card("Look one place to the right", "3.476 ≈ 3.48", "To round to the nearest hundredth, look at the thousandths digit: 6.", "6 is 5 or more, so the 7 goes up to 8.")
+}),
+L("g5-adddec", 5, "Decimals", "Adding decimals", {
+  make: () => ({a: rand(11,999)/10, b: rand(101,9999)/100}),
+  show: ({a,b}) => M(`${fmt(a)} + ${fmt(b)}`),
+  steps: ({a,b}) => { const wa = Math.floor(a), wb = Math.floor(b), da = round6(a-wa), db = round6(b-wb); return [
+    ns({l:"Add the whole numbers", a:s=>`${wa} + ${wb} = ${s}`, ans:wa+wb, h:"Add the parts before the decimal points."}),
+    ns({l:"Add the decimal parts", a:s=>`${fmt(da)} + ${fmt(db)} = ${s}`, ans:round6(da+db), h:`Line up the points: ${fmt(da)} is the same as ${(da).toFixed(2)}.`,
+      w:[[round6((Math.round(da*10) + Math.round(db*100))/100),"Didn't line up the decimal points",`${fmt(da)} means ${Math.round(da*10)} tenths, which is ${Math.round(da*100)} hundredths. Line up the points.`]]}),
+    ns({l:"Put them together", a:s=>`${fmt(a)} + ${fmt(b)} = ${s}`, ans:round6(a+b), h:`${wa+wb} + ${fmt(round6(da+db))}.`})
+  ]; },
+  learn: card("Line up the decimal points", "12.5 + 3.75", "Write 12.5 as 12.50 so both numbers have hundredths.", "Whole parts: 12 + 3 = 15. Decimal parts: 0.50 + 0.75 = 1.25. Total: 16.25.")
+}),
+L("g5-multdec", 5, "Decimals", "Multiplying decimals", {
+  make: () => ({A: rand(11,99), B: rand(2,9)}),   // A/10 × B/10
+  show: ({A,B}) => M(`${fmt(A/10)} × ${fmt(B/10)}`),
+  steps: ({A,B}) => [
+    ns({l:"Multiply without the points", a:s=>`${A} × ${B} = ${s}`, ans:A*B, h:`Ignore the decimal points for now.`}),
+    ns({l:"Count the decimal places", q:`How many digits come after the points, in both numbers together?`, a:s=>s, ans:2, h:`${fmt(A/10)} has 1 and ${fmt(B/10)} has 1.`}),
+    ns({l:"Place the point", a:s=>`${fmt(A/10)} × ${fmt(B/10)} = ${s}`, ans:round6(A*B/100), h:`Put the point 2 places from the right of ${A*B}.`,
+      w:[[round6(A*B/10),"Point in the wrong place","Count both numbers' decimal places: 1 + 1 = 2."],[A*B,"Forgot the decimal point","Put the decimal point back, 2 places from the right."]]})
+  ],
+  learn: card("Multiply, then place the point", "2.4 × 0.3", "24 × 3 = 72. There are 2 decimal places in all, so the answer is 0.72.")
+}),
+L("g5-divdec", 5, "Decimals", "Dividing by a decimal", {
+  make: () => { const d = rand(2,9), qt = rand(2,12); return {d, qt}; },   // (d*qt)/10 ÷ d/10
+  show: ({d,qt}) => M(`${fmt(d*qt/10)} ÷ ${fmt(d/10)}`),
+  steps: ({d,qt}) => [
+    ns({l:"Make the divisor whole", a:s=>`${fmt(d/10)} × 10 = ${s}`, ans:d, h:"Move its decimal point one place right."}),
+    ns({l:"Do the same to the other number", a:s=>`${fmt(d*qt/10)} × 10 = ${s}`, ans:d*qt, h:"Multiply it by 10 too, so the answer doesn't change.",
+      w:[[round6(d*qt/10),"Changed only one number","Multiply both numbers by 10."]]}),
+    ns({l:"Divide", a:s=>`${d*qt} ÷ ${d} = ${s}`, ans:qt, h:`How many ${d}s make ${d*qt}?`})
+  ],
+  learn: card("Make the divisor a whole number", "4.8 ÷ 0.6", "Multiply both numbers by 10: 48 ÷ 6. That's 8.", "Moving both points the same way doesn't change the answer.")
+}),
+L("g5-multfrac", 5, "Fractions", "Multiplying fractions", {
+  make: () => { const top = d => { let n; do { n = rand(1, d-1); } while (gcd(n,d) !== 1); return n; }; const b = rand(2,9), d = rand(2,9); return {a: top(b), b, c: top(d), d}; },
+  show: ({a,b,c,d}) => M(`${fr(a,b)} × ${fr(c,d)}`),
+  steps: ({a,b,c,d}) => [
+    ms({l:"Multiply straight across", a:S=>`${fr(a,b)} × ${fr(c,d)} = <span class="fr slots"><span>${S.n}</span><span>${S.d}</span></span>`, ans:{n:a*c, d:b*d},
+      h:`Top × top: ${a} × ${c}. Bottom × bottom: ${b} × ${d}.`,
+      w:[[{n:a*d, d:b*c},"Flipped like dividing","Flipping is only for dividing. To multiply, go straight across."],[{n:a+c, d:b+d},"Added instead of multiplied","Multiply top × top and bottom × bottom."]]}),
+    simplifyStep(a*c, b*d, "Simplify")
+  ],
+  learn: card("Top times top, bottom times bottom", `${fr(2,3)} × ${fr(3,4)} = ${fr(6,12)} = ${fr(1,2)}`, "Multiply the tops and the bottoms. Then simplify.")
+}),
+L("g5-improper", 5, "Fractions", "Mixed numbers to fractions", {
+  make: () => { const d = rand(2,9); let n; do { n = rand(1, d-1); } while (gcd(n,d) !== 1); return {w: rand(1,6), n, d}; },
+  show: ({w,n,d}) => M(`${w} ${fr(n,d)}`, "Write it as one fraction."),
+  steps: ({w,n,d}) => [
+    ns({l:"Wholes into pieces", a:s=>`${w} × ${d} = ${s}`, ans:w*d, h:`Each whole has ${d} pieces.`, w:[[w+d,"Added instead of multiplied",`${w} wholes with ${d} pieces each: multiply.`]]}),
+    ns({l:"Add the extra pieces", a:s=>`${w*d} + ${n} = ${s}`, ans:w*d+n, h:`Add the ${n} extra pieces.`}),
+    ms({l:"Write the fraction", a:S=>`${w} ${fr(n,d)} = <span class="fr slots"><span>${S.n}</span><span>${S.d}</span></span>`, ans:{n:w*d+n, d}, h:`${w*d+n} pieces, each a ${d === 2 ? "half" : "1/" + d}. The bottom stays ${d}.`,
+      w:[[{n:w*d+n, d:w*d},"Changed the bottom","The piece size doesn't change: the bottom stays " + d + "."]]})
+  ],
+  learn: card("Count all the pieces", `2 ${fr(3,4)} = ${fr(11,4)}`, "Each whole is 4 fourths, so 2 wholes are 8 fourths. Add the 3 extra: 11 fourths.")
+}),
+L("g5-fracof", 5, "Fractions", "Fraction of a number", {
+  make: () => { const d = rand(2,9); let n; do { n = rand(1, d-1); } while (gcd(n,d) !== 1); return {n, d, W: d*rand(2,12)}; },
+  show: ({n,d,W}) => M(`${fr(n,d)} of ${W}`),
+  steps: ({n,d,W}) => [
+    ns({l:"Split into equal groups", a:s=>`${W} ÷ ${d} = ${s}`, ans:W/d, h:`The bottom number tells how many equal groups: ${d}.`, w:[[W*d,"Multiplied instead of divided",`Split ${W} into ${d} equal groups: divide.`]]}),
+    ns({l:"Take that many groups", a:s=>`${W/d} × ${n} = ${s}`, ans:W/d*n, h:`The top number tells how many groups to take: ${n}.`})
+  ],
+  learn: card("Divide by the bottom, multiply by the top", `${fr(3,4)} of 20`, "Split 20 into 4 equal groups: 5 each. Take 3 groups: 15.")
+}),
+L("g5-unitdiv", 5, "Fractions", "Dividing by a unit fraction", {
+  make: () => ({W: rand(2,10), d: rand(2,8)}),
+  show: ({W,d}) => M(`${W} ÷ ${fr(1,d)}`, `How many ${fr(1,d)} pieces fit in ${W}?`),
+  steps: ({W,d}) => [
+    ns({l:"Pieces in one whole", q:`How many ${fr(1,d)} pieces make 1 whole?`, a:s=>s, ans:d, h:`It takes ${d} of them.`}),
+    ns({l:"Pieces in all", a:s=>`${W} × ${d} = ${s}`, ans:W*d, h:`${W} wholes, ${d} pieces in each.`,
+      w:[[round6(W/d),"Divided the wrong way",`The pieces are small, so lots of them fit. The answer is bigger than ${W}.`]]})
+  ],
+  learn: card("How many pieces fit?", `3 ÷ ${fr(1,4)} = 12`, "Each whole holds 4 fourths, so 3 wholes hold 12 fourths.")
+}),
+L("g5-volume", 5, "Measurement", "Volume of a box", {
+  make: () => ({l: rand(2,12), w: rand(2,12), h: rand(2,12)}),
+  show: ({l,w,h}) => M(`${l} × ${w} × ${h}`, `A box ${l} cm long, ${w} cm wide and ${h} cm tall. How many cubic cm?`),
+  steps: ({l,w,h}) => [
+    ns({l:"Area of the base", a:s=>`${l} × ${w} = ${s}`, ans:l*w, h:"Length times width.", w:[[l+w,"Added instead of multiplied","Area means length × width."]]}),
+    ns({l:"Times the height", a:s=>`${l*w} × ${h} = ${s}`, ans:l*w*h, h:"Stack the base layer up the height.", w:[[l*w+h,"Added instead of multiplied","Each layer is the base. Multiply by the number of layers."]]})
+  ],
+  learn: card("Volume = length × width × height", "4 × 3 × 2 = 24", "The bottom layer has 4 × 3 = 12 cubes. There are 2 layers, so 24 cubes.")
+}),
+L("g5-units", 5, "Measurement", "Converting units", {
+  make: () => ({u: pick([["foot","feet","inches",12],["yard","yards","feet",3],["meter","meters","centimeters",100],["kilogram","kilograms","grams",1000],["hour","hours","minutes",60],["gallon","gallons","quarts",4],["pound","pounds","ounces",16]]), n: rand(2,12)}),
+  show: ({u,n}) => M(`${n} ${u[1]} = ? ${u[2]}`),
+  steps: ({u:[one,many,small,f],n}) => [
+    ns({l:"How many in one?", q:`1 ${one} = how many ${small}?`, a:s=>s, ans:f, h:`1 ${one} is ${f} ${small}.`}),
+    ns({l:"Multiply", a:s=>`${n} × ${f} = ${s}`, ans:n*f, h:`Big unit to small unit: multiply.`, w:[[n+f,"Added instead of multiplied",`Each ${one} is ${f} ${small}, so multiply.`]]})
+  ],
+  learn: card("Big to small: multiply", "3 feet = 36 inches", "1 foot is 12 inches, so 3 feet is 3 × 12 = 36 inches.")
+}),
+];
+
+// ---- 6th grade ----
+const G6 = [
+L("g6-ratio", 6, "Ratios and percents", "Equivalent ratios", {
+  make: () => { let a, b; do { a = rand(1,9); b = rand(2,9); } while (gcd(a,b) !== 1 || a === b); return {a, b, k: rand(2,9)}; },
+  show: ({a,b,k}) => M(`${a} : ${b} = ? : ${b*k}`),
+  steps: ({a,b,k}) => [
+    ns({l:"Find the scale factor", a:s=>`${b} × ${s} = ${b*k}`, ans:k, h:`What times ${b} makes ${b*k}?`, w:[[b*k-b,"Added instead of multiplied","Ratios grow by multiplying, not adding."]]}),
+    ns({l:"Scale the other number", a:s=>`${a} × ${k} = ${s}`, ans:a*k, h:`Multiply ${a} by the same ${k}.`, w:[[a+b*k-b,"Added instead of multiplied","Use the same multiply on both numbers."]]})
+  ],
+  learn: card("Multiply both parts the same", "2 : 3 = 8 : 12", "3 × 4 = 12, so multiply the 2 by 4 too: 8.")
+}),
+L("g6-rate", 6, "Ratios and percents", "Unit rates", {
+  make: () => ({u: rand(2,15), n: rand(2,9), m: rand(2,12), item: pick(["notebooks","apples","pencils","stickers","tickets"])}),
+  show: ({u,n,m,item}) => M(`${n} ${item} cost $${u*n}`, `How much do ${m} ${item} cost?`),
+  steps: ({u,n,m}) => [
+    ns({l:"Cost of one", a:s=>`$${u*n} ÷ ${n} = $${s}`, ans:u, h:`Share the cost over ${n}.`, w:[[u*n*n,"Multiplied instead of divided","To find the cost of one, divide."]]}),
+    ns({l:`Cost of ${m}`, a:s=>`${m} × $${u} = $${s}`, ans:m*u, h:`${m} of them at $${u} each.`})
+  ],
+  learn: card("Find the cost of one first", "4 apples cost $12", "One apple costs $12 ÷ 4 = $3. So 7 apples cost 7 × $3 = $21.")
+}),
+L("g6-pctof", 6, "Ratios and percents", "Percent of a number", {
+  make: () => ({p: pick([10,20,25,30,40,50,60,70,75,80,90]), W: 20*rand(1,20)}),
+  show: ({p,W}) => M(`${p}% of ${W}`),
+  steps: ({p,W}) => { const base = p % 10 === 0 ? 10 : 25, part = W*base/100; return [
+    ns({l:`Find ${base}%`, a:s=>`${base}% of ${W} = ${s}`, ans:part, h: base === 10 ? `10% is one tenth: ${W} ÷ 10.` : `25% is one quarter: ${W} ÷ 4.`, w:[[W*base,"Multiplied instead of divided",`${base}% is a part of ${W}, so it's smaller than ${W}.`]]}),
+    ns({l:`Scale up to ${p}%`, a:s=>`${p/base} × ${part} = ${s}`, ans:W*p/100, h:`${p}% is ${p/base} groups of ${base}%.`})
+  ]; },
+  learn: card("Start from 10%", "30% of 80", "10% of 80 is 8. 30% is three of those: 24.")
+}),
+L("g6-pctwhole", 6, "Ratios and percents", "Find the whole", {
+  make: () => ({p: pick([10,20,25,50]), P: rand(2,30)}),
+  show: ({p,P}) => M(`${P} is ${p}% of ?`),
+  steps: ({p,P}) => [
+    ns({l:"How many parts make 100%?", a:s=>`${p}% × ${s} = 100%`, ans:100/p, h:`100 ÷ ${p}.`}),
+    ns({l:"Find the whole", a:s=>`${P} × ${100/p} = ${s}`, ans:P*100/p, h:`The whole is ${100/p} of those parts.`, w:[[round6(P*p/100),"Took a percent again",`We want the whole, so it's bigger than ${P}.`]]})
+  ],
+  learn: card("Count up to 100%", "15 is 25% of ?", "25% four times makes 100%. So the whole is 15 × 4 = 60.")
+}),
+L("g6-gcf", 6, "Number system", "Factor out the GCF", {
+  make: () => { let m, n; do { m = rand(1,9); n = rand(1,9); } while (m === n || gcd(m,n) !== 1); return {g: rand(2,9), m, n}; },
+  show: ({g,m,n}) => M(`${g*m} + ${g*n}`, "Factor out the greatest common factor."),
+  steps: ({g,m,n}) => { const smaller = []; for (let f = 2; f < g; f++) if (g % f === 0) smaller.push([f,"Common factor, but not the greatest",`${f} works, but there's a bigger one.`]); return [
+    ns({l:"Greatest common factor", a:s=>`GCF(${g*m}, ${g*n}) = ${s}`, ans:g, h:`The biggest number that divides both ${g*m} and ${g*n}.`, w:smaller}),
+    ms({l:"Factor it out", a:S=>`${g*m} + ${g*n} = ${g}(${S.m} + ${S.n})`, ans:{m, n}, h:`${g*m} ÷ ${g} and ${g*n} ÷ ${g}.`})
+  ]; },
+  learn: card("Pull out the biggest shared factor", "24 + 36 = 12(2 + 3)", "12 is the biggest number that divides both. 24 ÷ 12 = 2 and 36 ÷ 12 = 3.")
+}),
+L("g6-lcm", 6, "Number system", "Least common multiple", {
+  make: () => { let a, b; do { a = rand(2,12); b = rand(2,12); } while (a === b || lcm(a,b) === a*b && a*b > 60); return {a: Math.min(a,b), b: Math.max(a,b)}; },
+  show: ({a,b}) => M(`LCM(${a}, ${b})`),
+  steps: ({a,b}) => [
+    ns({l:"Count by the bigger number", q:`Count by ${b}s: ${b}, ${2*b}, ${3*b}, … Which is the first one ${a} goes into?`, a:s=>s, ans:lcm(a,b), h:`Check each multiple of ${b}: does ${a} divide it evenly?`,
+      w: lcm(a,b) !== a*b ? [[a*b,"Common multiple, but not the least",`${a*b} works, but there's a smaller one.`]] : []}),
+    ns({l:"Check it", a:s=>`${lcm(a,b)} ÷ ${a} = ${s}`, ans:lcm(a,b)/a, h:`It should come out even.`})
+  ],
+  learn: card("The first number both go into", "LCM(4, 6) = 12", "Count by 6s: 6, 12. 4 goes into 12, so the LCM is 12.")
+}),
+L("g6-numline", 6, "Number system", "Distance on a number line", {
+  make: () => ({a: -rand(1,12), b: rand(1,12)}),
+  show: ({a,b}) => M(`${fmt(a)} to ${b}`, "How far apart are they on the number line?"),
+  steps: ({a,b}) => [
+    ns({l:"From the negative to 0", a:s=>`|${fmt(a)}| = ${s}`, ans:-a, h:`How many steps from ${fmt(a)} to 0?`, w:[[a,"Distance is never negative","Distance counts steps, so it's always positive."]]}),
+    ns({l:"From 0 to the positive", a:s=>`|${b}| = ${s}`, ans:b, h:`How many steps from 0 to ${b}?`}),
+    ns({l:"Add the distances", a:s=>`${-a} + ${b} = ${s}`, ans:b-a, h:"You cross 0, so add the two distances.", w:[[b+a,"Subtracted the distances","Going from a negative to a positive crosses 0, so add."]]})
+  ],
+  learn: card("Cross zero, add the distances", "−3 to 5 is 8 apart", "From −3 to 0 is 3 steps. From 0 to 5 is 5 steps. 3 + 5 = 8.")
+}),
+L("g6-expo", 6, "Expressions and equations", "Exponents and order", {
+  make: () => ({a: rand(2,5), n: rand(2,3), b: rand(2,9), c: rand(2,9)}),
+  show: ({a,n,b,c}) => M(`${a}<sup>${n}</sup> + ${b} × ${c}`),
+  steps: ({a,n,b,c}) => [
+    ns({l:"Exponent first", a:s=>`${a}<sup>${n}</sup> = ${s}`, ans:a**n, h:`${a}<sup>${n}</sup> means ${Array(n).fill(a).join(" × ")}.`, w:[[a*n,"Multiplied the base by the exponent",`${a}<sup>${n}</sup> means ${Array(n).fill(a).join(" × ")}, not ${a} × ${n}.`]]}),
+    ns({l:"Multiply", a:s=>`${b} × ${c} = ${s}`, ans:b*c, h:`Multiply before adding.`}),
+    ns({l:"Add", a:s=>`${a**n} + ${b*c} = ${s}`, ans:a**n+b*c, h:"Add last."})
+  ],
+  learn: card("Exponents come before × and +", "2³ + 4 × 3", "2³ = 2 × 2 × 2 = 8. Then 4 × 3 = 12. Then 8 + 12 = 20.")
+}),
+L("g6-eval", 6, "Expressions and equations", "Evaluate expressions", {
+  make: () => ({a: rand(2,9), b: rand(2,9), x: rand(1,9), y: rand(1,9)}),
+  show: ({a,b,x,y}) => M(`${a}x + ${b}y`, `when x = ${x} and y = ${y}`),
+  steps: ({a,b,x,y}) => [
+    ns({l:`Find ${a}x`, a:s=>`${a} × ${x} = ${s}`, ans:a*x, h:`${a}x means ${a} times x.`, w:[[Number(`${a}${x}`),"Wrote the numbers side by side",`${a}x means ${a} × ${x}.`],[a+x,"Added instead of multiplied",`${a}x means ${a} × ${x}.`]]}),
+    ns({l:`Find ${b}y`, a:s=>`${b} × ${y} = ${s}`, ans:b*y, h:`${b}y means ${b} times y.`, w:[[Number(`${b}${y}`),"Wrote the numbers side by side",`${b}y means ${b} × ${y}.`]]}),
+    ns({l:"Add", a:s=>`${a*x} + ${b*y} = ${s}`, ans:a*x+b*y, h:"Add the two parts."})
+  ],
+  learn: card("Swap in the numbers", "3x + 2y, x = 4, y = 5", "3 × 4 = 12 and 2 × 5 = 10. So 3x + 2y = 22.")
+}),
+L("g6-onestep", 6, "Expressions and equations", "One-step equations", {
+  make: () => { const t = rand(0,3), a = rand(2,9), r = rand(2,12); return {t, a, x: t === 1 ? r + a : t === 3 ? r * a : r}; },
+  show: p => M(G6_ONE[p.t].eq(p)),
+  steps: p => { const T = G6_ONE[p.t]; return [
+    ns({l:"Undo it", n:T.undo(p), a:s=>`x = ${s}`, ans:p.x, h:T.undo(p), w:[[T.wrong(p),"Used the same operation","Do the opposite to undo it."]]}),
+    ns({l:"Check", a:s=>`${T.check(p)} = ${s}`, ans:T.rhs(p), h:"Put your x back in the equation."})
+  ]; },
+  learn: card("Do the opposite", "x + 7 = 15", "To undo + 7, subtract 7 from both sides: x = 8.", "Check: 8 + 7 = 15. ✓")
+}),
+L("g6-tri", 6, "Geometry", "Area of a triangle", {
+  make: () => { let b, h; do { b = rand(2,20); h = rand(2,20); } while ((b*h) % 2); return {b, h}; },
+  show: ({b,h}) => M(`base ${b}, height ${h}`, "Area = base × height ÷ 2"),
+  steps: ({b,h}) => [
+    ns({l:"Base × height", a:s=>`${b} × ${h} = ${s}`, ans:b*h, h:"Multiply the base and the height.", w:[[b+h,"Added instead of multiplied","Multiply base × height."]]}),
+    ns({l:"Half of it", a:s=>`${b*h} ÷ 2 = ${s}`, ans:b*h/2, h:"A triangle is half of a rectangle.", w:[[b*h,"Forgot to halve","A triangle is half of a rectangle: divide by 2."]]})
+  ],
+  learn: card("Half a rectangle", "base 6, height 4", "6 × 4 = 24 for the whole rectangle. The triangle is half: 12.")
+}),
+L("g6-trap", 6, "Geometry", "Area of a trapezoid", {
+  make: () => { let a, b, h; do { a = rand(2,15); b = rand(2,15); h = rand(2,12); } while (a === b || ((a+b)*h) % 2); return {a, b, h}; },
+  show: ({a,b,h}) => M(`bases ${a} and ${b}, height ${h}`, "Area = (base + base) × height ÷ 2"),
+  steps: ({a,b,h}) => [
+    ns({l:"Add the bases", a:s=>`${a} + ${b} = ${s}`, ans:a+b, h:"Add the two parallel sides."}),
+    ns({l:"Times the height", a:s=>`${a+b} × ${h} = ${s}`, ans:(a+b)*h, h:"Multiply by the height."}),
+    ns({l:"Half of it", a:s=>`${(a+b)*h} ÷ 2 = ${s}`, ans:(a+b)*h/2, h:"Divide by 2.", w:[[(a+b)*h,"Forgot to halve","Divide by 2 at the end."]]})
+  ],
+  learn: card("Average the bases", "bases 4 and 8, height 5", "4 + 8 = 12. 12 × 5 = 60. Half of that: 30.")
+}),
+L("g6-mean", 6, "Statistics", "Find the mean", {
+  make: () => { const n = rand(4,6); let v; do { v = Array.from({length:n}, () => rand(1,20)); } while (v.reduce((x,y)=>x+y) % n); return {v}; },
+  show: ({v}) => M(v.join(", "), "Find the mean (average)."),
+  steps: ({v}) => { const T = v.reduce((x,y)=>x+y); return [
+    ns({l:"Add them up", a:s=>`${v.join(" + ")} = ${s}`, ans:T, h:"Add all the numbers."}),
+    ns({l:"Count them", q:"How many numbers are there?", a:s=>s, ans:v.length, h:"Count the numbers in the list."}),
+    ns({l:"Divide", a:s=>`${T} ÷ ${v.length} = ${s}`, ans:T/v.length, h:"Share the total equally."})
+  ]; },
+  learn: card("Share it out equally", "4, 6, 8", "4 + 6 + 8 = 18. There are 3 numbers. 18 ÷ 3 = 6.")
+}),
+];
+const G6_ONE = [
+  { eq: p => `x + ${p.a} = ${p.x+p.a}`, undo: p => `Subtract ${p.a} from both sides.`, wrong: p => p.x+2*p.a, check: p => `${p.x} + ${p.a}`, rhs: p => p.x+p.a },
+  { eq: p => `x − ${p.a} = ${p.x-p.a}`, undo: p => `Add ${p.a} to both sides.`, wrong: p => p.x-2*p.a, check: p => `${p.x} − ${p.a}`, rhs: p => p.x-p.a },
+  { eq: p => `${p.a}x = ${p.a*p.x}`, undo: p => `Divide both sides by ${p.a}.`, wrong: p => p.a*p.a*p.x, check: p => `${p.a} × ${p.x}`, rhs: p => p.a*p.x },
+  { eq: p => `x ÷ ${p.a} = ${p.x/p.a}`, undo: p => `Multiply both sides by ${p.a}.`, wrong: p => round6(p.x/p.a/p.a), check: p => `${p.x} ÷ ${p.a}`, rhs: p => p.x/p.a },
+];
+
+// ---- 7th grade ----
+const G7 = [
+L("g7-prop", 7, "Proportions and percents", "Solve a proportion", {
+  make: () => { let a, b; do { a = rand(1,9); b = rand(2,9); } while (a === b); return {a, b, k: rand(2,8)}; },
+  show: ({a,b,k}) => M(`${fr(a,b)} = ${fr("x", b*k)}`),
+  steps: ({a,b,k}) => [
+    ns({l:"Cross multiply", a:s=>`${a} × ${b*k} = ${s}`, ans:a*b*k, h:`Multiply the top-left by the bottom-right.`}),
+    ns({l:"Divide", a:s=>`x = ${a*b*k} ÷ ${b} = ${s}`, ans:a*k, h:`Divide by the number across from x.`, w:[[a*b*k*b,"Multiplied instead of divided",`x × ${b} = ${a*b*k}, so divide by ${b}.`]]})
+  ],
+  learn: card("Cross multiply, then divide", `${fr(3,4)} = ${fr("x",20)}`, "3 × 20 = 60. Then x = 60 ÷ 4 = 15.")
+}),
+L("g7-scale", 7, "Proportions and percents", "Scale drawings", {
+  make: () => { const c = rand(1,4), km = rand(2,9); return {c, km, g: rand(2,8)}; },
+  show: ({c,km,g}) => M(`${c} cm = ${km} km`, `On the map, two towns are ${c*g} cm apart. How far is that really?`),
+  steps: ({c,km,g}) => [
+    ns({l:"How many map units?", a:s=>`${c*g} ÷ ${c} = ${s}`, ans:g, h:`How many groups of ${c} cm are in ${c*g} cm?`}),
+    ns({l:"Real distance", a:s=>`${g} × ${km} = ${s} km`, ans:g*km, h:`Each group is ${km} km.`, w:[[c*g*km,"Skipped a step",`Each ${c} cm (not each 1 cm) is ${km} km.`]]})
+  ],
+  learn: card("Count the groups", "2 cm = 5 km, 8 cm = ?", "8 cm is 4 groups of 2 cm. 4 × 5 = 20 km.")
+}),
+L("g7-discount", 7, "Proportions and percents", "Discounts, tax and tips", {
+  make: () => ({P: 20*rand(1,10), p: pick([10,15,20,25,30,40,50]), off: Math.random() < .5}),
+  show: ({P,p,off}) => M(`$${P}`, off ? `${p}% off. What's the sale price?` : `Add a ${p}% tip. What's the total?`),
+  steps: ({P,p,off}) => { const amt = P*p/100; return [
+    ns({l:`Find ${p}%`, a:s=>`${p}% of $${P} = $${s}`, ans:amt, h:`10% of $${P} is $${P/10}.`}),
+    ns({l: off ? "Take it off" : "Add it on", a:s=>`$${P} ${off ? "−" : "+"} $${fmt(amt)} = $${s}`, ans:P + (off ? -amt : amt), h: off ? "A discount takes money off." : "A tip adds money on.",
+      w:[[P + (off ? amt : -amt), off ? "Added the discount" : "Subtracted the tip", off ? "A discount takes money off: subtract." : "Tips and tax add on: add."]]})
+  ]; },
+  learn: card("Find the percent, then add or subtract", "$80, 25% off", "25% of $80 is $20. The sale price is $80 − $20 = $60.")
+}),
+L("g7-pctchange", 7, "Proportions and percents", "Percent change", {
+  make: () => { const p = pick([10,20,25,50,75]), O = pick([20,40,60,80,100,120,200]); return {O, p, up: Math.random() < .5}; },
+  show: ({O,p,up}) => M(`${O} → ${O + (up ? 1 : -1)*O*p/100}`, "What's the percent change?"),
+  steps: ({O,p,up}) => { const N = O + (up ? 1 : -1)*O*p/100, c = Math.abs(N-O); return [
+    ns({l:"How much did it change?", a:s=>`|${N} − ${O}| = ${s}`, ans:c, h:"Subtract to find the change."}),
+    ns({l:"Divide by the original", a:s=>`${c} ÷ ${O} = ${s}`, ans:round6(c/O), h:`Always divide by where you started: ${O}.`, w:[[round6(c/N),"Divided by the new number","Divide by the original amount."]]}),
+    ns({l:"Write it as a percent", a:s=>`${fmt(round6(c/O))} = ${s}%`, ans:p, h:"Move the decimal point two places right."})
+  ]; },
+  learn: card("Change ÷ original", "50 → 65", "The change is 15. 15 ÷ 50 = 0.3, which is 30%.")
+}),
+L("g7-addint", 7, "Integers", "Adding integers", {
+  make: () => { let a, b; do { a = nz(-15,15); b = nz(-15,15); } while (a > 0 && b > 0); return {a, b}; },
+  show: ({a,b}) => M(`${fmt(a)} + ${fmtP(b)}`),
+  steps: ({a,b}) => { const same = Math.sign(a) === Math.sign(b), A = Math.abs(a), B = Math.abs(b); return [
+    same ? ns({l:"Same signs: add the sizes", a:s=>`${A} + ${B} = ${s}`, ans:A+B, h:"Both are negative, so add their sizes."})
+         : ns({l:"Different signs: subtract the sizes", a:s=>`${Math.max(A,B)} − ${Math.min(A,B)} = ${s}`, ans:Math.abs(A-B), h:"Take the smaller size from the bigger one."}),
+    ns({l:"Pick the sign", a:s=>`${fmt(a)} + ${fmtP(b)} = ${s}`, ans:a+b, h: same ? "Two negatives make a negative." : "The answer takes the sign of the number farther from 0.",
+      w: a+b !== 0 ? [[-(a+b),"Wrong sign", same ? "Both numbers are negative, so the answer is negative." : "Use the sign of the number with the bigger size."]] : []})
+  ]; },
+  learn: card("Sizes and signs", "−7 + 12", "Different signs: 12 − 7 = 5. 12 is farther from 0 and it's positive, so the answer is 5.", "−4 + (−6): same signs, add: −10.")
+}),
+L("g7-subint", 7, "Integers", "Subtracting integers", {
+  make: () => ({a: nz(-12,12), b: nz(-12,12)}),
+  show: ({a,b}) => M(`${fmt(a)} − ${fmtP(b)}`),
+  steps: ({a,b}) => [
+    ns({l:"Add the opposite", q:`What is the opposite of ${fmt(b)}?`, a:s=>s, ans:-b, h:"The opposite has the other sign.", w:[[b,"Kept the same sign","The opposite flips the sign."]]}),
+    ns({l:"Now add", a:s=>`${fmt(a)} + ${fmtP(-b)} = ${s}`, ans:a-b, h:"Add the two numbers.", w:[[a+b,"Forgot to change the sign","Subtracting means adding the opposite."]]})
+  ],
+  learn: card("Subtracting is adding the opposite", "5 − (−3) = 5 + 3 = 8", "Change − to + and flip the sign of the second number.")
+}),
+L("g7-mulint", 7, "Integers", "Multiplying and dividing integers", {
+  make: () => { const a = nz(-12,12), b = nz(-12,12); return {a, b, div: Math.random() < .5}; },
+  show: ({a,b,div}) => M(div ? `${fmt(a*b)} ÷ ${fmtP(b)}` : `${fmt(a)} × ${fmtP(b)}`),
+  steps: ({a,b,div}) => { const ans = div ? a : a*b; return [
+    ns({l:"Ignore the signs", a:s=> div ? `${Math.abs(a*b)} ÷ ${Math.abs(b)} = ${s}` : `${Math.abs(a)} × ${Math.abs(b)} = ${s}`, ans:Math.abs(ans), h: div ? "Divide the sizes." : "Multiply the sizes."}),
+    ns({l:"Pick the sign", a:s=> (div ? `${fmt(a*b)} ÷ ${fmtP(b)}` : `${fmt(a)} × ${fmtP(b)}`) + ` = ${s}`, ans, h:"Same signs make a positive. Different signs make a negative.",
+      w:[[-ans,"Wrong sign","Same signs give a positive answer. Different signs give a negative one."]]})
+  ]; },
+  learn: card("Same signs: positive. Different: negative.", "−6 × 4 = −24", "6 × 4 = 24. The signs are different, so the answer is negative.", "−6 × −4 = 24, because the signs match.")
+}),
+L("g7-distribute", 7, "Expressions and equations", "Distribute and combine", {
+  make: () => ({a: rand(2,9), b: rand(1,9), c: rand(1,9)}),
+  show: ({a,b,c}) => M(`${a}(x + ${b}) + ${c}x`, "Simplify."),
+  steps: ({a,b,c}) => [
+    ms({l:"Distribute", a:S=>`${a}(x + ${b}) = ${S.p}x + ${S.q}`, ans:{p:a, q:a*b}, h:`Multiply ${a} by x and by ${b}.`, w:[[{p:a, q:b},"Only multiplied the first term",`Multiply ${a} by <b>both</b> x and ${b}.`]]}),
+    ns({l:"Combine the x terms", a:s=>`${a}x + ${c}x = ${s}x`, ans:a+c, h:"Add the numbers in front of x."}),
+    ms({l:"Write it simply", a:S=>`${S.p}x + ${S.q}`, ans:{p:a+c, q:a*b}, h:`${a+c}x and the number ${a*b}.`})
+  ],
+  learn: card("Multiply everything inside", "3(x + 4) + 2x", "3 × x = 3x and 3 × 4 = 12. Then 3x + 2x = 5x.", "So it's 5x + 12.")
+}),
+L("g7-circum", 7, "Geometry", "Circumference", {
+  make: () => ({r: rand(2,12)}),
+  show: ({r}) => M(`radius ${r}`, "Circumference = π × diameter. Use 3.14 for π."),
+  steps: ({r}) => [
+    ns({l:"Diameter", a:s=>`2 × ${r} = ${s}`, ans:2*r, h:"The diameter is twice the radius."}),
+    ns({l:"Times π", a:s=>`${2*r} × 3.14 = ${s}`, ans:round6(2*r*3.14), h:`${2*r} × 3.14.`, w:[[round6(r*3.14),"Used the radius","Use the diameter, which is 2 × the radius."]]})
+  ],
+  learn: card("C = π × d", "radius 5", "The diameter is 10. 10 × 3.14 = 31.4.")
+}),
+L("g7-circarea", 7, "Geometry", "Area of a circle", {
+  make: () => ({r: rand(2,12)}),
+  show: ({r}) => M(`radius ${r}`, "Area = π × r². Use 3.14 for π."),
+  steps: ({r}) => [
+    ns({l:"Square the radius", a:s=>`${r}² = ${s}`, ans:r*r, h:`${r} × ${r}.`, w:[[2*r,"Squared as times 2",`Squared means ${r} × ${r}.`]]}),
+    ns({l:"Times π", a:s=>`${r*r} × 3.14 = ${s}`, ans:round6(r*r*3.14), h:`${r*r} × 3.14.`})
+  ],
+  learn: card("A = π × r × r", "radius 3", "3 × 3 = 9. 9 × 3.14 = 28.26.")
+}),
+L("g7-angles", 7, "Geometry", "Complementary and supplementary", {
+  make: () => { const sup = Math.random() < .5; return {sup, a: sup ? rand(20,160) : rand(10,80)}; },
+  show: ({sup,a}) => M(`${a}° and ?`, `The angles are ${sup ? "supplementary" : "complementary"}.`),
+  steps: ({sup,a}) => { const T = sup ? 180 : 90; return [
+    ns({l:"What do they add up to?", q:`${sup ? "Supplementary" : "Complementary"} angles add up to how many degrees?`, a:s=>`${s}°`, ans:T, h:"Complementary makes a right angle. Supplementary makes a straight line.", w:[[sup ? 90 : 180,"Mixed up the two","Complementary = 90°, supplementary = 180°."]]}),
+    ns({l:"Missing angle", a:s=>`${T}° − ${a}° = ${s}°`, ans:T-a, h:`Subtract ${a} from ${T}.`})
+  ]; },
+  learn: card("90 or 180", "35° and ?, supplementary", "Supplementary angles make 180°. 180 − 35 = 145°.")
+}),
+L("g7-prob", 7, "Probability", "Probability", {
+  make: () => ({r: rand(1,8), b: rand(1,8), g: rand(1,8), c: rand(0,2)}),
+  show: ({r,b,g,c}) => M(`${r} red, ${b} blue, ${g} green`, `You pick one marble without looking. What's the chance it's ${["red","blue","green"][c]}?`),
+  steps: ({r,b,g,c}) => { const want = [r,b,g][c], name = ["red","blue","green"][c], T = r+b+g; return [
+    ns({l:"Ways to win", q:`How many marbles are ${name}?`, a:s=>s, ans:want, h:`Count the ${name} ones.`}),
+    ns({l:"All the ways", q:"How many marbles in all?", a:s=>s, ans:T, h:"Add all three colors."}),
+    fs({l:"Write the chance", a:s=>`P(${name}) = ${s}`, N:want, D:T, h:`${name} out of all: ${want} over ${T}, simplified.`, w:[[want, T-want, "Used the losers on the bottom","The bottom is <b>all</b> the marbles."]]})
+  ]; },
+  learn: card("Winners over everything", "3 red, 5 blue", "3 of the 8 marbles are red, so P(red) = 3/8.")
+}),
+];
+
+// ---- 8th grade ----
+const G8_EXP = [
+  { show: (a,b) => `x<sup>${a}</sup> · x<sup>${b}</sup>`, e: (a,b) => a+b, rule:"Multiplying powers: add the exponents.", wrong: (a,b) => [a*b,"Multiplied the exponents","When you multiply powers with the same base, add the exponents."] },
+  { show: (a,b) => `x<sup>${a+b}</sup> ÷ x<sup>${b}</sup>`, e: (a,b) => a, rule:"Dividing powers: subtract the exponents.", wrong: (a,b) => [(a+b)/b === Math.floor((a+b)/b) ? (a+b)/b : -1,"Divided the exponents","When you divide powers with the same base, subtract the exponents."] },
+  { show: (a,b) => `(x<sup>${a}</sup>)<sup>${b}</sup>`, e: (a,b) => a*b, rule:"A power of a power: multiply the exponents.", wrong: (a,b) => [a+b,"Added the exponents","A power of a power multiplies the exponents."] },
+];
+const G8 = [
+L("g8-exp", 8, "Exponents and roots", "Exponent rules", {
+  make: () => ({t: rand(0,2), a: rand(2,4), b: rand(2,3)}),
+  show: ({t,a,b}) => M(G8_EXP[t].show(a,b), "Simplify, then try x = 2."),
+  steps: ({t,a,b}) => { const R = G8_EXP[t], e = R.e(a,b); return [
+    ns({l:"New exponent", a:s=>`${R.show(a,b)} = x<sup>${s}</sup>`, ans:e, h:R.rule, w:[R.wrong(a,b)]}),
+    ns({l:"Try x = 2", a:s=>`2<sup>${e}</sup> = ${s}`, ans:2**e, h:`Multiply ${e} twos together.`, w:[[2*e,"Multiplied the base by the exponent",`2<sup>${e}</sup> means ${e} twos multiplied, not 2 × ${e}.`]]})
+  ]; },
+  learn: card("Three exponent rules", "x² · x³ = x⁵", "Multiply: add the exponents. Divide: subtract them. Power of a power: multiply them.")
+}),
+L("g8-sci", 8, "Exponents and roots", "Scientific notation", {
+  make: () => ({c: rand(11,99), e: rand(3,7)}),   // number is (c/10) × 10^e
+  show: ({c,e}) => M(big(c * 10**(e-1)), "Write it in scientific notation."),
+  steps: ({c,e}) => [
+    ns({l:"Count the places", q:"Put the point after the first digit. How many places did it move?", a:s=>s, ans:e, h:"Count the digits after the first one."}),
+    ms({l:"Write it", a:S=>`${big(c * 10**(e-1))} = ${S.c} × 10<sup>${S.e}</sup>`, ans:{c:c/10, e}, h:`The front number is between 1 and 10: ${fmt(c/10)}.`,
+      w:[[{c, e:e-1},"Front number too big","The front number has to be at least 1 and less than 10."]]})
+  ],
+  learn: card("A number from 1 to 10, times a power of 10", "45,000 = 4.5 × 10⁴", "Move the point after the 4: it moves 4 places. So 4.5 × 10⁴.")
+}),
+L("g8-roots", 8, "Exponents and roots", "Square and cube roots", {
+  make: () => { const cube = Math.random() < .4; return {cube, n: cube ? rand(2,6) : rand(2,15)}; },
+  show: ({cube,n}) => M(`${cube ? "∛" : "√"}${n ** (cube ? 3 : 2)}`),
+  steps: ({cube,n}) => { const p = cube ? 3 : 2, v = n**p; return [
+    ns({l:"Find the root", q:`What number times itself${cube ? ", three times," : ""} makes ${v}?`, a:s=>`${cube ? "∛" : "√"}${v} = ${s}`, ans:n, h:`Try numbers: ${cube ? "2 × 2 × 2 = 8, 3 × 3 × 3 = 27, …" : "5 × 5 = 25, 6 × 6 = 36, …"}`,
+      w:[[v/p,"The root isn't a division",`${cube ? "Cube" : "Square"} root means the number that multiplies by itself.`]]}),
+    ns({l:"Check it", a:s=>`${Array(p).fill(n).join(" × ")} = ${s}`, ans:v, h:"Multiply to check."})
+  ]; },
+  learn: card("Undo the square", "√81 = 9", "9 × 9 = 81, so the square root of 81 is 9. ∛64 = 4 because 4 × 4 × 4 = 64.")
+}),
+L("g8-both", 8, "Linear equations", "Variables on both sides", {
+  make: () => { const a = rand(3,9), c = rand(1, a-1), x = rand(1,10), b = rand(1,20); return {a, b, c, x, d: (a-c)*x + b}; },
+  show: ({a,b,c,d}) => M(`${a}x + ${b} = ${c === 1 ? "" : c}x + ${d}`),
+  steps: ({a,b,c,d,x}) => [
+    ns({l:"Get x on one side", n:`Subtract ${c === 1 ? "" : c}x from both sides.`, a:s=>`${s}x + ${b} = ${d}`, ans:a-c, h:`${a} − ${c}.`, w:[[a+c,"Added instead of subtracted",`Subtract ${c}x from both sides.`]]}),
+    ns({l:"Move the number", a:s=>`${a-c}x = ${s}`, ans:d-b, h:`Subtract ${b} from both sides.`, w:[[d+b,"Added instead of subtracted",`To undo + ${b}, subtract ${b}.`]]}),
+    ns({l:"Divide", a:s=>`x = ${s}`, ans:x, h:`${d-b} ÷ ${a-c}.`})
+  ],
+  learn: card("Gather the x's, then solve", "5x + 3 = 2x + 18", "Subtract 2x: 3x + 3 = 18. Subtract 3: 3x = 15. Divide: x = 5.")
+}),
+L("g8-system", 8, "Linear equations", "Systems by substitution", {
+  make: () => ({k: rand(2,5), x: rand(1,10)}),
+  show: ({k,x}) => M(`y = ${k}x<br>x + y = ${(k+1)*x}`),
+  steps: ({k,x}) => [
+    ns({l:"Substitute", a:s=>`x + ${k}x = ${s}x`, ans:k+1, h:`Put ${k}x in place of y. x is 1x.`, w:[[k,"Forgot the x",`x is 1x, so x + ${k}x = ${k+1}x.`]]}),
+    ns({l:"Solve for x", a:s=>`${k+1}x = ${(k+1)*x}, so x = ${s}`, ans:x, h:`${(k+1)*x} ÷ ${k+1}.`}),
+    ns({l:"Find y", a:s=>`y = ${k} × ${x} = ${s}`, ans:k*x, h:`Use y = ${k}x.`})
+  ],
+  learn: card("Swap one equation into the other", "y = 2x and x + y = 15", "x + 2x = 15, so 3x = 15 and x = 5. Then y = 2 × 5 = 10.")
+}),
+L("g8-slope", 8, "Functions and slope", "Slope from two points", {
+  make: () => { const x1 = rand(-5,5), run = rand(1,5), m = nz(-4,4), y1 = rand(-6,6); return {x1, y1, x2: x1+run, y2: y1+m*run, m}; },
+  show: ({x1,y1,x2,y2}) => M(`(${fmt(x1)}, ${fmt(y1)}) and (${fmt(x2)}, ${fmt(y2)})`, "Find the slope."),
+  steps: ({x1,y1,x2,y2,m}) => [
+    ns({l:"Rise", a:s=>`${fmt(y2)} − ${fmtP(y1)} = ${s}`, ans:y2-y1, h:"Subtract the y values.", w:[[y1-y2,"Subtracted in the wrong order","Keep the same order for both: second point minus first."]]}),
+    ns({l:"Run", a:s=>`${fmt(x2)} − ${fmtP(x1)} = ${s}`, ans:x2-x1, h:"Subtract the x values in the same order."}),
+    ns({l:"Slope", a:s=>`m = ${fmt(y2-y1)} ÷ ${x2-x1} = ${s}`, ans:m, h:"Rise over run.", w:[[round6((x2-x1)/(y2-y1)),"Flipped rise and run","Slope is rise ÷ run: the y change goes on top."]]})
+  ],
+  learn: card("Rise over run", "(1, 2) and (3, 8)", "Rise: 8 − 2 = 6. Run: 3 − 1 = 2. Slope: 6 ÷ 2 = 3.")
+}),
+L("g8-intercept", 8, "Functions and slope", "Slope-intercept form", {
+  make: () => ({m: nz(-5,5), x0: nz(-5,5), y0: rand(-10,10)}),
+  show: ({m,x0,y0}) => M(`slope ${fmt(m)}, through (${fmt(x0)}, ${fmt(y0)})`, "Write the line as y = mx + b."),
+  steps: ({m,x0,y0}) => { const b = y0 - m*x0; return [
+    ns({l:"m times x", a:s=>`${fmtP(m)} × ${fmtP(x0)} = ${s}`, ans:m*x0, h:"Multiply the slope by the point's x."}),
+    ns({l:"Find b", a:s=>`b = ${fmt(y0)} − ${fmtP(m*x0)} = ${s}`, ans:b, h:"b = y − mx.", w:[[y0+m*x0,"Added instead of subtracted","b = y − mx: subtract."]]}),
+    ms({l:"Write the line", a:S=>`y = ${S.m}x + ${S.b}`, ans:{m, b}, h:`m is ${fmt(m)} and b is ${fmt(b)}.`})
+  ]; },
+  learn: card("Find b with the point", "slope 2, through (3, 7)", "7 = 2 × 3 + b, so b = 7 − 6 = 1. The line is y = 2x + 1.")
+}),
+L("g8-func", 8, "Functions and slope", "Evaluate a function", {
+  make: () => ({a: nz(-6,9), b: nz(-12,12), x: rand(-6,6)}),
+  show: ({a,b,x}) => M(`f(x) = ${poly([[a,"x"],[b,""]])}`, `Find f(${fmt(x)}).`),
+  steps: ({a,b,x}) => [
+    ns({l:"Multiply", a:s=>`${fmtP(a)} × ${fmtP(x)} = ${s}`, ans:a*x, h:`Put ${fmt(x)} in for x.`}),
+    ns({l:"Add the number", a:s=>`f(${fmt(x)}) = ${fmt(a*x)} + ${fmtP(b)} = ${s}`, ans:a*x+b, h:"Add the constant."})
+  ],
+  learn: card("Plug in x", "f(x) = 3x − 5, f(4)", "3 × 4 = 12. 12 − 5 = 7. So f(4) = 7.")
+}),
+L("g8-leg", 8, "Geometry", "Find a missing leg", {
+  make: () => { const [a,b,c] = pick(TRIPLES); return Math.random() < .5 ? {a, b, c} : {a:b, b:a, c}; },
+  show: ({a,c}) => M(`a = ${a}, c = ${c}, b = ?`, "Right triangle: c is the long side. a² + b² = c²"),
+  steps: ({a,b,c}) => [
+    ns({l:"Square c", a:s=>`${c}² = ${s}`, ans:c*c, h:`${c} × ${c}.`, w:[[2*c,"Squared as times 2",`Squared means ${c} × ${c}.`]]}),
+    ns({l:"Square a", a:s=>`${a}² = ${s}`, ans:a*a, h:`${a} × ${a}.`}),
+    ns({l:"Subtract", a:s=>`b² = ${c*c} − ${a*a} = ${s}`, ans:b*b, h:"For a leg, subtract.", w:[[c*c+a*a,"Added instead of subtracted","c is the longest side, so subtract to find a leg."]]}),
+    ns({l:"Square root", a:s=>`b = √${b*b} = ${s}`, ans:b, h:`What number times itself is ${b*b}?`})
+  ],
+  learn: card("Subtract to find a leg", "a = 6, c = 10", "10² − 6² = 100 − 36 = 64. √64 = 8, so b = 8.")
+}),
+L("g8-cyl", 8, "Geometry", "Volume of a cylinder", {
+  make: () => ({r: rand(1,6), h: rand(2,10)}),
+  show: ({r,h}) => M(`radius ${r}, height ${h}`, "V = π × r² × h. Use 3.14 for π."),
+  steps: ({r,h}) => [
+    ns({l:"Square the radius", a:s=>`${r}² = ${s}`, ans:r*r, h:`${r} × ${r}.`, w:[[2*r,"Squared as times 2",`Squared means ${r} × ${r}.`]]}),
+    ns({l:"Times the height", a:s=>`${r*r} × ${h} = ${s}`, ans:r*r*h, h:"Multiply by the height."}),
+    ns({l:"Times π", a:s=>`${r*r*h} × 3.14 = ${s}`, ans:round6(r*r*h*3.14), h:`${r*r*h} × 3.14.`})
+  ],
+  learn: card("Base area × height", "radius 2, height 5", "2² = 4. 4 × 5 = 20. 20 × 3.14 = 62.8.")
+}),
+L("g8-cone", 8, "Geometry", "Volume of a cone", {
+  make: () => { let r, h; do { r = rand(1,6); h = rand(2,12); } while ((r*r*h) % 3); return {r, h}; },
+  show: ({r,h}) => M(`radius ${r}, height ${h}`, "V = π × r² × h ÷ 3. Use 3.14 for π."),
+  steps: ({r,h}) => [
+    ns({l:"r² × h", a:s=>`${r}² × ${h} = ${s}`, ans:r*r*h, h:`${r*r} × ${h}.`}),
+    ns({l:"Divide by 3", a:s=>`${r*r*h} ÷ 3 = ${s}`, ans:r*r*h/3, h:"A cone is a third of a cylinder.", w:[[r*r*h,"Forgot the ÷ 3","A cone holds a third of a cylinder: divide by 3."]]}),
+    ns({l:"Times π", a:s=>`${r*r*h/3} × 3.14 = ${s}`, ans:round6(r*r*h/3*3.14), h:`${r*r*h/3} × 3.14.`})
+  ],
+  learn: card("A third of a cylinder", "radius 3, height 4", "3² × 4 = 36. 36 ÷ 3 = 12. 12 × 3.14 = 37.68.")
+}),
+L("g8-translate", 8, "Geometry", "Translations", {
+  make: () => ({x: rand(-8,8), y: rand(-8,8), dx: nz(-6,6), dy: nz(-6,6)}),
+  show: ({x,y,dx,dy}) => M(`(${fmt(x)}, ${fmt(y)})`, `Move it ${Math.abs(dx)} ${dx > 0 ? "right" : "left"} and ${Math.abs(dy)} ${dy > 0 ? "up" : "down"}.`),
+  steps: ({x,y,dx,dy}) => [
+    ns({l:"New x", a:s=>`${fmt(x)} ${dx > 0 ? "+" : "−"} ${Math.abs(dx)} = ${s}`, ans:x+dx, h: dx > 0 ? "Right adds to x." : "Left subtracts from x.", w:[[x-dx,"Moved the wrong way", dx > 0 ? "Right means add." : "Left means subtract."]]}),
+    ns({l:"New y", a:s=>`${fmt(y)} ${dy > 0 ? "+" : "−"} ${Math.abs(dy)} = ${s}`, ans:y+dy, h: dy > 0 ? "Up adds to y." : "Down subtracts from y.", w:[[y-dy,"Moved the wrong way", dy > 0 ? "Up means add." : "Down means subtract."]]})
+  ],
+  learn: card("Slide the point", "(2, 3), 4 right and 5 down", "x: 2 + 4 = 6. y: 3 − 5 = −2. The new point is (6, −2).")
+}),
+L("g8-tri", 8, "Geometry", "Angles in a triangle", {
+  make: () => { const a = rand(20,100), b = rand(20, 150-a); return {a, b}; },
+  show: ({a,b}) => M(`${a}°, ${b}°, ?`, "Two angles of a triangle. Find the third."),
+  steps: ({a,b}) => [
+    ns({l:"Add the two angles", a:s=>`${a}° + ${b}° = ${s}°`, ans:a+b, h:"Add them."}),
+    ns({l:"Subtract from 180", a:s=>`180° − ${a+b}° = ${s}°`, ans:180-a-b, h:"A triangle's angles add up to 180°.", w:[[360-a-b,"Used 360°","Triangles add up to 180°. 360° is for four-sided shapes."]]})
+  ],
+  learn: card("Triangles add up to 180°", "50°, 60°, ?", "50 + 60 = 110. 180 − 110 = 70°.")
+}),
+];
+
+// ---- 9th grade · Algebra 1 ----
+const binom = a => a < 0 ? `(x − ${-a})` : `(x + ${a})`;
+const G9 = [
+L("g9-multistep", 9, "Equations", "Multi-step equations", {
+  make: () => ({a: rand(2,9), b: rand(1,9), x: rand(1,12)}),
+  show: ({a,b,x}) => M(`${a}(x + ${b}) = ${a*(x+b)}`),
+  steps: ({a,b,x}) => [
+    ns({l:"Distribute", a:s=>`${a}x + ${s} = ${a*(x+b)}`, ans:a*b, h:`Multiply ${a} by ${b} too.`, w:[[b,"Only multiplied the first term",`Multiply ${a} by <b>both</b> x and ${b}.`]]}),
+    ns({l:"Subtract", a:s=>`${a}x = ${s}`, ans:a*x, h:`${a*(x+b)} − ${a*b}.`}),
+    ns({l:"Divide", a:s=>`x = ${s}`, ans:x, h:`${a*x} ÷ ${a}.`})
+  ],
+  learn: card("Distribute, then undo", "3(x + 4) = 27", "3x + 12 = 27. Subtract 12: 3x = 15. Divide by 3: x = 5.")
+}),
+L("g9-twopoint", 9, "Linear functions", "Line through two points", {
+  make: () => { const m = nz(-4,4), b = rand(-8,8), x1 = rand(-4,2), x2 = x1 + rand(1,4); return {m, b, x1, x2}; },
+  show: ({m,b,x1,x2}) => M(`(${fmt(x1)}, ${fmt(m*x1+b)}) and (${fmt(x2)}, ${fmt(m*x2+b)})`, "Write the line as y = mx + b."),
+  steps: ({m,b,x1,x2}) => { const y1 = m*x1+b, y2 = m*x2+b; return [
+    ns({l:"Slope", a:s=>`m = (${fmt(y2)} − ${fmtP(y1)}) ÷ (${fmt(x2)} − ${fmtP(x1)}) = ${s}`, ans:m, h:"Rise over run.", w:[[round6((x2-x1)/(y2-y1)),"Flipped rise and run","The y change goes on top."]]}),
+    ns({l:"Find b", a:s=>`b = ${fmt(y1)} − ${fmtP(m)} × ${fmtP(x1)} = ${s}`, ans:b, h:"b = y − mx, using the first point."}),
+    ms({l:"Write the line", a:S=>`y = ${S.m}x + ${S.b}`, ans:{m, b}, h:`m = ${fmt(m)}, b = ${fmt(b)}.`})
+  ]; },
+  learn: card("Slope first, then b", "(1, 5) and (3, 9)", "m = (9 − 5) ÷ (3 − 1) = 2. b = 5 − 2 × 1 = 3. So y = 2x + 3.")
+}),
+L("g9-elim", 9, "Equations", "Systems by elimination", {
+  make: () => { const x = rand(-6,12), y = rand(-6,12); return {x, y}; },
+  show: ({x,y}) => M(`x + y = ${x+y}<br>x − y = ${x-y}`),
+  steps: ({x,y}) => [
+    ns({l:"Add the equations", n:"The y's cancel.", a:s=>`2x = ${s}`, ans:2*x, h:`${x+y} + ${fmtP(x-y)}.`}),
+    ns({l:"Solve for x", a:s=>`x = ${s}`, ans:x, h:`${2*x} ÷ 2.`}),
+    ns({l:"Find y", a:s=>`${fmt(x)} + y = ${x+y}, y = ${s}`, ans:y, h:`${x+y} − ${fmtP(x)}.`})
+  ],
+  learn: card("Add to cancel a variable", "x + y = 10, x − y = 4", "Add them: 2x = 14, so x = 7. Then 7 + y = 10, so y = 3.")
+}),
+L("g9-negexp", 9, "Exponents", "Zero and negative exponents", {
+  make: () => ({a: rand(2,5), n: rand(1,3)}),
+  show: ({a,n}) => M(`${a}<sup>−${n}</sup>`),
+  steps: ({a,n}) => [
+    ns({l:"Make the exponent positive", a:s=>`${a}<sup>${n}</sup> = ${s}`, ans:a**n, h:`Multiply ${n} copies of ${a}.`}),
+    fs({l:"Flip it", a:s=>`${a}<sup>−${n}</sup> = ${s}`, N:1, D:a**n, n:"A negative exponent means 1 over the power.", h:`1 over ${a**n}.`, w:[[-(a**n), 1, "Thought it was a negative number","A negative exponent doesn't make the number negative. It flips it: 1 over the power."]]})
+  ],
+  learn: card("Negative exponent = flip", `2<sup>−3</sup> = ${fr(1,8)}`, "2³ = 8, so 2⁻³ = 1/8. And anything to the 0 power is 1.")
+}),
+L("g9-growth", 9, "Exponents", "Exponential growth", {
+  make: () => ({P: pick([10,20,50,100,200,500]), r: rand(2,3), t: rand(2,5)}),
+  show: ({P,r,t}) => M(`${P} × ${r}<sup>${t}</sup>`, `${P} bacteria ${r === 2 ? "double" : "triple"} every hour. How many after ${t} hours?`),
+  steps: ({P,r,t}) => [
+    ns({l:"Growth factor", a:s=>`${r}<sup>${t}</sup> = ${s}`, ans:r**t, h:`Multiply ${t} copies of ${r}.`, w:[[r*t,"Multiplied instead of using a power",`${r === 2 ? "Doubling" : "Tripling"} ${t} times means ${Array(t).fill(r).join(" × ")}.`]]}),
+    ns({l:"Times the start", a:s=>`${P} × ${r**t} = ${s}`, ans:P*r**t, h:`Start with ${P}.`})
+  ],
+  learn: card("Multiply again and again", "100 × 2³", "Doubling 3 times is × 2 × 2 × 2 = × 8. So 100 becomes 800.")
+}),
+L("g9-polyadd", 9, "Polynomials and quadratics", "Add and subtract polynomials", {
+  make: () => ({a: nz(-9,9), b: nz(-9,9), c: nz(-9,9), d: nz(-9,9), e: nz(-9,9), f: nz(-9,9), sub: Math.random() < .5}),
+  show: ({a,b,c,d,e,f,sub}) => M(`(${poly([[a,"x²"],[b,"x"],[c,""]])}) ${sub ? "−" : "+"} (${poly([[d,"x²"],[e,"x"],[f,""]])})`),
+  steps: ({a,b,c,d,e,f,sub}) => { const k = sub ? -1 : 1, op = sub ? "−" : "+"; const W = (x,y) => [[x - k*y, sub ? "Forgot to subtract" : "Subtracted instead of added", sub ? "Subtract every term of the second polynomial." : "This one is a plus."]];
+    return [
+    ns({l:"x² terms", a:s=>`${fmt(a)} ${op} ${fmtP(d)} = ${s}`, ans:a+k*d, h:"Combine the x² numbers.", w:W(a,d)}),
+    ns({l:"x terms", a:s=>`${fmt(b)} ${op} ${fmtP(e)} = ${s}`, ans:b+k*e, h:"Combine the x numbers.", w:W(b,e)}),
+    ns({l:"Numbers", a:s=>`${fmt(c)} ${op} ${fmtP(f)} = ${s}`, ans:c+k*f, h:"Combine the plain numbers.", w:W(c,f)})
+  ]; },
+  learn: card("Combine like terms", "(2x² + 3x − 1) + (x² − 5x + 4)", "x²: 2 + 1 = 3. x: 3 − 5 = −2. Numbers: −1 + 4 = 3.", "So 3x² − 2x + 3. For subtraction, flip every sign in the second one first.")
+}),
+L("g9-foil", 9, "Polynomials and quadratics", "Multiply binomials", {
+  make: () => ({a: nz(-9,9), b: nz(-9,9)}),
+  show: ({a,b}) => M(`${binom(a)}${binom(b)}`),
+  steps: ({a,b}) => [
+    ns({l:"Outer + inner", a:s=>`${fmt(b)}x + ${fmtP(a)}x = ${s}x`, ans:a+b, h:`Outer: x × ${fmt(b)}. Inner: ${fmt(a)} × x. Add them.`}),
+    ns({l:"Last", a:s=>`${fmtP(a)} × ${fmtP(b)} = ${s}`, ans:a*b, h:"Multiply the two numbers.", w:[[a+b,"Added instead of multiplied","The last terms multiply."]]}),
+    ms({l:"Write the answer", a:S=>`x² + ${S.p}x + ${S.q}`, ans:{p:a+b, q:a*b}, h:`x², then ${fmt(a+b)}x, then ${fmt(a*b)}.`})
+  ],
+  learn: card("First, outer, inner, last", "(x + 3)(x + 4)", "First: x². Outer + inner: 4x + 3x = 7x. Last: 12.", "So x² + 7x + 12.")
+}),
+L("g9-gcf", 9, "Polynomials and quadratics", "Factor out the GCF", {
+  make: () => { let m, n; do { m = rand(1,7); n = rand(1,7); } while (gcd(m,n) !== 1); return {g: rand(2,6), m, n}; },
+  show: ({g,m,n}) => M(`${g*m}x² + ${g*n}x`),
+  steps: ({g,m,n}) => [
+    ns({l:"Number part", q:`What's the biggest number that divides ${g*m} and ${g*n}?`, a:s=>s, ans:g, h:"Find the greatest common factor of the numbers."}),
+    ms({l:"Factor it out", n:"Both terms have an x, so take out an x too.", a:S=>`${g*m}x² + ${g*n}x = ${g}x(${S.m}x + ${S.n})`, ans:{m, n}, h:`${g*m}x² ÷ ${g}x = ${m === 1 ? "" : m}x and ${g*n}x ÷ ${g}x = ${n}.`})
+  ],
+  learn: card("Take out what they share", "6x² + 9x = 3x(2x + 3)", "Both numbers divide by 3, and both terms have an x.")
+}),
+L("g9-solvefactor", 9, "Polynomials and quadratics", "Solve by factoring", {
+  make: () => { let p, r; do { p = rand(1,9); r = rand(1,9); } while (p === r); return {p, r}; },
+  show: ({p,r}) => M(`x² − ${p+r}x + ${p*r} = 0`),
+  steps: ({p,r}) => [
+    ms({l:"Factor", a:S=>`(x − ${S.m})(x − ${S.n}) = 0`, ans:{m:p, n:r}, anyOrder:true, h:`Two numbers that multiply to ${p*r} and add to ${p+r}.`}),
+    ms({l:"Solutions", a:S=>`x = ${S.m} or x = ${S.n}`, ans:{m:p, n:r}, anyOrder:true, h:`Set each factor to 0.`, w:[[{m:-p, n:-r},"Flipped the signs",`x − ${p} = 0 means x = ${p}.`]]})
+  ],
+  learn: card("Factor, then set each part to 0", "x² − 5x + 6 = 0", "(x − 2)(x − 3) = 0. So x − 2 = 0 or x − 3 = 0.", "x = 2 or x = 3.")
+}),
+L("g9-quadform", 9, "Polynomials and quadratics", "The quadratic formula", {
+  make: () => { let r1, r2; do { r1 = rand(-8,8); r2 = rand(-8,8); } while (r1 === r2); return {r1, r2}; },
+  show: ({r1,r2}) => M(`${poly([[1,"x²"],[-(r1+r2),"x"],[r1*r2,""]])} = 0`, "x = (−b ± √(b² − 4ac)) ÷ 2a"),
+  steps: ({r1,r2}) => { const b = -(r1+r2), c = r1*r2, D = b*b - 4*c; return [
+    ns({l:"Discriminant", a:s=>`b² − 4ac = ${fmtP(b)}² − 4(1)(${fmt(c)}) = ${s}`, ans:D, h:`${b*b} − ${fmtP(4*c)}.`, w:[[b*b+4*c,"Sign slip",`Careful: − 4ac with c = ${fmt(c)}.`]]}),
+    ns({l:"Square root", a:s=>`√${D} = ${s}`, ans:Math.sqrt(D), h:`What number times itself is ${D}?`}),
+    ms({l:"Both answers", a:S=>`x = ${S.m} or x = ${S.n}`, ans:{m:r1, n:r2}, anyOrder:true, h:`(${fmt(-b)} + ${Math.sqrt(D)}) ÷ 2 and (${fmt(-b)} − ${Math.sqrt(D)}) ÷ 2.`})
+  ]; },
+  learn: card("Discriminant first", "x² − 2x − 8 = 0", "b² − 4ac = 4 + 32 = 36, and √36 = 6.", "x = (2 + 6) ÷ 2 = 4 or x = (2 − 6) ÷ 2 = −2.")
+}),
+L("g9-radical", 9, "Exponents", "Simplify square roots", {
+  make: () => ({k: rand(2,6), m: pick([2,3,5,6,7])}),
+  show: ({k,m}) => M(`√${k*k*m}`),
+  steps: ({k,m}) => [
+    ns({l:"Biggest perfect square", a:s=>`${k*k*m} = ${s} × ${m}`, ans:k*k, h:`Look for 4, 9, 16, 25, 36 that divide ${k*k*m}.`}),
+    ns({l:"Its square root", a:s=>`√${k*k} = ${s}`, ans:k, h:`${k} × ${k} = ${k*k}.`}),
+    ms({l:"Write it simply", a:S=>`√${k*k*m} = ${S.c}√${S.r}`, ans:{c:k, r:m}, h:`${k} comes out, ${m} stays inside.`})
+  ],
+  learn: card("Pull out the perfect square", "√72 = 6√2", "72 = 36 × 2. √36 = 6 comes out, and the 2 stays under the root.")
+}),
+L("g9-median", 9, "Data", "Find the median", {
+  make: () => { const n = pick([5,7]); return {v: Array.from({length:n}, () => rand(1,30))}; },
+  show: ({v}) => M(v.join(", "), "Find the median."),
+  steps: ({v}) => { const s2 = [...v].sort((a,b)=>a-b), mid = (v.length+1)/2; return [
+    ns({l:"Count them", q:"How many numbers are there?", a:s=>s, ans:v.length, h:"Count the list."}),
+    ns({l:"Middle spot", a:s=>`(${v.length} + 1) ÷ 2 = ${s}`, ans:mid, h:"The middle position."}),
+    ns({l:"Median", q:`Put them in order: ${s2.join(", ")}. What's in spot ${mid}?`, a:s=>`median = ${s}`, ans:s2[mid-1], h:"Count to the middle spot of the sorted list.",
+      w: v[mid-1] !== s2[mid-1] ? [[v[mid-1],"Didn't sort first","Put the numbers in order from least to greatest first."]] : []})
+  ]; },
+  learn: card("Sort, then take the middle", "7, 2, 9, 4, 5", "Sorted: 2, 4, 5, 7, 9. The middle one is 5.")
+}),
+];
+
+// ---- 10th grade · Geometry ----
+const G10 = [
+L("g10-mid", 10, "Coordinate geometry", "Midpoint", {
+  make: () => { let x1, x2, y1, y2; do { x1 = rand(-9,9); x2 = rand(-9,9); y1 = rand(-9,9); y2 = rand(-9,9); } while ((x1+x2) % 2 || (y1+y2) % 2 || (x1 === x2 && y1 === y2)); return {x1, x2, y1, y2}; },
+  show: ({x1,x2,y1,y2}) => M(`(${fmt(x1)}, ${fmt(y1)}) and (${fmt(x2)}, ${fmt(y2)})`, "Find the midpoint."),
+  steps: ({x1,x2,y1,y2}) => [
+    ns({l:"Average the x's", a:s=>`(${fmt(x1)} + ${fmtP(x2)}) ÷ 2 = ${s}`, ans:(x1+x2)/2, h:"Add the x values and halve.", w:[[x1+x2,"Forgot to halve","The midpoint is the average: divide by 2."]]}),
+    ns({l:"Average the y's", a:s=>`(${fmt(y1)} + ${fmtP(y2)}) ÷ 2 = ${s}`, ans:(y1+y2)/2, h:"Add the y values and halve.", w:[[y1+y2,"Forgot to halve","Divide by 2."]]})
+  ],
+  learn: card("Average each coordinate", "(2, 3) and (6, 9)", "x: (2 + 6) ÷ 2 = 4. y: (3 + 9) ÷ 2 = 6. The midpoint is (4, 6).")
+}),
+L("g10-perp", 10, "Coordinate geometry", "Perpendicular slopes", {
+  make: () => { let p, r; do { p = nz(-6,6); r = rand(1,6); } while (gcd(Math.abs(p), r) !== 1); return {p, r}; },
+  show: ({p,r}) => M(`m = ${r === 1 ? fmt(p) : (p < 0 ? "−" : "") + fr(Math.abs(p), r)}`, "Find the slope of a perpendicular line."),
+  steps: ({p,r}) => [
+    fs({l:"Flip it", a:s=>`flip ${r === 1 ? fmt(Math.abs(p)) : fr(Math.abs(p), r)} → ${s}`, N:r, D:Math.abs(p), n:"Ignore the sign for now and flip top and bottom.", h:`Swap ${Math.abs(p)} and ${r}.`}),
+    fs({l:"Change the sign", a:s=>`perpendicular slope = ${s}`, N: p > 0 ? -r : r, D:Math.abs(p), h:"Perpendicular slopes have opposite signs.", n:"Opposite sign, flipped. Put any minus sign on top.",
+      w:[[p > 0 ? r : -r, Math.abs(p), "Forgot to change the sign","Perpendicular means flip <b>and</b> change the sign."]]})
+  ],
+  learn: card("Flip and change the sign", `m = ${fr(2,3)} → ${"−"}${fr(3,2)}`, "Perpendicular slopes multiply to −1.")
+}),
+L("g10-dist", 10, "Coordinate geometry", "Distance between points", G10_DIST),
+L("g10-circle", 10, "Coordinate geometry", "Equation of a circle", {
+  make: () => ({h: nz(-9,9), k: nz(-9,9), r: rand(1,9)}),
+  show: ({h,k,r}) => M(`(x ${h < 0 ? "+" : "−"} ${Math.abs(h)})² + (y ${k < 0 ? "+" : "−"} ${Math.abs(k)})² = ${r*r}`, "Find the center and radius."),
+  steps: ({h,k,r}) => [
+    ms({l:"Center", a:S=>`(${S.h}, ${S.k})`, ans:{h, k}, h:"The center uses the opposite signs of what's inside the parentheses.", w:[[{h:-h, k:-k},"Flipped the signs","(x − h)²: the center's x is h, so x + 3 means h = −3."]]}),
+    ns({l:"Radius", a:s=>`r = √${r*r} = ${s}`, ans:r, h:`The equation shows r² = ${r*r}.`, w:[[r*r,"Forgot the square root","The right side is r², so take the square root."]]})
+  ],
+  learn: card("(x − h)² + (y − k)² = r²", "(x − 2)² + (y + 3)² = 16", "Center (2, −3). Radius √16 = 4.")
+}),
+L("g10-polygon", 10, "Angles and triangles", "Angles in a polygon", {
+  make: () => ({n: pick([5,6,8,9,10,12,15,18,20])}),
+  show: ({n}) => M(`a regular ${n}-sided polygon`, "How big is each inside angle?"),
+  steps: ({n}) => [
+    ns({l:"Triangles inside", a:s=>`${n} − 2 = ${s}`, ans:n-2, h:"A polygon splits into (sides − 2) triangles."}),
+    ns({l:"Total degrees", a:s=>`${n-2} × 180° = ${s}°`, ans:(n-2)*180, h:"Each triangle has 180°.", w:[[n*180,"Used n instead of n − 2",`It's ${n} − 2 triangles, not ${n}.`]]}),
+    ns({l:"Each angle", a:s=>`${(n-2)*180}° ÷ ${n} = ${s}°`, ans:(n-2)*180/n, h:"Regular means all angles are equal: divide."})
+  ],
+  learn: card("(n − 2) × 180°", "hexagon", "A hexagon splits into 4 triangles: 4 × 180 = 720°. Each angle: 720 ÷ 6 = 120°.")
+}),
+L("g10-exterior", 10, "Angles and triangles", "Exterior angle", {
+  make: () => { const a = rand(20,80), b = rand(20,80); return {a, b}; },
+  show: ({a,b}) => M(`${a}° and ${b}°`, "Two inside angles of a triangle. Find the outside angle at the third corner."),
+  steps: ({a,b}) => [
+    ns({l:"Third inside angle", a:s=>`180° − ${a}° − ${b}° = ${s}°`, ans:180-a-b, h:"Inside angles add to 180°."}),
+    ns({l:"Outside angle", a:s=>`180° − ${180-a-b}° = ${s}°`, ans:a+b, h:"The outside angle and the inside one make a straight line.", w:[[180-a-b,"Gave the inside angle","The outside angle is the other part of the straight line."]]})
+  ],
+  learn: card("Exterior = the two far angles added", "50° and 60°", "The outside angle is 50 + 60 = 110°.")
+}),
+L("g10-similar", 10, "Angles and triangles", "Similar triangles", {
+  make: () => { const k = pick([2,3,4,1.5,2.5]); let a, b; do { a = 2*rand(2,8); b = 2*rand(2,8); } while (a === b); return {a, b, k}; },
+  show: ({a,b,k}) => M(`small: ${a} and ${b}<br>big: ${fmt(a*k)} and ?`, "The triangles are similar. Find the missing side."),
+  steps: ({a,b,k}) => [
+    ns({l:"Scale factor", a:s=>`${fmt(a*k)} ÷ ${a} = ${s}`, ans:k, h:"Big side ÷ matching small side.", w:[[round6(a/(a*k)),"Divided the wrong way","Big ÷ small, so the factor is more than 1."]]}),
+    ns({l:"Missing side", a:s=>`${b} × ${fmt(k)} = ${s}`, ans:round6(b*k), h:"Multiply the matching small side by the scale factor.", w:[[b+a*k-a,"Added instead of multiplied","Similar shapes scale by multiplying."]]})
+  ],
+  learn: card("Same shape, scaled", "small 4 and 6, big 8 and ?", "8 ÷ 4 = 2, so everything doubles. 6 × 2 = 12.")
+}),
+L("g10-special", 10, "Right triangles and trig", "Special right triangles", {
+  make: () => ({t: Math.random() < .5 ? 45 : 30, s: rand(2,12)}),
+  show: ({t,s}) => M(t === 45 ? `45°-45°-90°, leg ${s}` : `30°-60°-90°, short leg ${s}`, t === 45 ? "Find the hypotenuse." : "Find the hypotenuse and the long leg."),
+  steps: ({t,s}) => t === 45 ? [
+    ms({l:"Hypotenuse", a:S=>`${S.c}√${S.r}`, ans:{c:s, r:2}, h:`In a 45-45-90 triangle, hypotenuse = leg × √2.`})
+  ] : [
+    ns({l:"Hypotenuse", a:s2=>`2 × ${s} = ${s2}`, ans:2*s, h:"The hypotenuse is twice the short leg."}),
+    ms({l:"Long leg", a:S=>`${S.c}√${S.r}`, ans:{c:s, r:3}, h:"The long leg is the short leg × √3.", w:[[{c:s, r:2},"Used √2","√2 is for 45-45-90 triangles. 30-60-90 uses √3."]]})
+  ],
+  learn: card("Two triangles to remember", "45-45-90: x, x, x√2", "30-60-90: short leg x, hypotenuse 2x, long leg x√3.")
+}),
+L("g10-trig", 10, "Right triangles and trig", "Sine, cosine and tangent", {
+  make: () => { const [a,b,c] = pick(TRIPLES); return {a, b, c, f: pick(["sin","cos","tan"])}; },
+  show: ({a,b,c,f}) => M(`${f} A`, `Right triangle: side ${a} is opposite angle A, side ${b} is next to it, hypotenuse ${c}.`),
+  steps: ({a,b,c,f}) => { const top = f === "cos" ? b : a, bot = f === "tan" ? b : c; return [
+    ns({l:"Top of the ratio", q: f === "cos" ? "Cosine uses the adjacent side on top. Which side is that?" : "Which side is opposite angle A?", a:s=>s, ans:top, h:"SOH CAH TOA: sin = opposite/hyp, cos = adjacent/hyp, tan = opposite/adjacent.", w:[[f === "cos" ? a : b,"Mixed up opposite and adjacent","Opposite is across from the angle. Adjacent is next to it (not the hypotenuse)."]]}),
+    ns({l:"Bottom of the ratio", q: f === "tan" ? "Tangent uses the adjacent side on the bottom. Which side?" : "Which side is the hypotenuse?", a:s=>s, ans:bot, h:"SOH CAH TOA."}),
+    fs({l:"Write the ratio", a:s=>`${f} A = ${s}`, N:top, D:bot, h:`${top} over ${bot}, simplified.`})
+  ]; },
+  learn: card("SOH CAH TOA", "3-4-5 triangle", "sin = opposite ÷ hypotenuse = 3/5. cos = adjacent ÷ hypotenuse = 4/5. tan = opposite ÷ adjacent = 3/4.")
+}),
+L("g10-sector", 10, "Circles", "Area of a sector", {
+  make: () => { const t = pick([90,180,270,60,120,45]); return {t, r: t % 90 ? (t === 45 ? 2*rand(1,5) : 3*rand(1,3)) : rand(2,10)}; }, // keeps the answer to a few decimals
+  show: ({r,t}) => M(`radius ${r}, angle ${t}°`, "Find the area of the slice. Use 3.14 for π."),
+  steps: ({r,t}) => { const A = round6(3.14*r*r); return [
+    fs({l:"Fraction of the circle", a:s=>`${t} ÷ 360 = ${s}`, N:t, D:360, h:`${t} out of 360 degrees.`}),
+    ns({l:"Whole circle", a:s=>`3.14 × ${r}² = ${s}`, ans:A, h:`${r} × ${r} × 3.14.`, w:[[round6(3.14*2*r),"Squared as times 2",`r² means ${r} × ${r}.`]]}),
+    ns({l:"The slice", a:s=>`${fr(t/gcd(t,360), 360/gcd(t,360))} × ${fmt(A)} = ${s}`, ans:round6(A*t/360), h:"Take that fraction of the whole area."})
+  ]; },
+  learn: card("A fraction of the circle", "radius 4, 90°", "90° is 1/4 of the circle. The whole area is 3.14 × 16 = 50.24. A quarter is 12.56.")
+}),
+L("g10-arc", 10, "Circles", "Arc length", {
+  make: () => { const t = pick([90,180,270,60,120,45]); return {t, r: t % 90 ? (t === 45 ? 2*rand(1,5) : 3*rand(1,3)) : rand(2,10)}; }, // keeps the answer to a few decimals
+  show: ({r,t}) => M(`radius ${r}, angle ${t}°`, "Find the length of the arc. Use 3.14 for π."),
+  steps: ({r,t}) => { const C = round6(2*3.14*r); return [
+    fs({l:"Fraction of the circle", a:s=>`${t} ÷ 360 = ${s}`, N:t, D:360, h:`${t} out of 360 degrees.`}),
+    ns({l:"Whole circumference", a:s=>`2 × 3.14 × ${r} = ${s}`, ans:C, h:"2πr.", w:[[round6(3.14*r),"Used the radius alone","Circumference is 2 × π × r."]]}),
+    ns({l:"The arc", a:s=>`${fr(t/gcd(t,360), 360/gcd(t,360))} × ${fmt(C)} = ${s}`, ans:round6(C*t/360), h:"Take that fraction of the circumference."})
+  ]; },
+  learn: card("A fraction of the circumference", "radius 5, 180°", "180° is half. The circumference is 2 × 3.14 × 5 = 31.4. Half is 15.7.")
+}),
+L("g10-surface", 10, "Area and volume", "Surface area of a box", {
+  make: () => ({l: rand(2,10), w: rand(2,10), h: rand(2,10)}),
+  show: ({l,w,h}) => M(`${l} × ${w} × ${h}`, "Find the surface area: the total area of all 6 faces."),
+  steps: ({l,w,h}) => [
+    ns({l:"Top and bottom", a:s=>`${l} × ${w} = ${s}`, ans:l*w, h:"One face: length × width."}),
+    ns({l:"Front and back", a:s=>`${l} × ${h} = ${s}`, ans:l*h, h:"Length × height."}),
+    ns({l:"The two sides", a:s=>`${w} × ${h} = ${s}`, ans:w*h, h:"Width × height."}),
+    ns({l:"All six faces", a:s=>`2 × (${l*w} + ${l*h} + ${w*h}) = ${s}`, ans:2*(l*w+l*h+w*h), h:"Each face has a matching partner.", w:[[l*w+l*h+w*h,"Counted only three faces","Each face has a twin on the other side: double it."]]})
+  ],
+  learn: card("Three pairs of faces", "2 × 3 × 4", "2×3 = 6, 2×4 = 8, 3×4 = 12. Add: 26. Double it: 52.")
+}),
+L("g10-pyramid", 10, "Area and volume", "Volume of a pyramid", {
+  make: () => { let s, h; do { s = rand(2,10); h = rand(2,15); } while ((s*s*h) % 3); return {s, h}; },
+  show: ({s,h}) => M(`square base ${s}, height ${h}`, "V = base area × height ÷ 3"),
+  steps: ({s,h}) => [
+    ns({l:"Base area", a:s2=>`${s} × ${s} = ${s2}`, ans:s*s, h:"The base is a square."}),
+    ns({l:"Times the height", a:s2=>`${s*s} × ${h} = ${s2}`, ans:s*s*h, h:"Multiply by the height."}),
+    ns({l:"Divide by 3", a:s2=>`${s*s*h} ÷ 3 = ${s2}`, ans:s*s*h/3, h:"A pyramid is a third of a box.", w:[[s*s*h,"Forgot the ÷ 3","A pyramid holds a third of a box with the same base and height."]]})
+  ],
+  learn: card("A third of a box", "base 6, height 5", "6 × 6 = 36. 36 × 5 = 180. 180 ÷ 3 = 60.")
+}),
+];
+
+// ---- 11th grade · Algebra 2 ----
+const sup = n => `<sup>${n}</sup>`;
+const G11 = [
+L("g11-seq", 11, "Sequences", "Arithmetic sequences", G11_SEQ),
+L("g11-geo", 11, "Sequences", "Geometric sequences", {
+  make: () => ({a: rand(1,5), r: pick([2,3]), n: rand(4,7)}),
+  show: ({a,r,n}) => M(`${[0,1,2,3].map(k=>a*r**k).join(", ")}, …`, `Find term number ${n}.`),
+  steps: ({a,r,n}) => [
+    ns({l:"Common ratio", a:s=>`r = ${a*r} ÷ ${a} = ${s}`, ans:r, h:"Divide a term by the one before it.", w:[[a*r-a,"Subtracted instead of divided","Geometric sequences multiply. Divide to find the ratio."]]}),
+    ns({l:"Count the jumps", q:`From term 1 to term ${n}, how many jumps?`, a:s=>s, ans:n-1, h:`${n} − 1.`, w:[[n,"Off by one",`You start on term 1, so it's ${n} − 1 jumps.`]]}),
+    ns({l:"Ratio to the power", a:s=>`${r}${sup(n-1)} = ${s}`, ans:r**(n-1), h:`Multiply ${n-1} copies of ${r}.`, w:[[r*(n-1),"Multiplied instead of a power",`${r}${sup(n-1)} means ${r} times itself ${n-1} times.`]]}),
+    ns({l:"Times the first term", a:s=>`a<sub>${n}</sub> = ${a} × ${r**(n-1)} = ${s}`, ans:a*r**(n-1), h:"Start at the first term and multiply."})
+  ],
+  learn: card("aₙ = a₁ · rⁿ⁻¹", "3, 6, 12, 24, …", "Each term doubles, so r = 2.", "Term 6 is 5 jumps away: 3 × 2⁵ = 3 × 32 = 96.")
+}),
+L("g11-log", 11, "Exponents and logs", "Evaluating logarithms", {
+  make: () => { const b = pick([2,3,5,10]), top = b === 2 ? 6 : b === 3 ? 4 : 3; return {b, m: rand(1,top), k: rand(1,top)}; },
+  show: ({b,m,k}) => M(`log<sub>${b}</sub> ${big(b**m)} + log<sub>${b}</sub> ${big(b**k)}`),
+  steps: ({b,m,k}) => [
+    ns({l:"First log", q:`${b} to what power makes ${big(b**m)}?`, a:s=>`log<sub>${b}</sub> ${big(b**m)} = ${s}`, ans:m, h:`Count how many ${b}'s multiply to ${big(b**m)}.`, w:[[b**m/b,"Divided instead","A log asks for the exponent, not a quotient."]]}),
+    ns({l:"Second log", a:s=>`log<sub>${b}</sub> ${big(b**k)} = ${s}`, ans:k, h:`${b} to what power is ${big(b**k)}?`}),
+    ns({l:"Add them", a:s=>`${m} + ${k} = ${s}`, ans:m+k, h:"Add the two exponents.", n:`Check: log<sub>${b}</sub> (${big(b**m)} × ${big(b**k)}) is the same.`})
+  ],
+  learn: card("A log is an exponent", "log₂ 8 = 3", "because 2³ = 8.", "Adding logs with the same base is the log of the product: log₂ 8 + log₂ 4 = 3 + 2 = 5.")
+}),
+L("g11-expeq", 11, "Exponents and logs", "Exponential equations", {
+  make: () => { const b = pick([2,3,5]), k = rand(2, b === 2 ? 7 : 4); return {b, k, c: nz(-5,5)}; },
+  show: ({b,k,c}) => M(`${b}${sup(`x ${c<0?"−":"+"} ${Math.abs(c)}`)} = ${big(b**k)}`, "Solve for x."),
+  steps: ({b,k,c}) => [
+    ns({l:"Same base", a:s=>`${big(b**k)} = ${b}${sup(s)}`, ans:k, h:`How many ${b}'s multiply to ${big(b**k)}?`}),
+    ns({l:"Set exponents equal", a:s=>`x ${c<0?"−":"+"} ${Math.abs(c)} = ${k}, so x = ${s}`, ans:k-c, h:`Same base means the exponents match. Undo the ${c<0?"−":"+"} ${Math.abs(c)}.`, w:[[k+c,"Wrong direction",`To undo ${c<0?"−":"+"} ${Math.abs(c)}, do the opposite.`]]})
+  ],
+  learn: card("Make the bases match", "2ˣ⁺¹ = 16", "16 = 2⁴, so x + 1 = 4 and x = 3.")
+}),
+L("g11-ratexp", 11, "Exponents and logs", "Rational exponents", {
+  make: () => { const n = pick([2,3]), r = n === 2 ? rand(2,9) : rand(2,5), m = rand(1,3); return {n, r, m: m === n ? m+1 : m}; },
+  show: ({n,r,m}) => M(`${r**n}${sup(`${m}/${n}`)}`),
+  steps: ({n,r,m}) => [
+    ns({l:"Take the root", a:s=>`${n === 2 ? "√" : "∛"}${r**n} = ${s}`, ans:r, h:`The bottom ${n} means the ${n === 2 ? "square" : "cube"} root.`, w:[[r**n/n,"Divided by the bottom",`${sup(`1/${n}`)} is a root, not dividing by ${n}.`]]}),
+    ns({l:"Raise to the top", a:s=>`${r}${sup(m)} = ${s}`, ans:r**m, h:`The top ${m} is the power.`})
+  ],
+  learn: card("Bottom is the root, top is the power", "8^(2/3)", "∛8 = 2, then 2² = 4.")
+}),
+L("g11-evalpoly", 11, "Polynomials", "Evaluate a polynomial", {
+  make: () => ({a: nz(-4,4), b: nz(-9,9), c: rand(-9,9), k: nz(-4,4)}),
+  show: ({a,b,c,k}) => M(`f(x) = ${poly([[a,"x²"],[b,"x"],[c,""]])}`, `Find f(${fmt(k)}).`),
+  steps: ({a,b,c,k}) => [
+    ns({l:"Square term", a:s=>`${fmt(a)} · ${fmtP(k)}² = ${s}`, ans:a*k*k, h:`Square ${fmt(k)} first (${k*k}), then multiply by ${fmt(a)}.`, w:[[-a*k*k,"Sign of the square","A negative squared is positive."],[a*2*k,"Doubled instead of squared","Squared means times itself."]]}),
+    ns({l:"x term", a:s=>`${fmt(b)} · ${fmtP(k)} = ${s}`, ans:b*k, h:"Watch the signs."}),
+    ns({l:"Add it up", a:s=>`${fmt(a*k*k)} + ${fmtP(b*k)} + ${fmtP(c)} = ${s}`, ans:a*k*k+b*k+c, h:"Add the three parts."})
+  ],
+  learn: card("Plug in, then simplify", "f(x) = 2x² − 3x + 1, f(−2)", "2 · 4 = 8, −3 · −2 = 6, so 8 + 6 + 1 = 15.")
+}),
+L("g11-synth", 11, "Polynomials", "Synthetic division", {
+  make: () => { let r, s; do { r = nz(-6,6); s = nz(-6,6); } while (r === s); return {r, s}; },
+  show: ({r,s}) => M(`(${poly([[1,"x²"],[-(r+s),"x"],[r*s,""]])}) ÷ (x ${r<0?"+":"−"} ${Math.abs(r)})`, `Use ${fmt(r)} in the box. Bring down the 1.`),
+  steps: ({r,s}) => { const b = -(r+s), c = r*s; return [
+    ns({l:"Multiply", a:s2=>`1 × ${fmtP(r)} = ${s2}`, ans:r, h:`Multiply the number you brought down by ${fmt(r)}.`, n:"Use the number from the divisor with its sign flipped."}),
+    ns({l:"Add", a:s2=>`${fmt(b)} + ${fmtP(r)} = ${s2}`, ans:b+r, h:"Add down the column."}),
+    ns({l:"Multiply", a:s2=>`${fmt(b+r)} × ${fmtP(r)} = ${s2}`, ans:(b+r)*r, h:`${fmt(b+r)} times ${fmt(r)}.`}),
+    ns({l:"Remainder", a:s2=>`${fmt(c)} + ${fmtP((b+r)*r)} = ${s2}`, ans:0, h:"Add the last column. If it's 0, it divides evenly."}),
+    ns({l:"Quotient", a:s2=>`x + ${s2}`, ans:b+r, h:"The bottom row is the answer: 1 and the number you got by adding.", n:"Answer: x + (the middle number)."})
+  ]; },
+  learn: card("Multiply, add, repeat", "(x² + x − 6) ÷ (x − 2)", "Bring down 1. 1 × 2 = 2; 1 + 2 = 3. 3 × 2 = 6; −6 + 6 = 0.", "Bottom row 1, 3, 0 means x + 3, remainder 0.")
+}),
+L("g11-inverse", 11, "Functions", "Inverse functions", {
+  make: () => ({a: pick([2,3,4,5,-2,-3]), b: nz(-9,9), x: rand(-6,9)}),
+  show: ({a,b,x}) => M(`f(x) = ${poly([[a,"x"],[b,""]])}`, `Find f⁻¹(${fmt(a*x+b)}).`),
+  steps: ({a,b,x}) => [
+    ns({l:"Undo the adding", a:s=>`${fmt(a*x+b)} − ${fmtP(b)} = ${s}`, ans:a*x, h:"The inverse undoes f in reverse order: subtract first.", w:[[a*x+2*b,"Added instead","Undo + with −."]]}),
+    ns({l:"Undo the multiplying", a:s=>`${fmt(a*x)} ÷ ${fmtP(a)} = ${s}`, ans:x, h:`Divide by ${fmt(a)}.`}),
+  ],
+  learn: card("Run it backwards", "f(x) = 3x + 2, f⁻¹(14)", "f adds 2 last, so undo it first: 14 − 2 = 12.", "Then undo × 3: 12 ÷ 3 = 4. Check: f(4) = 14.")
+}),
+L("g11-compose", 11, "Functions", "Composing functions", {
+  make: () => ({a: nz(-5,5), b: nz(-9,9), c: nz(-5,5), d: nz(-9,9), k: nz(-4,4)}),
+  show: ({a,b,c,d,k}) => M(`f(x) = ${poly([[a,"x"],[b,""]])}<br>g(x) = ${poly([[c,"x"],[d,""]])}`, `Find f(g(${fmt(k)})).`),
+  steps: ({a,b,c,d,k}) => { const g = c*k+d; return [
+    ns({l:"Inside first", a:s=>`g(${fmt(k)}) = ${fmt(c)} · ${fmtP(k)} + ${fmtP(d)} = ${s}`, ans:g, h:"Work from the inside out: g first."}),
+    ns({l:"Then the outside", a:s=>`f(${fmt(g)}) = ${fmt(a)} · ${fmtP(g)} + ${fmtP(b)} = ${s}`, ans:a*g+b, h:`Put ${fmt(g)} into f.`, w:[[c*(a*k+b)+d,"Wrong order","f(g(x)) means g first, then f."]]})
+  ]; },
+  learn: card("Inside out", "f(x) = x + 1, g(x) = 2x, f(g(3))", "g(3) = 6, then f(6) = 7.")
+}),
+L("g11-vertex", 11, "Functions", "Vertex of a parabola", {
+  make: () => { const a = pick([1,2,-1,-2,3]), h = nz(-5,5); return {a, b: -2*a*h, c: rand(-9,9), h}; },
+  show: ({a,b,c}) => M(`y = ${poly([[a,"x²"],[b,"x"],[c,""]])}`, "Find the vertex."),
+  steps: ({a,b,c,h}) => [
+    ns({l:"x of the vertex", a:s=>`x = −(${fmt(b)}) ÷ (2 · ${fmtP(a)}) = ${s}`, ans:h, h:"Use x = −b ÷ 2a.", w:[[-h,"Forgot the minus","The formula starts with −b."]]}),
+    ns({l:"y of the vertex", a:s=>`y = ${fmt(a)}(${fmt(h)})² + ${fmtP(b)}(${fmt(h)}) + ${fmtP(c)} = ${s}`, ans:a*h*h+b*h+c, h:`Plug x = ${fmt(h)} back in.`})
+  ],
+  learn: card("x = −b ÷ 2a", "y = x² − 6x + 5", "x = 6 ÷ 2 = 3. y = 9 − 18 + 5 = −4. Vertex (3, −4).")
+}),
+L("g11-radical", 11, "Functions", "Radical equations", {
+  make: () => ({a: nz(-9,9), b: rand(2,9)}),
+  show: ({a,b}) => M(`√(x ${a<0?"−":"+"} ${Math.abs(a)}) = ${b}`, "Solve for x."),
+  steps: ({a,b}) => [
+    ns({l:"Square both sides", a:s=>`x ${a<0?"−":"+"} ${Math.abs(a)} = ${b}² = ${s}`, ans:b*b, h:`Squaring undoes the square root: ${b} × ${b}.`, w:[[2*b,"Doubled instead","Squared means times itself."]]}),
+    ns({l:"Solve", a:s=>`x = ${s}`, ans:b*b-a, h:`Undo the ${a<0?"−":"+"} ${Math.abs(a)}.`, w:[[b*b+a,"Wrong direction","Do the opposite operation."]]})
+  ],
+  learn: card("Square to undo the root", "√(x + 3) = 5", "x + 3 = 25, so x = 22. Check: √25 = 5.")
+}),
+L("g11-complex", 11, "Complex numbers", "Multiplying complex numbers", {
+  make: () => ({a: nz(-6,6), b: nz(-6,6), c: nz(-6,6), d: nz(-6,6)}),
+  show: ({a,b,c,d}) => M(`(${fmt(a)} ${b<0?"−":"+"} ${Math.abs(b)}i)(${fmt(c)} ${d<0?"−":"+"} ${Math.abs(d)}i)`),
+  steps: ({a,b,c,d}) => [
+    ns({l:"First × first", a:s=>`${fmt(a)} · ${fmtP(c)} = ${s}`, ans:a*c, h:"Multiply the two real parts."}),
+    ns({l:"Last × last", a:s=>`${fmt(b)}i · ${fmtP(d)}i = ${fmt(b*d)}i² = ${s}`, ans:-b*d, h:"i² = −1, so flip the sign.", w:[[b*d,"Forgot i² = −1","i × i = −1, so the sign flips."]]}),
+    ns({l:"Real part", a:s=>`${fmt(a*c)} + ${fmtP(-b*d)} = ${s}`, ans:a*c-b*d, h:"Add the two plain numbers."}),
+    ns({l:"Imaginary part", a:s=>`${fmt(a)} · ${fmtP(d)} + ${fmtP(b)} · ${fmtP(c)} = ${s}`, ans:a*d+b*c, h:"Outside × outside plus inside × inside.", n:"These are the i terms."})
+  ],
+  learn: card("FOIL, then i² = −1", "(2 + 3i)(1 + 4i)", "2 + 8i + 3i + 12i². 12i² = −12.", "So 2 − 12 + 11i = −10 + 11i.")
+}),
+L("g11-comb", 11, "Probability", "Combinations", {
+  make: i => ({n: rand(5,12), k: i % 2 ? 3 : 2}),
+  show: ({n,k}) => M(`C(${n}, ${k})`, `How many ways to choose ${k} from ${n} when order doesn't matter?`),
+  steps: ({n,k}) => { const top = k === 2 ? n*(n-1) : n*(n-1)*(n-2), f = k === 2 ? 2 : 6; return [
+    ns({l:"Ordered picks", a:s=>`${k === 2 ? `${n} × ${n-1}` : `${n} × ${n-1} × ${n-2}`} = ${s}`, ans:top, h:`Count down ${k} numbers from ${n} and multiply.`}),
+    ns({l:"Ways to order them", a:s=>`${k}! = ${s}`, ans:f, h:k === 2 ? "2 × 1." : "3 × 2 × 1."}),
+    ns({l:"Divide", a:s=>`${top} ÷ ${f} = ${s}`, ans:top/f, h:"Order doesn't matter, so divide out the repeats.", w:[[top,"Didn't divide","Each group got counted once for every order."]]})
+  ]; },
+  learn: card("Count, then remove repeats", "C(5, 2)", "5 × 4 = 20 ordered pairs. Each pair shows up 2 ways.", "20 ÷ 2 = 10.")
+}),
+];
+
+// ---- 12th grade · Precalculus and Calculus ----
+const G12 = [
+L("g12-rad", 12, "Trigonometry", "Degrees to radians", {
+  make: () => ({t: pick([30,45,60,90,120,135,150,210,225,240,270,300,315,330])}),
+  show: ({t}) => M(`${t}°`, "Write it in radians."),
+  steps: ({t}) => [
+    ns({l:"Common factor", a:s=>`GCF of ${t} and 180 = ${s}`, ans:gcd(t,180), h:`The biggest number that divides both ${t} and 180.`}),
+    fs({l:"Radians", a:s=>`${t}° × ${fr("π",180)} = ${s} π`, N:t, D:180, h:`${t} ÷ ${gcd(t,180)} over 180 ÷ ${gcd(t,180)}.`, n:"Write the number in front of π, in lowest terms."})
+  ],
+  learn: card("Multiply by π/180", "120°", "120/180 = 2/3, so 120° = 2π/3.")
+}),
+L("g12-deg", 12, "Trigonometry", "Radians to degrees", {
+  make: () => { let n, d; do { d = pick([2,3,4,6]); n = rand(1, 2*d-1); } while (gcd(n,d) !== 1); return {n, d}; },
+  show: ({n,d}) => M(`${n === 1 ? "" : n}π/${d}`, "Write it in degrees."),
+  steps: ({n,d}) => [
+    ns({l:"One piece", a:s=>`180° ÷ ${d} = ${s}°`, ans:180/d, h:"π is 180°, so split 180 into the bottom number of pieces."}),
+    ns({l:"Times the top", a:s=>`${n} × ${180/d}° = ${s}°`, ans:180*n/d, h:`Take ${n} of those pieces.`})
+  ],
+  learn: card("π = 180°", "5π/6", "180 ÷ 6 = 30, and 5 × 30 = 150°.")
+}),
+L("g12-unit", 12, "Trigonometry", "Unit circle values", {
+  make: i => i % 2 ? {f:"sin", t: pick([30,150,210,330])} : {f:"cos", t: pick([60,120,240,300])},
+  show: ({f,t}) => M(`${f} ${t}°`),
+  steps: ({f,t}) => { const quad = Math.floor(t/90) + 1, ref = [t, 180-t, t-180, 360-t][quad-1];
+    const pos = f === "sin" ? quad <= 2 : (quad === 1 || quad === 4); return [
+    ns({l:"Quadrant", a:s=>`${t}° is in quadrant ${s}`, ans:quad, h:"I is 0–90°, II is 90–180°, III is 180–270°, IV is 270–360°."}),
+    ns({l:"Reference angle", a:s=>`reference angle = ${s}°`, ans:ref, h:"The angle back to the nearest x-axis."}),
+    fs({l:"Value", a:s=>`${f} ${t}° = ${s}`, N: pos ? 1 : -1, D:2, h:`${f} ${ref}° = 1/2. ${f === "sin" ? "Sine" : "Cosine"} is ${pos ? "positive" : "negative"} in quadrant ${quad}.`,
+      w:[[pos ? -1 : 1, 2, "Wrong sign", f === "sin" ? "Sine is the y value: positive above the x-axis." : "Cosine is the x value: positive right of the y-axis."]], n:"Put any minus sign on the top."})
+  ]; },
+  learn: card("Reference angle, then sign", "sin 210°", "Quadrant III, reference 30°. sin 30° = 1/2.", "Below the x-axis, sine is negative: −1/2.")
+}),
+L("g12-limit", 12, "Limits", "Limits by factoring", {
+  make: () => { let a, b; do { a = nz(-6,6); b = nz(-6,6); } while (a + b === 0 || -b === a); return {a, b}; },
+  show: ({a,b}) => M(`lim<sub>x→${fmt(a)}</sub> (${poly([[1,"x²"],[b-a,"x"],[-a*b,""]])}) ÷ (x ${a<0?"+":"−"} ${Math.abs(a)})`),
+  steps: ({a,b}) => [
+    ns({l:"Factor the top", a:s=>`(x ${a<0?"+":"−"} ${Math.abs(a)})(x + ${s})`, ans:b, h:`Find the other factor: it multiplies with ${fmt(-a)} to make ${fmt(-a*b)}.`, n:"Plugging in gives 0 ÷ 0, so factor first."}),
+    ns({l:"Cancel and plug in", a:s=>`${fmt(a)} + ${fmtP(b)} = ${s}`, ans:a+b, h:`After canceling, plug x = ${fmt(a)} into x + ${fmt(b)}.`, w:[[0,"Stopped at 0 ÷ 0","0 ÷ 0 means simplify, not that the limit is 0."]]})
+  ],
+  learn: card("0 ÷ 0 means factor", "lim x→2 of (x² − 4) ÷ (x − 2)", "(x − 2)(x + 2) ÷ (x − 2) = x + 2.", "Now plug in: 2 + 2 = 4.")
+}),
+L("g12-power", 12, "Derivatives", "Power rule", G12_POWER),
+L("g12-polyd", 12, "Derivatives", "Derivative of a polynomial", {
+  make: () => ({a: nz(-4,4), b: nz(-6,6), c: nz(-9,9), d: rand(-9,9)}),
+  show: ({a,b,c,d}) => M(`f(x) = ${poly([[a,"x³"],[b,"x²"],[c,"x"],[d,""]])}`, "Find f′(x), then f′(1)."),
+  steps: ({a,b,c}) => [
+    ns({l:"x³ term", a:s=>`${s}x²`, ans:3*a, h:`3 × ${fmt(a)}.`}),
+    ns({l:"x² term", a:s=>`${s}x`, ans:2*b, h:`2 × ${fmt(b)}.`}),
+    ns({l:"x term", a:s=>`${s}`, ans:c, h:"The derivative of cx is c. The constant disappears."}),
+    ns({l:"f′(1)", a:s=>`${fmt(3*a)} + ${fmtP(2*b)} + ${fmtP(c)} = ${s}`, ans:3*a+2*b+c, h:"With x = 1 every power of x is 1, so just add."})
+  ],
+  learn: card("One term at a time", "f(x) = 2x³ − x² + 5x + 7", "f′(x) = 6x² − 2x + 5. The 7 drops out.")
+}),
+L("g12-chain", 12, "Derivatives", "Chain rule", {
+  make: () => ({a: pick([2,3,4,5]), b: nz(-9,9), n: rand(2,5)}),
+  show: ({a,b,n}) => M(`f(x) = (${a}x ${b<0?"−":"+"} ${Math.abs(b)})${sup(n)}`, "Find f′(x)."),
+  steps: ({a,b,n}) => [
+    ns({l:"Outside: power rule", a:s=>`${n}(${a}x ${b<0?"−":"+"} ${Math.abs(b)})${sup(s)}`, ans:n-1, h:"Lower the exponent by 1."}),
+    ns({l:"Inside's derivative", a:s=>`d/dx (${a}x ${b<0?"−":"+"} ${Math.abs(b)}) = ${s}`, ans:a, h:"The derivative of ax + b is a."}),
+    ns({l:"Multiply in front", a:s=>`f′(x) = ${s}(${a}x ${b<0?"−":"+"} ${Math.abs(b)})${sup(n-1)}`, ans:n*a, h:`${n} × ${a}.`, w:[[n,"Forgot the inside","The chain rule multiplies by the inside's derivative too."]]})
+  ],
+  learn: card("Outside, then times inside", "(3x + 1)⁴", "4(3x + 1)³ × 3 = 12(3x + 1)³.")
+}),
+L("g12-tangent", 12, "Derivatives", "Slope of a tangent line", {
+  make: () => ({a: nz(-4,4), b: nz(-9,9), k: nz(-4,4)}),
+  show: ({a,b,k}) => M(`f(x) = ${poly([[a,"x²"],[b,"x"]])}`, `Find the slope at x = ${fmt(k)}.`),
+  steps: ({a,b,k}) => [
+    ms({l:"Derivative", a:S=>`f′(x) = ${S.p}x + ${S.r}`, ans:{p:2*a, r:b}, h:`2 × ${fmt(a)} for x², and ${fmt(b)} for the x term.`}),
+    ns({l:"Plug in", a:s=>`${fmt(2*a)} · ${fmtP(k)} + ${fmtP(b)} = ${s}`, ans:2*a*k+b, h:"The slope of the tangent line is f′ at that point.", w:[[a*k*k+b*k,"Used f instead of f′","Slope comes from the derivative, not f itself."]]})
+  ],
+  learn: card("Slope = f′(x)", "f(x) = x² + 3x at x = 2", "f′(x) = 2x + 3, so the slope is 7.")
+}),
+L("g12-anti", 12, "Integrals", "Antiderivatives", {
+  make: () => { const n = rand(1,5); return {n, a: (n+1) * pick([1,2,3,4,-1,-2])}; },
+  show: ({a,n}) => M(`∫ ${a === 1 ? "" : fmt(a)}x${sup(n)} dx`),
+  steps: ({a,n}) => [
+    ns({l:"Raise the exponent", a:s=>`${n} + 1 = ${s}`, ans:n+1, h:"Integrating goes the other way from derivatives: up by 1.", w:[[n-1,"Lowered instead","That's the derivative. Antiderivatives go up."]]}),
+    ns({l:"Divide by it", a:s=>`${fmt(a)} ÷ ${n+1} = ${s}`, ans:a/(n+1), h:`Divide the coefficient by the new exponent, ${n+1}.`, n:`Answer: (that)x${sup(n+1)} + C`})
+  ],
+  learn: card("Up one, divide by the new power", "∫ 6x² dx", "x² → x³, and 6 ÷ 3 = 2.", "So the answer is 2x³ + C.")
+}),
+L("g12-defint", 12, "Integrals", "Definite integrals", {
+  make: () => { const n = rand(1,3); return {n, a: (n+1) * rand(1,3), k: rand(1,3)}; },
+  show: ({a,n,k}) => M(`∫<sub>0</sub><sup>${k}</sup> ${a}x${sup(n === 1 ? "" : n)} dx`),
+  steps: ({a,n,k}) => { const c = a/(n+1); return [
+    ms({l:"Antiderivative", a:S=>`${S.c}x${sup(S.e)}`, ans:{c, e:n+1}, h:`Raise ${n} to ${n+1}, then ${a} ÷ ${n+1}.`}),
+    ns({l:"Top minus bottom", a:s=>`${c}·${k}${sup(n+1)} − ${c}·0${sup(n+1)} = ${s}`, ans:c*k**(n+1), h:`Plug in ${k}, then subtract the value at 0 (which is 0).`})
+  ]; },
+  learn: card("F(top) − F(bottom)", "∫₀² 3x² dx", "Antiderivative x³. 2³ − 0³ = 8.")
+}),
+L("g12-series", 12, "Vectors and series", "Arithmetic series", {
+  make: () => ({a: rand(1,20), d: rand(1,9), n: rand(6,30)}),
+  show: ({a,d,n}) => M(`${[0,1,2].map(k=>a+k*d).join(" + ")} + …`, `Add the first ${n} terms.`),
+  steps: ({a,d,n}) => { const last = a+(n-1)*d; return [
+    ns({l:"Last term", a:s=>`${a} + ${n-1} × ${d} = ${s}`, ans:last, h:`Term ${n} is ${n-1} jumps from the first.`, w:[[a+n*d,"Off by one",`It's ${n} − 1 jumps.`]]}),
+    ns({l:"First plus last", a:s=>`${a} + ${last} = ${s}`, ans:a+last, h:"Pair the first and last terms."}),
+    ns({l:"Sum", a:s=>`${a+last} × ${n} ÷ 2 = ${s}`, ans:(a+last)*n/2, h:`There are ${n} ÷ 2 pairs, each worth ${a+last}.`, w:[[(a+last)*n,"Forgot to halve","Each pair uses two terms, so divide by 2."]]})
+  ]; },
+  learn: card("Pair them up", "1 + 2 + … + 100", "1 + 100 = 101, and there are 50 pairs.", "101 × 100 ÷ 2 = 5,050.")
+}),
+L("g12-vecmag", 12, "Vectors and series", "Vector length", {
+  make: () => { const [p, r, m] = pick(TRIPLES); const s1 = pick([1,-1]), s2 = pick([1,-1]); return Math.random() < .5 ? {x:s1*p, y:s2*r, m} : {x:s1*r, y:s2*p, m}; },
+  show: ({x,y}) => M(`v = ⟨${fmt(x)}, ${fmt(y)}⟩`, "Find |v|."),
+  steps: ({x,y,m}) => [
+    ns({l:"Square and add", a:s=>`${fmtP(x)}² + ${fmtP(y)}² = ${s}`, ans:x*x+y*y, h:`${x*x} + ${y*y}.`, w:[[x+y,"Forgot to square","Square each part first."]]}),
+    ns({l:"Square root", a:s=>`√${x*x+y*y} = ${s}`, ans:m, h:"It's the Pythagorean theorem."})
+  ],
+  learn: card("√(x² + y²)", "⟨3, −4⟩", "9 + 16 = 25, and √25 = 5.")
+}),
+L("g12-dot", 12, "Vectors and series", "Dot product", {
+  make: () => ({a: nz(-9,9), b: nz(-9,9), c: nz(-9,9), d: nz(-9,9)}),
+  show: ({a,b,c,d}) => M(`⟨${fmt(a)}, ${fmt(b)}⟩ · ⟨${fmt(c)}, ${fmt(d)}⟩`),
+  steps: ({a,b,c,d}) => [
+    ns({l:"x parts", a:s=>`${fmt(a)} × ${fmtP(c)} = ${s}`, ans:a*c, h:"Multiply the first numbers."}),
+    ns({l:"y parts", a:s=>`${fmt(b)} × ${fmtP(d)} = ${s}`, ans:b*d, h:"Multiply the second numbers."}),
+    ns({l:"Add", a:s=>`${fmt(a*c)} + ${fmtP(b*d)} = ${s}`, ans:a*c+b*d, h:"The dot product is one number: add them.", n:"If it's 0, the vectors are perpendicular."})
+  ],
+  learn: card("Multiply matching parts, then add", "⟨2, 3⟩ · ⟨4, −1⟩", "8 + (−3) = 5.")
+}),
+];
+
+
 // ---- lessons: all open, so she can skip ahead or go back. Keep ids stable: saved progress uses them. ----
 const FRACTIONS = op => ({ make: i => makeProblem(i, op(i)), steps: stepsFor, show: p => `<div class="math">${fr(p.a,p.b)} ${p.op} ${fr(p.c,p.d)}</div>` });
+const BY_GRADE = [G5, G6, G7, G8, G9, G10, G11, G12];
 const LESSONS = [
   { id:"k-add", grade:0, title:"Adding within 10", ...K_ADD },
   { id:"g1-ten", grade:1, title:"Make a ten to add", ...G1_TEN },
   { id:"g2-regroup", grade:2, title:"Adding with regrouping", ...G2_REGROUP },
   { id:"g3-split", grade:3, title:"Multiply by breaking apart", ...G3_SPLIT },
   { id:"g4-partial", grade:4, title:"Multiply big numbers", ...G4_PARTIAL },
-  { id:"add", grade:5, title:"Adding fractions", learn:LEARN_ADD, ...FRACTIONS(() => "+") },
-  { id:"sub", grade:5, title:"Subtracting fractions", learn:LEARN_SUB, ...FRACTIONS(() => "−") },
-  { id:"mix", grade:5, title:"Adding and subtracting", learn:LEARN_MIX, ...FRACTIONS(i => i % 2 ? "−" : "+") },
-  { id:"g6-divide", grade:6, title:"Dividing fractions", ...G6_DIVIDE },
-  { id:"g7-eq", grade:7, title:"Two-step equations", ...G7_EQ },
-  { id:"g8-pyth", grade:8, title:"Pythagorean theorem", ...G8_PYTH },
-  { id:"g9-factor", grade:9, title:"Factoring quadratics", ...G9_FACTOR },
-  { id:"g10-dist", grade:10, title:"Distance between points", ...G10_DIST },
-  { id:"g11-seq", grade:11, title:"Arithmetic sequences", ...G11_SEQ },
-  { id:"g12-power", grade:12, title:"Derivatives: power rule", ...G12_POWER },
-];
+  { id:"add", grade:5, unit:"Fractions", title:"Adding fractions", learn:LEARN_ADD, ...FRACTIONS(() => "+") },
+  { id:"sub", grade:5, unit:"Fractions", title:"Subtracting fractions", learn:LEARN_SUB, ...FRACTIONS(() => "−") },
+  { id:"mix", grade:5, unit:"Fractions", title:"Adding and subtracting", learn:LEARN_MIX, ...FRACTIONS(i => i % 2 ? "−" : "+") },
+  { id:"g6-divide", grade:6, unit:"Number system", title:"Dividing fractions", ...G6_DIVIDE },
+  { id:"g7-eq", grade:7, unit:"Expressions and equations", title:"Two-step equations", ...G7_EQ },
+  { id:"g8-pyth", grade:8, unit:"Geometry", title:"Pythagorean theorem", ...G8_PYTH },
+  { id:"g9-factor", grade:9, unit:"Polynomials and quadratics", title:"Factoring quadratics", ...G9_FACTOR },
+  ...BY_GRADE.flat()
+].map((l,k) => ({l, k})).sort((x,y) => x.l.grade - y.l.grade || unitRank(x.l) - unitRank(y.l) || x.k - y.k).map(x => x.l);
+// units keep the order they have in each grade's list
+function unitRank(l){ const g = BY_GRADE[l.grade-5]; return g ? g.findIndex(m => m.unit === l.unit) : 0; }
 const inGrade = g => LESSONS.map((l,i)=>i).filter(i => LESSONS[i].grade === g);
 const tintOf = i => inGrade(LESSONS[i].grade).indexOf(i) % 3;
 if (save.grade == null) save.grade = 5;
@@ -708,26 +1879,30 @@ function lessonNav(){
     <button class="ctl" data-lesson="${g[k+1]}" ${k<g.length-1?"":"disabled"} aria-label="Next lesson">›</button></div>`;
 }
 function learnHTML(){
-  const L = LESSONS[cur].learn, c = L[learnIdx];
+  const L = LESSONS[cur].learn, c = L[learnIdx], rep = save.reports[LESSONS[cur].id];
   return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="steps">${L.map((_,i)=>`<span class="dot ${i<learnIdx?"ok":i===learnIdx?"busy":""}"></span>`).join("")}</span><button class="ctl" data-go="practice">Skip to practice</button></div>
   ${lessonNav()}
   <section class="panel"><div class="card"><h2 class="label">${c.h}</h2>${c.body}</div>
     <div class="actions" style="justify-content:space-between">
       <button class="ctl" data-learn="-1" ${learnIdx===0?"disabled":""}>Previous</button>
       ${learnIdx < L.length-1 ? `<button class="ctl" data-learn="1">Next</button>` : `<button class="ctl go" data-go="practice">Start practice</button>`}
-    </div></section>`;
+    </div></section>
+  ${rep ? `<section class="panel"><button class="lesson" data-report="${rep.key}">${scoreChip(rep.level)}<span class="name">Last time: ${LEVELS[rep.level]}</span><span class="muted">${when(rep.date)} · summary ›</span></button></section>` : ""}`;
 }
 
+const item = () => st.items[st.i];
+const lessonOf = it => LESSONS[idx(it.id)];
+const canShow = () => st.mode === "practice" && (st.misses >= 2 || (st.hinted && st.misses >= 1));
 function practiceHTML(){
-  const p = st.problems[st.i], s = st.steps[st.step];
-  const fb = st.feedback;
+  const it = item(), s = st.steps[st.step], fb = st.feedback, n = st.items.length, test = st.mode === "test";
   const dotFor = {good:"ok", bad:"err", hint:"busy"};
-  return `<div class="bar"><button class="ctl" data-go="learn" aria-label="Quit to lesson">Quit</button>
-    <span class="steps" aria-label="Problem ${st.i+1} of ${LESSON_LEN}">${st.problems.map((_,i)=>`<span class="dot ${i<st.i?"ok":i===st.i?"busy":""}"></span>`).join("")}</span>
-    <span class="ctl badged"><span class="badge on">${st.i+1}</span>of <span class="mono">${LESSON_LEN}</span></span></div>
+  return `<div class="bar"><button class="ctl" data-go="${test ? "home" : "learn"}" aria-label="Quit">Quit</button>
+    <span class="steps" aria-label="Problem ${st.i+1} of ${n}">${st.items.map((_,i)=>`<span class="dot ${i<st.i?"ok":i===st.i?"busy":""}"></span>`).join("")}</span>
+    <span class="ctl badged"><span class="badge on">${st.i+1}</span>of <span class="mono">${n}</span></span></div>
+  ${test ? `<div class="bar"><span class="ctl grow" style="background:none;text-align:center">${st.title}: no hints, one try per step</span></div>` : ""}
   <section class="panel split">
     <div class="col">
-    <div class="card">${LESSONS[cur].show(p)}
+    <div class="card">${test ? `<div class="label">${lessonOf(it).title}</div>` : ""}${lessonOf(it).show(it.p)}
       <div class="work">${st.work.map((w,k)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${k+1}</span>${w.html}</div>`).join("")}</div>
     </div>
     ${s ? `<div class="card"><div class="label">${s.label}</div>
@@ -737,47 +1912,72 @@ function practiceHTML(){
     <div class="col">
     ${fb ? `<div class="feedback fb-${fb.type}" role="status"><span class="dot ${dotFor[fb.type]}"></span><span>${fb.html}</span></div>` : ""}
     ${s ? `<div class="tray" style="background:none;padding:0">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-key="${n}">${n}</button>`).join("")}
-      <button data-key="next" aria-label="Next box">⇥</button><button data-key="0">0</button><button data-key="back" aria-label="Erase">⌫</button></div>
+      <button data-key="−" aria-label="Negative">−</button><button data-key="0">0</button><button data-key="." aria-label="Decimal point">.</button>
+      <button data-key="next" class="wide" aria-label="Next box">Next box ⇥</button><button data-key="back" aria-label="Erase">⌫</button></div>
     <div class="actions">
-      <button class="ctl" data-act="hint">Hint</button>
-      ${st.misses >= 2 ? `<button class="ctl" data-act="show">Show me</button>` : ""}
+      ${test ? "" : `<button class="ctl badged" data-act="hint" ${st.hintsLeft || st.hinted ? "" : "disabled"}><span class="badge">${st.hintsLeft}</span>Hint${st.hintsLeft === 1 ? "" : "s"}</button>`}
+      ${canShow() ? `<button class="ctl" data-act="show">Show me</button>` : ""}
       <button class="ctl go" data-act="check">Check</button>
-    </div>` : `<div class="actions"><button class="ctl go" data-act="nextprob">${st.i < LESSON_LEN-1 ? "Next problem" : "Finish lesson"}</button></div>`}
+    </div>` : `<div class="actions"><button class="ctl go" data-act="nextprob">${st.i < n-1 ? "Next problem" : test ? "Finish test" : "Finish lesson"}</button></div>`}
     </div>
   </section>`;
 }
 
-function startPractice(){
-  st = { i:0, problems:Array.from({length:LESSON_LEN},(_,i)=>LESSONS[cur].make(i)), step:0, vals:{}, active:"x",
-         misses:0, feedback:null, work:[], clean:0, mistakes:[], probMistake:false, xpEarned:0 };
-  loadStep();
+// ---- runs: practice for one lesson, or a test across a unit or a whole grade ----
+function newRun(mode, items, extra){
+  st = { mode, items, i:0, vals:{}, active:"x", misses:0, feedback:null, clean:0, mistakes:[], probs:[], xpEarned:0,
+         hints:0, shown:0, extra:0, pts:0, maxPts:0, t0:Date.now(), hintsLeft: Math.ceil(items.length/2), ...extra };
+  startProblem();
 }
-// a lesson in progress is saved after every change, so leaving mid-lesson loses nothing
+function startPractice(){
+  const l = LESSONS[cur], sc = lastScore(l.id);
+  const n = sc != null && sc <= 1 ? 10 : LESSON_LEN; // she struggled last time: start with more problems
+  newRun("practice", Array.from({length:n}, (_,i) => ({id:l.id, p:l.make(i)})), {key:l.id, title:l.title});
+}
+function shuffle(a){ a = [...a]; for (let i = a.length-1; i > 0; i--){ const j = rand(0,i); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function startTest(key){
+  const [kind, g, unit] = key.split(":");
+  const list = kind === "unit" ? inGrade(+g).filter(i => (LESSONS[i].unit || "Skills") === unit) : inGrade(+g);
+  const n = Math.min(kind === "unit" ? 10 : 12, Math.max(6, list.length * 2));
+  const order = shuffle(list);
+  const items = shuffle(Array.from({length:n}, (_,k) => { const l = LESSONS[order[k % order.length]]; return {id:l.id, p:l.make(k)}; }));
+  cur = order[0];
+  newRun("test", items, {key, title: kind === "unit" ? `${unit} test` : `${GRADE_NAME[+g]} check-up`, hintsLeft:0});
+}
+function startProblem(){ st.step = 0; st.work = []; st.prob = {wrong:0, hints:0, shown:0, t0:Date.now()}; cur = idx(item().id); loadStep(); }
+
+// a run in progress is saved after every change, so leaving mid-lesson loses nothing
 function saveRun(){
   if (!st) return;
-  save.run = {id:LESSONS[cur].id, i:st.i, step:st.step, problems:st.problems, work:st.work, clean:st.clean, mistakes:st.mistakes, probMistake:st.probMistake, xpEarned:st.xpEarned};
+  const {steps, vals, feedback, ...keep} = st;
+  save.run = keep;
   persist();
 }
 function runIndex(){
   const r = save.run; if (!r) return -1;
-  const id = r.id || ["add","sub","mix"][r.cur]; // older saves stored a position
-  return LESSONS.findIndex(l => l.id === id);
+  return idx(r.items ? r.items[r.i].id : r.id || ["add","sub","mix"][r.cur]); // older saves stored a position
 }
 function resumeRun(){
-  if (runIndex() < 0) { delete save.run; return; }
-  const r = save.run; if (!r) return;
-  cur = runIndex();
-  st = Object.assign({vals:{}, misses:0, feedback:null}, r);
-  loadStep();
+  const r = save.run;
+  if (!r || runIndex() < 0) { delete save.run; return; }
+  if (!r.items){ // a save from before tests: one lesson, a fixed list of problems
+    const id = LESSONS[runIndex()].id;
+    st = { mode:"practice", key:id, title:LESSONS[runIndex()].title, items:r.problems.map(p => ({id, p})), i:r.i, clean:r.clean||0, mistakes:[], probs:[],
+           xpEarned:r.xpEarned||0, hints:0, shown:0, extra:0, pts:0, maxPts:0, t0:Date.now(), hintsLeft:4 };
+    startProblem();
+  } else {
+    st = Object.assign({}, r);
+    cur = idx(item().id);
+    const {misses, hinted} = r; loadStep(); // st.step and st.work come back from the save
+    Object.assign(st, {misses: misses || 0, hinted: !!hinted});
+  }
   view = "practice";
 }
 function loadStep(){
-  const steps = LESSONS[cur].steps(st.problems[st.i]).map((s,k) => /^Step /.test(s.label) ? s : {...s, label:`Step ${k+1} · ${s.label}`});
-  st.steps = steps;
+  st.steps = lessonOf(item()).steps(item().p).map((s,k) => ({...s, base:s.label.replace(/^Step \d+ · /,""), label: /^Step /.test(s.label) ? s.label : `Step ${k+1} · ${s.label}`}));
   st.vals = {};
-  st.misses = 0;
-  const ids = slotIds();
-  st.active = ids[0];
+  st.misses = 0; st.hinted = false; st.lastTry = 0; st.stepT0 = Date.now();
+  st.active = slotIds()[0];
   st.feedback = null;
 }
 function slotIds(){
@@ -785,21 +1985,92 @@ function slotIds(){
   return [...s.ask().matchAll(/data-slot="(\w+)"/g)].map(m=>m[1]);
 }
 
+// ---- mistake detection: name the slip, not just "wrong" ----
+const CATS = {
+  sign:   ["Sign mix-up", "The size of the number was right but the sign was flipped.", "Before checking, ask: should this be positive or negative?"],
+  reuse:  ["Reused an earlier number", "Typed the answer from an earlier step instead of doing the new one.", "Read what each new step is asking before answering."],
+  place:  ["Place value or decimal point", "The digits were right but a zero or the decimal point was in the wrong place.", "Estimate first, then line up place values."],
+  off1:   ["Off by one", "Answers exactly 1 away: usually a counting or small adding slip.", "Count again slowly, or check by working backwards."],
+  digits: ["Digits mixed up", "The right digits typed in the wrong order.", "Read the answer back before tapping Check."],
+  close:  ["Arithmetic slip", "Right method, but the arithmetic was a little off.", "Redo the multiplying or adding carefully; an estimate catches these."],
+  swap:   ["Boxes swapped", "The right numbers in the wrong boxes.", "Check which box is which before typing."],
+  flip:   ["Fraction flipped", "Top and bottom of the fraction were switched.", "The part goes on top and the whole on the bottom."],
+  method: ["Didn't know the step yet", "The answer wasn't close and didn't match a common slip.", "Go back over the lesson cards for this step together."],
+};
+const SAY = {
+  sign: "So close! The size is right. Check the sign: should it be positive or negative?",
+  reuse: "That's the number from an earlier step. This step asks for something new.",
+  place: "The digits look right. Check where the zeros or the decimal point go.",
+  off1: "Just 1 away! Count again carefully.",
+  digits: "Right digits, wrong order. Read it back.",
+  close: "Close! Redo the arithmetic carefully.",
+  swap: "Right numbers, wrong boxes. Swap them.",
+  flip: "Flipped! Check which number goes on top.",
+};
+const digitsOf = x => String(Math.abs(round6(x))).replace(".","").split("").sort().join("");
+function diagnose(s, v){
+  const A = s.answer, ids = Object.keys(A).filter(k => A[k] != null);
+  if (ids.length === 2 && ids.includes("n") && ids.includes("d")){
+    if (A.n !== 0 && eq(v.n * A.n, v.d * A.d) && !eq(v.n, A.n)) return "flip";
+    if (A.n !== 0 && eq(v.n * A.d, -A.n * v.d)) return "sign";
+    return "method";
+  }
+  if (ids.length > 1){
+    const a = ids.map(k => A[k]), x = ids.map(k => v[k]), srt = arr => [...arr].sort((p,q)=>p-q);
+    if (srt(a).every((t,i) => eq(t, srt(x)[i]))) return "swap";
+    if (ids.every(k => eq(v[k], A[k]) || eq(v[k], -A[k]))) return "sign";
+    return "method";
+  }
+  const a = A[ids[0]], x = v[ids[0]];
+  if (x == null) return "method";
+  if (a !== 0 && eq(x, -a)) return "sign";
+  const earlier = st.steps.slice(0, st.step).flatMap(t => Object.values(t.answer));
+  if (earlier.some(e => eq(e, x))) return "reuse";
+  if (a !== 0 && [10,100,1000,.1,.01,.001].some(f => eq(x, a*f))) return "place";
+  if (Number.isInteger(a) && eq(Math.abs(x-a), 1)) return "off1";
+  if (Math.abs(a) >= 10 && digitsOf(x) === digitsOf(a)) return "digits";
+  if (a !== 0 && Math.abs(x-a) / Math.abs(a) <= .1) return "close";
+  return "method";
+}
+const typed = v => v.n !== undefined && v.d !== undefined ? (v.d === 1 ? fmt(v.n) : `${fmt(v.n)}/${fmt(v.d)}`)
+  : Object.values(v).filter(x => x != null).map(fmt).join(", ");
+
 function check(){
   const s = st.steps[st.step];
   const v = {};
-  for (const id of slotIds()) v[id] = st.vals[id] === undefined || st.vals[id] === "" ? null : Number(st.vals[id]);
+  for (const id of slotIds()) v[id] = parseNum(st.vals[id]);
   if (Object.values(v).every(x => x == null)) { st.feedback = {type:"hint", html:"Tap a box and use the number pad to type your answer."}; return; }
   const r = s.check(v);
   if (r.ok) return pass(false);
   if (r.soft){ st.feedback = {type:"hint", html:r.msg}; return; }
-  st.misses++;
-  st.probMistake = true;
-  st.mistakes.push({kind:r.kind});
-  st.feedback = {type:"bad", html:`<strong>Not yet.</strong> ${r.msg}${st.misses>=2?" <br>Stuck? Tap <b>Show me</b>.":""}`};
+  const now = Date.now(), rushed = st.misses >= 1 && now - st.lastTry < 4000; // quick repeat tries look like guessing
+  st.lastTry = now; st.misses++; st.prob.wrong++;
+  const cat = r.generic ? diagnose(s, v) : "concept";
+  st.mistakes.push({n:st.i+1, step:st.step+1, label:s.base, id:item().id, typed:typed(v), want:typed(s.answer),
+    kind: cat === "concept" ? r.kind : CATS[cat][0], cat, msg: cat === "concept" ? r.msg : CATS[cat][1], rushed});
+  if (st.mode === "test"){
+    st.vals = Object.fromEntries(Object.entries(s.answer).filter(([k,x])=>x!=null).map(([k,x])=>[k, fmt(x)]));
+    pass(true);
+    st.feedback = {type:"hint", html:`Not this time. The answer was <b>${typed(s.answer)}</b>. ${st.steps[st.step] ? "Keep going." : ""}`};
+    return;
+  }
+  const msg = cat === "concept" ? r.msg : SAY[cat] || (st.hinted ? s.hint : `Read the step again${st.hintsLeft ? ", or tap Hint" : ""}.`);
+  st.feedback = {type:"bad", html:`<strong>Not yet.</strong> ${msg}${rushed ? " <br>Slow down a little and read the step again." : ""}${canShow() ? " <br>Stuck? Tap <b>Show me</b>." : ""}`};
+}
+// hints are limited: about one for every two problems, and only after a first try
+function hint(){
+  const s = st.steps[st.step];
+  if (st.hinted){ st.feedback = {type:"hint", html:`<strong>Hint:</strong> ${s.hint}`}; return; }
+  if (!st.hintsLeft){ st.feedback = {type:"hint", html:"No hints left in this lesson. Give it your best try. <b>Show me</b> opens after two tries."}; return; }
+  if (!st.misses && Date.now() - st.stepT0 < 15000){ st.feedback = {type:"hint", html:"Give it one try first. The hint opens after you try."}; return; }
+  st.hinted = true; st.hintsLeft--; st.hints++; st.prob.hints++;
+  st.feedback = {type:"hint", html:`<strong>Hint:</strong> ${s.hint}`};
 }
 function pass(shown){
   const s = st.steps[st.step];
+  // points for the 0–4 score: full for first try, half after a hint or one miss, nothing when shown
+  st.pts += shown ? 0 : st.mode === "test" ? 1 : st.misses === 0 ? (st.hinted ? .5 : 1) : st.misses === 1 ? .5 : .25;
+  st.maxPts++;
   st.work.push({html:s.work(), shown});
   st.step++;
   if (st.step < st.steps.length){
@@ -807,48 +2078,127 @@ function pass(shown){
     const msg = shown ? `Here's how: ${s.explain}` : praise;
     loadStep();
     st.feedback = {type: shown ? "hint" : "good", html:`<strong>${msg}</strong>`};
-  } else {
-    const xp = st.probMistake ? 10 : 15;
-    st.xpEarned += xp;
-    if (!st.probMistake) st.clean++;
-    st.feedback = {type:"good", html: shown ? `Here's how: ${s.explain} <br><strong>+${xp} XP.</strong> That one was tricky, and you finished it.`
-      : `<span class="pop">⭐</span> <strong>Solved! +${xp} XP</strong>${st.probMistake ? "" : " (no mistakes bonus)"}`};
+    return;
   }
+  const pr = st.prob, clean = !pr.wrong && !pr.hints && !pr.shown;
+  const xp = st.mode === "test" ? (pr.wrong ? 5 : 15) : pr.shown ? 5 : pr.wrong ? 10 : pr.hints ? 12 : 15;
+  st.xpEarned += xp;
+  if (clean) st.clean++;
+  st.probs.push({id:item().id, p:item().p, work:st.work, hints:pr.hints, wrong:pr.wrong, shown:pr.shown, ms:Date.now()-pr.t0});
+  let more = "";
+  if (st.mode === "practice" && (pr.wrong || pr.shown) && st.items.length < MAX_LEN){
+    st.items.push({id:item().id, p:lessonOf(item()).make(st.items.length)}); st.extra++;
+    more = "<br>I added one more problem like this so you can practice it.";
+  }
+  st.feedback = {type:"good", html: st.mode === "test" ? `<strong>Problem done. +${xp} XP</strong>`
+    : shown ? `Here's how: ${s.explain} <br><strong>+${xp} XP.</strong> That one was tricky, and you finished it.${more}`
+    : `<span class="pop">⭐</span> <strong>Solved! +${xp} XP</strong>${clean ? " (no mistakes bonus)" : ""}${more}`};
 }
 function showMe(){
   const s = st.steps[st.step];
-  st.vals = Object.fromEntries(Object.entries(s.answer).filter(([k,v])=>v!=null));
+  st.vals = Object.fromEntries(Object.entries(s.answer).filter(([k,v])=>v!=null).map(([k,v])=>[k, fmt(v)]));
+  st.shown++; st.prob.shown++;
   pass(true);
 }
 function nextProblem(){
-  if (st.i < LESSON_LEN-1){
-    st.i++; st.step = 0; st.work = []; st.probMistake = false; loadStep();
-  } else {
-    save.xp += st.xpEarned; save.done++; save.lessons[LESSONS[cur].id] = lessonDone(LESSONS[cur].id) + 1;
-    const today = new Date().toDateString(), yest = new Date(Date.now()-864e5).toDateString();
-    if (save.last !== today) save.streak = save.last === yest ? save.streak + 1 : 1;
-    save.last = today; delete save.run; persist();
-    view = "done";
-  }
+  if (st.i < st.items.length-1){ st.i++; startProblem(); return; }
+  const pct = st.maxPts ? st.pts / st.maxPts : 0, level = levelOf(pct), now = Date.now();
+  const rep = {key:st.key, mode:st.mode, title:st.title, date:now, ms:now-st.t0, total:st.items.length, extra:st.extra, clean:st.clean,
+    hints:st.hints, shown:st.shown, pct, level, xp:st.xpEarned, probs:st.probs, mistakes:st.mistakes};
+  save.xp += st.xpEarned;
+  const today = new Date().toDateString(), yest = new Date(now-864e5).toDateString();
+  if (save.last !== today) save.streak = save.last === yest ? save.streak + 1 : 1;
+  save.last = today;
+  const book = st.mode === "test" ? save.tests : save.scores, old = book[st.key];
+  book[st.key] = {last:level, best:Math.max(level, old ? old.best : 0), pct, date:now};
+  if (st.mode === "practice"){ save.done++; save.lessons[st.key] = lessonDone(st.key) + 1; }
+  const cats = {}; st.mistakes.forEach(m => cats[m.kind] = (cats[m.kind]||0) + 1);
+  save.log.unshift({key:st.key, mode:st.mode, title:st.title, date:now, level, total:rep.total, hints:rep.hints, shown:rep.shown, cats,
+    rushed: st.mistakes.filter(m => m.rushed).length});
+  save.log = save.log.slice(0, 60);
+  save.reports[st.key] = rep;
+  delete save.run; persist(true);
+  st.report = rep;
+  view = "done";
 }
 
-function doneHTML(){
-  const counts = {};
-  st.mistakes.forEach(m => counts[m.kind] = (counts[m.kind]||0) + 1);
-  const list = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  return `<div class="bar"><span class="ctl grow" style="background:none">${LESSONS[cur].title}: complete</span>${statsHTML()}</div>
-  <section class="panel">
-    <div class="bento" style="background:var(--card)">
-      <div><span class="k">XP earned</span><span class="v">+${st.xpEarned}</span></div>
-      <div><span class="k">No mistakes</span><span class="v">${st.clean}/${LESSON_LEN}</span></div>
-      <div><span class="k">Streak</span><span class="v">${save.streak}d</span></div>
-    </div>
-    <div class="actions">${(g => g.indexOf(cur) < g.length-1 ? `<button class="ctl go" data-lesson="${g[g.indexOf(cur)+1]}">Next lesson</button>` : "")(inGrade(LESSONS[cur].grade))}<button class="ctl" data-go="practice">Practice again</button><button class="ctl" data-go="home">All lessons</button></div>
+// ---- summaries: what she did, and a closer look for the grown-up ----
+const when = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric"});
+const mins = ms => Math.max(1, Math.round(ms / 60000));
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+function summaryLine(rep){
+  const pct = Math.round(rep.pct * 100);
+  return rep.mode === "test"
+    ? `${plural(rep.total, "problem")} in ${plural(mins(rep.ms), "minute")}. ${rep.clean} with every step right. ${pct}% of steps right on the first try.`
+    : `${plural(rep.total, "problem")} in ${plural(mins(rep.ms), "minute")}${rep.extra ? `, including ${rep.extra} extra added for practice` : ""}. ${rep.clean} with no mistakes and no hints. ${plural(rep.hints, "hint")} used, "Show me" ${plural(rep.shown, "time")}. ${pct}% of steps right on the first try.`;
+}
+function reportHTML(rep){
+  const groups = {};
+  for (const m of rep.mistakes){ const g = groups[m.kind] = groups[m.kind] || {n:0, cat:m.cat, msg:m.msg, label:m.label, list:[]}; g.n++; g.list.push(m); }
+  const sorted = Object.entries(groups).sort((a,b) => b[1].n - a[1].n);
+  const rushed = rep.mistakes.filter(m => m.rushed).length;
+  const lessonsIn = [...new Set(rep.probs.map(p => p.id))];
+  const skills = lessonsIn.map(id => { const l = LESSONS[idx(id)]; return l ? `<b>${l.title}</b>` : ""; }).filter(Boolean);
+  return `<section class="panel">
+    <div class="head"><h2>What you did</h2><span class="muted">${when(rep.date)}</span></div>
+    <div class="prose" style="padding:0 5px"><p>${rep.mode === "test" ? `Tested ${skills.join(", ")}.` : `Practiced ${skills.join(", ")}.`}</p><p>${summaryLine(rep)}</p></div>
+    <div class="probs">${rep.probs.map((pr,k) => { const l = LESSONS[idx(pr.id)]; if (!l) return "";
+      const tag = pr.shown ? ["busy", `shown ${pr.shown}×`] : pr.wrong ? ["err", plural(pr.wrong, "mistake")] : pr.hints ? ["busy", plural(pr.hints, "hint")] : ["ok", "no mistakes"];
+      return `<details class="card"><summary><span class="badge">${k+1}</span><span class="name">${rep.mode === "test" ? l.title : `Problem ${k+1}`}</span><span class="dot ${tag[0]}"></span><span class="muted">${tag[1]}</span></summary>
+        ${l.show(pr.p)}<div class="work">${pr.work.map((w,j)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${j+1}</span>${w.html}</div>`).join("")}</div></details>`; }).join("")}</div>
   </section>
   <section class="panel">
-    <div class="head"><h2>For the grown-up</h2><span class="muted">${list.length ? "mistakes, most common first" : ""}</span></div>
-    ${list.length ? `<div class="facts" style="background:var(--card)">${list.map(([k,n])=>`<div><span>${k}</span><span class="v">×${n}</span></div>`).join("")}</div>`
-      : `<p style="padding:0 5px">No mistakes this time. Ready for the next lesson.</p>`}
+    <div class="head"><h2>For the grown-up</h2>${scoreChip(rep.level, true)}</div>
+    <div class="prose" style="padding:0 5px"><p>Score ${rep.level} of 4: ${LEVELS[rep.level]}. ${["Not yet showing this skill.","Starting to get it, with a lot of help.","Getting there: some steps are solid, others need more practice.","Meets the goal: most steps right on the first try.","Above the goal: nearly every step right on the first try."][rep.level]}</p>
+    ${rushed ? `<p>${plural(rushed, "answer")} came very quickly after a miss, which usually means guessing.</p>` : ""}</div>
+    ${sorted.length ? `<h3 class="label" style="padding:0 5px">Mistake patterns, most common first</h3>
+    <div class="facts" style="background:var(--card)">${sorted.map(([k,g]) => `<div class="pattern"><span><b>${k}</b><span class="k">${g.cat === "concept" ? `${g.label}: ${g.msg}` : `${CATS[g.cat][1]} Tip: ${CATS[g.cat][2]}`}</span></span><span class="v">×${g.n}</span></div>`).join("")}</div>
+    <h3 class="label" style="padding:0 5px">Every mistake</h3>
+    <div class="facts mlist" style="background:var(--card)">${rep.mistakes.map(m => `<div><span><span class="k">Problem ${m.n} · Step ${m.step} · ${m.label}${rep.mode === "test" && LESSONS[idx(m.id)] ? ` · ${LESSONS[idx(m.id)].title}` : ""}</span><span>Typed <b class="mono">${m.typed}</b>, answer <b class="mono">${m.want}</b>. ${m.kind}${m.rushed ? " (quick retry)" : ""}.</span></span></div>`).join("")}</div>`
+    : `<p style="padding:0 5px">No mistakes this time.</p>`}
+  </section>`;
+}
+function doneHTML(){
+  const rep = st.report, test = rep.mode === "test", g = inGrade(LESSONS[cur].grade), k = g.indexOf(cur);
+  return `<div class="bar"><span class="ctl grow" style="background:none">${rep.title}: complete</span>${statsHTML()}</div>
+  <section class="panel">
+    <div class="bento" style="background:var(--card)">
+      <div><span class="k">Score</span><span class="v">${rep.level}<span class="of"> of 4</span></span><span class="k">${LEVELS[rep.level]}</span></div>
+      <div><span class="k">XP earned</span><span class="v">+${rep.xp}</span></div>
+      <div><span class="k">${test ? "All steps right" : "No mistakes"}</span><span class="v">${rep.clean}/${rep.total}</span></div>
+    </div>
+    <div class="actions">${!test && k < g.length-1 ? `<button class="ctl go" data-lesson="${g[k+1]}">Next lesson</button>` : ""}${test ? `<button class="ctl go" data-test="${rep.key}">Take it again</button>` : `<button class="ctl" data-go="practice">Practice again</button>`}<button class="ctl" data-go="home">All lessons</button></div>
+  </section>
+  ${reportHTML(rep)}`;
+}
+function reportViewHTML(){
+  const rep = save.reports[reportKey];
+  return `<div class="bar"><button class="ctl" data-go="${idx(reportKey) >= 0 ? "learn" : "parent"}">Back</button><span class="ctl grow" style="background:none">${rep.title}: ${when(rep.date)}</span></div>
+  ${reportHTML(rep)}`;
+}
+function parentHTML(){
+  const totals = {}, cats = {};
+  for (const e of save.log) for (const [k,n] of Object.entries(e.cats || {})) totals[k] = (totals[k]||0) + n;
+  for (const r of Object.values(save.reports)) for (const m of r.mistakes) cats[m.kind] = cats[m.kind] || m;
+  const top = Object.entries(totals).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const weak = LESSONS.map((l,i)=>i).filter(i => { const s = lastScore(LESSONS[i].id); return s != null && s <= 2; });
+  const hints = save.log.reduce((a,e) => a + (e.hints||0), 0), rushed = save.log.reduce((a,e) => a + (e.rushed||0), 0);
+  return `<div class="bar"><button class="ctl" data-go="home">Home</button><span class="ctl grow" style="background:none">For the grown-up</span></div>
+  <section class="panel">
+    <div class="head"><h2>Scores by grade</h2><span class="muted">0 to 4</span></div>
+    <div class="facts" style="background:var(--card)">${GRADES.map((n,g) => { const a = gradeLevel(g), t = save.tests[testKey(g)]; if (a == null && !t) return "";
+      return `<div class="pattern"><span><b>${GRADE_NAME[g]}</b><span class="k">Lesson average ${a == null ? "—" : `${a.toFixed(1)} of 4`} · check-up ${t ? `${t.last}: ${LEVELS[t.last]}` : "not taken"}</span></span>${scoreChip(t ? t.last : a == null ? null : Math.round(a))}</div>`; }).join("") || `<div><span>No lessons finished yet.</span></div>`}</div>
+    <p class="muted" style="padding:0 5px">4 Advanced · 3 Proficient · 2 Approaching · 1 Beginning · 0 Not yet. Based on how many steps were right on the first try. Hints count half.</p>
+  </section>
+  <section class="panel">
+    <div class="head"><h2>Mistake patterns</h2><span class="muted">last ${plural(save.log.length, "session")}</span></div>
+    ${top.length ? `<div class="facts" style="background:var(--card)">${top.map(([k,n]) => { const m = cats[k]; return `<div class="pattern"><span><b>${k}</b>${m ? `<span class="k">${m.cat === "concept" ? `${m.label}: ${m.msg}` : `${CATS[m.cat][1]} Tip: ${CATS[m.cat][2]}`}</span>` : ""}</span><span class="v">×${n}</span></div>`; }).join("")}</div>` : `<p style="padding:0 5px">No mistakes recorded yet.</p>`}
+    <p class="muted" style="padding:0 5px">${plural(hints, "hint")} used${rushed ? `, ${plural(rushed, "quick retry")} that looked like guessing` : ""}.</p>
+  </section>
+  ${weak.length ? `<section class="panel"><div class="head"><h2>Needs more practice</h2></div><div class="lessons">${weak.map(i => `<button class="lesson" data-lesson="${i}">${scoreChip(lastScore(LESSONS[i].id))}<span class="name">${LESSONS[i].title}</span><span class="muted">${GRADES[LESSONS[i].grade]}</span></button>`).join("")}</div></section>` : ""}
+  <section class="panel">
+    <div class="head"><h2>Recent sessions</h2></div>
+    ${save.log.length ? `<div class="lessons">${save.log.slice(0, 20).map(e => `<button class="lesson" ${save.reports[e.key] ? `data-report="${e.key}"` : "disabled"}>${scoreChip(e.level)}<span class="name">${e.title}</span><span class="muted">${when(e.date)}${e.mode === "test" ? " · test" : ""}</span></button>`).join("")}</div>` : `<p style="padding:0 5px">Nothing yet. Finished lessons and tests show up here.</p>`}
   </section>`;
 }
 
@@ -858,13 +2208,21 @@ function key(k){
   const ids = slotIds();
   if (k === "next"){ st.active = ids[(ids.indexOf(st.active)+1) % ids.length]; }
   else if (k === "back"){ st.vals[st.active] = String(st.vals[st.active] ?? "").slice(0,-1); }
-  else { const cur = String(st.vals[st.active] ?? ""); if (cur.length < 4) st.vals[st.active] = (cur === "0" ? "" : cur) + k; }
+  else {
+    let cur = String(st.vals[st.active] ?? "");
+    if (k === "−") cur = cur.startsWith("−") ? cur.slice(1) : "−" + cur;
+    else if (k === ".") { if (!cur.includes(".")) cur = (cur === "" || cur === "−" ? cur + "0" : cur) + "."; }
+    else if (cur.replace(/[−.]/g,"").length < 6) cur = (cur === "0" ? "" : cur === "−0" ? "−" : cur) + k;
+    st.vals[st.active] = cur;
+  }
   render();
 }
 document.addEventListener("click", e => {
-  const t = e.target.closest("button"); if (!t) return;
+  const t = e.target.closest("button"); if (!t || t.disabled) return;
   if (t.dataset.grade){ save.grade = Number(t.dataset.grade); persist(); }
   else if (t.dataset.lesson){ cur = Math.max(0, Math.min(LESSONS.length-1, Number(t.dataset.lesson))); view = "learn"; learnIdx = 0; }
+  else if (t.dataset.test){ startTest(t.dataset.test); view = "practice"; }
+  else if (t.dataset.report){ reportKey = t.dataset.report; if (idx(reportKey) >= 0) cur = idx(reportKey); view = "report"; }
   else if (t.dataset.go){
     view = t.dataset.go;
     if (view === "learn") learnIdx = 0;
@@ -874,20 +2232,24 @@ document.addEventListener("click", e => {
   else if (t.dataset.slot){ st.active = t.dataset.slot; }
   else if (t.dataset.key){ return key(t.dataset.key); }
   else if (t.dataset.act === "check") check();
-  else if (t.dataset.act === "hint") st.feedback = {type:"hint", html:`<strong>Hint:</strong> ${st.steps[st.step].hint}`};
+  else if (t.dataset.act === "hint") hint();
   else if (t.dataset.act === "show") showMe();
   else if (t.dataset.act === "nextprob") nextProblem();
   else if (t.dataset.act === "resume") resumeRun();
+  else return; // a tap on a summary row opens it natively
   render();
 });
 document.addEventListener("keydown", e => {
   if (view !== "practice") return;
   if (/^\d$/.test(e.key)) key(e.key);
+  else if (e.key === "-") key("−");
+  else if (e.key === ".") key(".");
   else if (e.key === "Backspace") key("back");
   else if (e.key === "Tab"){ e.preventDefault(); key("next"); }
   else if (e.key === "Enter"){ e.preventDefault(); if (st.steps[st.step]) check(); else nextProblem(); render(); }
 });
 render();
 </script>
+
 </body>
 </html>

@@ -4,13 +4,15 @@ A Duolingo-style math app for kindergarten through 12th grade, built for an iPad
 
 ## What's in it
 
-- **Grades K–12** with a grade picker. Each grade has a playable lesson (5th grade has three fraction lessons), plus a "Coming next" list. Any lesson can be picked, so she can skip ahead or go back.
+- **Grades K–12** with a grade picker. Grades 5–12 have the full year: 115 lessons grouped into units (fractions, decimals, ratios, integers, equations, functions, geometry, trig, logs, limits, derivatives, integrals and more). K–4 have one lesson each so far. Any lesson can be picked, so she can skip ahead or go back.
 - **Works upright or sideways.** Turned sideways, the iPad shows the problem and the number pad side by side.
-- **Short intro cards, then 5 random problems.** The numbers change every time.
-- **Solve by steps:** find the least common denominator, rewrite each fraction, add or subtract, simplify. Finished steps stay on screen like written work.
-- **Mistake explanations** for the common wrong answers in each lesson (adding the denominators, forgetting the carried ten, squaring as times 2, and so on). After two misses, "Show me" walks through the step.
-- **Saved on the device:** XP, the daily streak, finished lessons, and a lesson left halfway (a "Keep going" card on the home screen).
-- **For the grown-up:** a list of which mistakes came up at the end of each lesson.
+- **Short intro cards, then 8 random problems.** The numbers change every time. Each problem with a mistake adds one more like it (up to 12), and a lesson she scored low on last time starts with 10.
+- **Solve by steps:** every problem is split into the steps a teacher would want on paper. Finished steps stay on screen like written work. The number pad has a minus sign and a decimal point.
+- **Mistake explanations** for the common wrong answers in each lesson, plus automatic detection of sign mix-ups, off-by-one, place value and decimal point slips, swapped digits or boxes, flipped fractions, reusing an earlier number, small arithmetic slips and quick guessing.
+- **Limited hints:** about one per two problems, and only after a first try. "Show me" opens after two misses.
+- **Tests and 0–4 scores:** a unit test for each unit and a grade check-up, with no hints. Lessons and tests are scored 0–4 (4 Advanced, 3 Proficient, 2 Approaching, 1 Beginning, 0 Not yet).
+- **Summaries:** after each lesson or test, "What you did" lists every problem and its steps, and "For the grown-up" shows the score, mistake patterns with tips, and every mistake (what was typed and the right answer). A "For the grown-up" page on the home screen shows scores by grade, patterns across sessions, and lessons that need more practice.
+- **Saved on the device:** XP, the daily streak, scores, summaries, and a lesson or test left halfway (a "Keep going" card on the home screen).
 
 ## Running it
 
