@@ -3,7 +3,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid";
-import { expectedOf, twoNums } from "../../area-common/steps";
+import { expectedOf, polyText, twoNums } from "../../area-common/steps";
 
 /** x² + (p + q)x + pq = (x + p)(x + q), with 1 ≤ p ≤ q. */
 export interface FactorProblem { p: number; qn: number }
@@ -51,8 +51,8 @@ export function explainFactor(prob: FactorProblem, answers: AnswerModel): Explan
       cols: [{ label: "x", size: X }, { label: String(q), size: q, from: 1, cls: "acc" }],
       rows: [{ label: "x", size: X }, { label: String(p), size: p, from: 1, cls: "acc" }],
       cells: [
-        [{ text: "x", sup: "2" }, { text: `${q}x`, textFrom: 1, focus: [1] }],
-        [{ text: `${p}x`, textFrom: 1, focus: [1] }, { text: String(p * q) }],
+        [{ text: "x", sup: "2" }, { text: polyText([[q, "x"]]), textFrom: 1, focus: [1] }],
+        [{ text: polyText([[p, "x"]]), textFrom: 1, focus: [1] }, { text: String(p * q) }],
       ],
       lines: [
         { text: `x² + ${p + q}x + ${p * q}`, from: 0, until: 0, cls: "lbl" },

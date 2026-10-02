@@ -2,6 +2,7 @@
 // the first r rows shaded for one fraction, the first c columns for the other; the overlap is the product.
 import type { SceneDiagram, SceneItem } from "../scene/schema";
 import { r1 } from "../scene/helpers";
+import { lineRows, type PictureLine } from "../area-model/grid";
 
 export interface FracGridSpec {
   /** the whole is rows × cols squares */
@@ -16,7 +17,7 @@ export interface FracGridSpec {
   rowLabel: string;
   colLabel: string;
   /** lines under the grid, e.g. "6 of 12 squares" at the overlap beat; lines never shown together share a row */
-  notes?: { text: string; from: number; until?: number; cls?: string }[];
+  notes?: PictureLine[];
   alt: string;
 }
 
@@ -51,20 +52,13 @@ export function buildFracGrid(spec: FracGridSpec): SceneDiagram {
   const gridH = rows * cell, notes = spec.notes ?? [];
   const noteW = Math.max(0, ...notes.map(n => n.text.length * 10.2));
   const width = Math.max(left + cols * cell + 20, noteW + 24);
-  const slots: { from: number; until: number }[][] = [], rowOf: number[] = [];
-  notes.forEach(n => {
-    const span = { from: n.from, until: n.until ?? Infinity };
-    let row = slots.findIndex(s => s.every(o => span.until < o.from || o.until < span.from));
-    if (row < 0) { row = slots.length; slots.push([]); }
-    slots[row]!.push(span);
-    rowOf.push(row);
-  });
+  const { rowOf, count } = lineRows(notes);
   const cx = Math.min(Math.max(left + (cols * cell) / 2, noteW / 2 + 12), width - noteW / 2 - 12);
   notes.forEach((n, k) => items.push({ type: "text", x: r1(cx), y: r1(top + gridH + 24 + rowOf[k]! * 26), text: n.text, cls: n.cls ?? "lbl", from: n.from, ...(n.until != null ? { until: n.until } : {}), enter: "rise", delay: 0.4 }));
   return {
     kind: "scene", family: "frac-grid",
     width: r1(width),
-    height: r1(top + gridH + (slots.length ? 12 + slots.length * 26 : 16)),
+    height: r1(top + gridH + (count ? 12 + count * 26 : 16)),
     items, alt: spec.alt,
   };
 }

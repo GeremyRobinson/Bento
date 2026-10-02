@@ -19,6 +19,8 @@ export const generateFoil = (rng: Rng): FoilProblem => ({ a: nonZero(rng, -9, 9)
 const x = text("x");
 /** (x + 3) or (x − 3), as the current app's binom */
 const binom = (a: number): MathText => [text("("), x, op(a < 0 ? "−" : "+"), num(Math.abs(a)), text(")")];
+/** a negative number in parentheses, as text */
+const pf = (v: number) => (v < 0 ? `(${f(v)})` : f(v));
 const sideText = (a: number) => (a < 0 ? `−${Math.abs(a)}` : `+${a}`);
 
 export function foilAnswers({ a, b }: FoilProblem): AnswerModel {
@@ -50,7 +52,7 @@ export function explainFoil(p: FoilProblem, answers: AnswerModel): Explanation {
       ],
       lines: [
         { text: `${polyText([[b, "x"]])} + ${polyText([[a, "x"]])} = ${polyText([[mid, "x"]])}`.replace("+ −", "− "), from: 1, until: 1 },
-        { text: `${f(a)} × ${f(b)} = ${f(last)}`, from: 2, until: 2 },
+        { text: `${pf(a)} × ${pf(b)} = ${f(last)}`, from: 2, until: 2 },
         { text: result, from: 3 },
       ],
       alt: `An (x ${a < 0 ? "−" : "+"} ${Math.abs(a)}) by (x ${b < 0 ? "−" : "+"} ${Math.abs(b)}) area: x², ${polyText([[b, "x"]])}, ${polyText([[a, "x"]])} and ${f(last)}, which make ${result}.`,
@@ -59,7 +61,7 @@ export function explainFoil(p: FoilProblem, answers: AnswerModel): Explanation {
     timeline: beats(4),
     steps: [
       { id: "middle", narration: `Outer: x × ${f(b)}. Inner: ${f(a)} × x. Together ${polyText([[mid, "x"]])}.`, math: [num(b), x, op("+"), ...numP(a), x, op("="), num(mid), x], state: 1, answerStep: "middle", result: mid },
-      { id: "last", narration: `Last: ${f(a)} × ${f(b)} = ${f(last)}.`, math: [...numP(a), op("×"), ...numP(b), op("="), num(last)], state: 2, answerStep: "last", result: last },
+      { id: "last", narration: `Last: ${pf(a)} × ${pf(b)} = ${f(last)}.`, math: [...numP(a), op("×"), ...numP(b), op("="), num(last)], state: 2, answerStep: "last", result: last },
       { id: "answer", narration: `First is x². So it's ${result}.`, math: [...binom(a), ...binom(b), op("="), text(result)], state: 3, answerStep: "answer", result: mid },
     ],
   };

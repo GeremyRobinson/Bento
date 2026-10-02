@@ -2,6 +2,7 @@
 // a box's three different faces, or a pyramid inside its box. Sizes and labels come from the problem.
 import type { SceneDiagram, SceneItem } from "../scene/schema";
 import { r1 } from "../scene/helpers";
+import { lineRows, type PictureLine } from "../area-model/grid";
 
 type P3 = [number, number, number];
 
@@ -13,7 +14,7 @@ interface Common {
   /** edge labels and the beat they show at */
   labels?: { l?: string; w?: string; h?: string; from?: number };
   /** lines of text under the picture */
-  lines?: { text: string; from: number; until?: number; cls?: string }[];
+  lines?: PictureLine[];
   alt: string;
 }
 
@@ -21,7 +22,7 @@ export type Box3dSpec = Common & (
   /** unit cubes; layer z shows at layerBeats[z] (a beat per layer, or one beat for several, staggered) */
   | { mode: "cubes"; layerBeats: number[] }
   /** the three faces you can see, each with its area written on it */
-  | { mode: "faces"; beats: { top: number; front: number; side: number; hidden?: number }; text?: { top?: string; front?: string; side?: string } }
+  | { mode: "faces"; beats: { top: number; front: number; side: number }; text?: { top?: string; front?: string; side?: string } }
   /** a pyramid in its box: the base, then the box, then the pyramid */
   | { mode: "pyramid"; beats: { base: number; box: number; pyramid: number }; baseText?: string }
 );
@@ -59,6 +60,8 @@ export function buildBox3d(spec: Box3dSpec): SceneDiagram {
   const centre = (ps: P3[]): P3 => [0, 1, 2].map(k => ps.reduce((a, p) => a + p[k]!, 0) / ps.length) as P3;
 
   if (spec.mode === "cubes") {
+    // the box's outline, which the layers fill
+    if (Math.min(...spec.layerBeats) > 0) items.push(poly(top(h), "wire", 0, "fade"), poly(front(0, h), "wire", 0, "fade"), poly(side(0, h), "wire", 0, "fade"));
     const beatsSeen = new Map<number, number>();
     for (let z = 0; z < h; z++) {
       const from = spec.layerBeats[z] ?? spec.layerBeats[spec.layerBeats.length - 1] ?? 0;
@@ -73,12 +76,12 @@ export function buildBox3d(spec: Box3dSpec): SceneDiagram {
     const b = spec.beats;
     // the box's outline first, so each face lands in its place
     items.push(poly(top(h), "wire", 0, "fade"), poly(front(0, h), "wire", 0, "fade"), poly(side(0, h), "wire", 0, "fade"));
-    if (b.hidden != null) for (const e of [[[l, 0, 0], [0, 0, 0]], [[0, w, 0], [0, 0, 0]], [[0, 0, h], [0, 0, 0]]] as [P3, P3][]) items.push(seg(e[0], e[1], "wire", b.hidden, "fade"));
     const faces: [P3[], string, number, string | undefined][] = [
       [top(h), "cf top", b.top, spec.text?.top], [front(0, h), "cf left", b.front, spec.text?.front], [side(0, h), "cf right", b.side, spec.text?.side],
     ];
     for (const [ps, cls, from] of faces) items.push(poly(ps, cls, from, "pop", 0.1));
-    for (const [ps, , from, t] of faces) if (t) { const [x, y] = at(centre(ps)); items.push({ type: "text", x, y, text: t, cls: "lbl onlbl", from, enter: "rise", delay: 0.4 }); }
+    // the light top face takes the tint colour; the darker sides take white
+    for (const [ps, cls, from, t] of faces) if (t) { const [x, y] = at(centre(ps)); items.push({ type: "text", x, y, text: t, cls: cls === "cf top" ? "lbl" : "lbl onlbl", from, enter: "rise", delay: 0.4 }); }
   } else {
     const b = spec.beats, apex: P3 = [l / 2, w / 2, h];
     items.push(poly(top(0), "cf top", b.base, "pop", 0.1));
@@ -99,14 +102,7 @@ export function buildBox3d(spec: Box3dSpec): SceneDiagram {
   }
 
   const picH = Math.max(...pts.map(p => p[1])) - miny + pad;
-  const slots: { from: number; until: number }[][] = [], rowOf: number[] = [];
-  lines.forEach(x => {
-    const span = { from: x.from, until: x.until ?? Infinity };
-    let row = slots.findIndex(s => s.every(o => span.until < o.from || o.until < span.from));
-    if (row < 0) { row = slots.length; slots.push([]); }
-    slots[row]!.push(span);
-    rowOf.push(row);
-  });
+  const { rowOf, count } = lineRows(lines);
   lines.forEach((x, k) => items.push({ type: "text", x: r1(width / 2), y: r1(picH + 4 + rowOf[k]! * 26), text: x.text, cls: x.cls ?? "lbl acc", from: x.from, ...(x.until != null ? { until: x.until } : {}), enter: "rise" }));
-  return { kind: "scene", family: "box3d", width: r1(width), height: r1(picH + (slots.length ? slots.length * 26 + 6 : 0)), items, alt: spec.alt };
+  return { kind: "scene", family: "box3d", width: r1(width), height: r1(picH + (count ? count * 26 + 6 : 0)), items, alt: spec.alt };
 }

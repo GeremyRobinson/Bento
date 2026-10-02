@@ -3,6 +3,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid";
+import { r1 } from "../../../../explanations/diagrams/scene/helpers";
 import { expectedOf, ms, ns, readNumbers } from "../../area-common/steps";
 
 /** a(x + b) + cx: distribute, then combine the x terms. */
@@ -45,9 +46,11 @@ export function explainDistribute(p: DistributeProblem, answers: AnswerModel): E
       rows: [{ label: String(a), size: a }, { label: String(c), size: c, from: 2 }],
       cells: [
         [{ text: `${a}x`, from: 1, focus: [1] }, { text: String(ab), from: 1, focus: [1] }],
-        [{ text: `${c}x`, from: 2, color: 1, focus: [2] }, null],
+        [{ text: `${c}x`, from: 2, color: 0, focus: [2] }, null],
       ],
       outlineFrom: null,
+      // the a by (x + b) rectangle the problem starts with
+      extras: g => [{ type: "rect", x: r1(g.left), y: r1(g.top), w: r1(g.width), h: r1(g.ys[1]! - g.top), cls: "ax thin", enter: "fade" }],
       lines: [
         { text: `${a}(x + ${b}) = ${a}x + ${ab}`, from: 1, until: 1 },
         { text: `${a}x + ${c}x = ${sum}x`, from: 2, until: 2 },

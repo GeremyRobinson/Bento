@@ -37,7 +37,7 @@ export function explainSurface(p: SurfaceProblem, answers: AnswerModel): Explana
     idea: ["A box has three different faces, and each one has a twin on the other side. Add the three, then double."],
     statement: [num(l), op("×"), num(w), op("×"), num(h)],
     diagram: buildBox3d({
-      mode: "faces", l, w, h, beats: { top: 1, front: 2, side: 3, hidden: 4 },
+      mode: "faces", l, w, h, beats: { top: 1, front: 2, side: 3 },
       text: { top: String(T), front: String(F), side: String(S) },
       labels: { l: String(l), w: String(w), h: String(h), from: 0 },
       lines: [{ text: `2 × (${T} + ${F} + ${S}) = ${total}`, from: 4 }],

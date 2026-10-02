@@ -40,13 +40,15 @@ export interface AreaGridSpec {
   /** draw the unit squares from this beat (only when every side is a whole number and squares stay big enough) */
   units?: number;
   /** lines of text under the picture */
-  lines?: { text: string; from: number; until?: number; cls?: string }[];
+  lines?: PictureLine[];
   /** extra shapes drawn over the grid, placed with the computed layout */
   extras?: (g: AreaGeometry) => SceneItem[];
   /** beat the outline appears at (default 0); null draws none, for grids with an empty spot */
   outlineFrom?: number | null;
   maxWidth?: number;
   maxHeight?: number;
+  /** smallest row height, for strips far longer than they are tall (default 34) */
+  minRow?: number;
   alt: string;
 }
 
@@ -63,6 +65,22 @@ export interface AreaGeometry {
   unitY: number;
   /** true when every column and row is drawn at the same scale */
   toScale: boolean;
+}
+
+/** A line of text under a picture, shown from one beat (until another). */
+export interface PictureLine { text: string; from: number; until?: number; cls?: string }
+
+/** Puts lines that are never on screen together in the same row; returns each line's row and how many rows there are. */
+export function lineRows(lines: PictureLine[]): { rowOf: number[]; count: number } {
+  const rows: { from: number; until: number }[][] = [], rowOf: number[] = [];
+  for (const l of lines) {
+    const span = { from: l.from, until: l.until ?? Infinity };
+    let row = rows.findIndex(r => r.every(o => span.until < o.from || o.until < span.from));
+    if (row < 0) { row = rows.length; rows.push([]); }
+    rows[row]!.push(span);
+    rowOf.push(row);
+  }
+  return { rowOf, count: rows.length };
 }
 
 const FONT = 17;
@@ -95,8 +113,8 @@ export function layoutAreaGrid(spec: AreaGridSpec): AreaGeometry {
   const colSizes = spec.cols.map(c => Math.abs(c.size)), rowSizes = spec.rows.map(r => Math.abs(r.size));
   const sw = colSizes.reduce((a, b) => a + b, 0), sh = rowSizes.reduce((a, b) => a + b, 0);
   const scale = Math.min(maxW / sw, maxH / sh);
-  const colMins = spec.cols.map((c, i) => Math.max(30, textWidth(sideText(c)) + 10, ...spec.rows.map((_, j) => textWidth(cellText(spec.cells[j]?.[i] ?? null)) + 16)));
-  const rowMins = spec.rows.map(() => 34);
+  const colMins = spec.cols.map((c, i) => Math.max(30, textWidth(sideText(c)) + 10, ...spec.rows.map((_, j) => textWidth(cellText(spec.cells[j]?.[i] ?? null)) + 22)));
+  const rowMins = spec.rows.map(() => spec.minRow ?? 34);
   const cw = fitParts(colSizes, colMins, maxW, scale), rh = fitParts(rowSizes, rowMins, maxH, scale);
   const left = Math.max(40, ...spec.rows.map(r => textWidth(sideText(r)) + 22)), top = 34;
   const xs = [left], ys = [top];
@@ -108,7 +126,12 @@ export function layoutAreaGrid(spec: AreaGridSpec): AreaGeometry {
 
 /** The picture: labels on the sides, a coloured cell per product, optional unit squares, lines of text under it. */
 export function buildAreaGrid(spec: AreaGridSpec): SceneDiagram & { geometry: AreaGeometry } {
-  const g = layoutAreaGrid(spec), items: SceneItem[] = [];
+  const lay = layoutAreaGrid(spec), items: SceneItem[] = [];
+  const lines = spec.lines ?? [];
+  const lineW = Math.max(0, ...lines.map(l => textWidth(l.text)));
+  // when the text under it is wider, the grid moves to the middle
+  const shift = Math.max(0, (lineW + 24 - (lay.left + lay.width + 14)) / 2);
+  const g: AreaGeometry = { ...lay, left: lay.left + shift, xs: lay.xs.map(x => x + shift) };
   const { left, top, xs, ys } = g;
   const label = (x: number, y: number, s: AreaSide, cls: string, delay: number): SceneItem =>
     ({ type: "text", x: r1(x), y: r1(y), text: s.label, ...(s.sup ? { sup: s.sup } : {}), cls: `${cls}${s.cls ? ` ${s.cls}` : ""}`, from: s.from ?? 0, enter: "rise", delay });
@@ -157,25 +180,14 @@ export function buildAreaGrid(spec: AreaGridSpec): SceneDiagram & { geometry: Ar
     items.push({ type: "text", x: r1((xs[i]! + xs[i + 1]!) / 2), y: r1((ys[j]! + ys[j + 1]!) / 2), text: c.text, ...(c.sup ? { sup: c.sup } : {}), cls: "lbl", from: Math.max(c.from ?? 0, c.textFrom ?? 0), enter: "rise", delay: 0.3 });
   }));
 
-  const lines = spec.lines ?? [];
-  const lineW = Math.max(0, ...lines.map(l => textWidth(l.text)));
   const width = Math.max(left + g.width + 14, lineW + 24);
   const cx = Math.min(Math.max(left + g.width / 2, lineW / 2 + 12), width - lineW / 2 - 12);
-  const rowsOf = new Map<number, number>();
-  // lines that are never on screen together share a row
-  const slots: { from: number; until: number }[][] = [];
-  lines.forEach((l, k) => {
-    const span = { from: l.from, until: l.until ?? Infinity };
-    let row = slots.findIndex(s => s.every(o => span.until < o.from || o.until < span.from));
-    if (row < 0) { row = slots.length; slots.push([]); }
-    slots[row]!.push(span);
-    rowsOf.set(k, row);
-  });
-  lines.forEach((l, k) => items.push({ type: "text", x: r1(cx), y: r1(top + g.height + 28 + rowsOf.get(k)! * 26), text: l.text, cls: l.cls ?? "lbl acc", from: l.from, ...(l.until != null ? { until: l.until } : {}), enter: "rise" }));
+  const { rowOf, count } = lineRows(lines);
+  lines.forEach((l, k) => items.push({ type: "text", x: r1(cx), y: r1(top + g.height + 28 + rowOf[k]! * 26), text: l.text, cls: l.cls ?? "lbl acc", from: l.from, ...(l.until != null ? { until: l.until } : {}), enter: "rise" }));
 
   return {
     kind: "scene", family: spec.family ?? "area-model",
-    width: r1(width), height: r1(top + g.height + (slots.length ? 14 + slots.length * 26 : 12)),
+    width: r1(width), height: r1(top + g.height + (count ? 14 + count * 26 : 12)),
     items, alt: spec.alt, geometry: g,
   };
 }

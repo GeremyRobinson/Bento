@@ -53,7 +53,7 @@ export function explainPartial(p: PartialProblem, answers: AnswerModel): Explana
     idea: ["Split the big number into hundreds, tens and ones. Multiply each part, then add."],
     statement,
     diagram: buildAreaGrid({
-      cols, rows: [{ label: String(m), size: m }], cells: [cells],
+      cols, rows: [{ label: String(m), size: m }], cells: [cells], minRow: 80,
       lines: [{ text: `${n} × ${m} = ${P.filter(x => x > 0).join(" + ")} = ${total}`, from: 4 }],
       alt: `A ${m} by ${n} rectangle cut by place value: ${shown.map(([v, i]) => `${m} × ${v} = ${P[i]}`).join(", ")}. Together ${total}.`,
     }),
