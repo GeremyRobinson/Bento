@@ -79,6 +79,7 @@ export const lesson: LessonDefinition<RegroupProblem> = {
   generate: rng => generateRegroup(rng),
   restore: raw => { const r = readNumbers(raw, ["a", "b"] as const); try { return r && createRegroup(r.a, r.b); } catch { return null; } },
   display: p => [num(p.a), op("+"), num(p.b)],
+  displayCounters: p => ({ op: "+", groups: [{ kind: "blocks", value: p.a }, { kind: "blocks", value: p.b }] }),
   answers: regroupAnswers,
   explain: explainRegroup,
   story: ({ a, b }) => ({ op: "+", text: `A class read **${a}** books in May and **${b}** books in June. How many books did they read in all?` }),

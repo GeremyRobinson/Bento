@@ -88,6 +88,8 @@ export interface LessonDefinition<P = unknown> {
   display(problem: P): MathText;
   /** an optional line under the problem, e.g. "Factor it." */
   displayNote?(problem: P): RichText;
+  /** counters under the problem in practice, built from its numbers (the current app's dots, ten frames and base-ten blocks) */
+  displayCounters?(problem: P): Counters;
   answers(problem: P): AnswerModel;
   explain(problem: P, answers: AnswerModel): Explanation;
   /** some lessons tell every third problem as a story */
@@ -98,3 +100,8 @@ export interface LessonDefinition<P = unknown> {
 
 /** Erases the problem type so lessons of different kinds can live in one registry. */
 export type AnyLesson = LessonDefinition<any>;
+
+/** One group of counters standing for a number: loose dots, a ten frame, or tens rods and ones cubes. */
+export interface CounterGroup { kind: "dots" | "tenFrame" | "blocks"; value: number }
+/** Groups shown in a row with an operation sign between them, e.g. 3 dots + 2 dots. */
+export interface Counters { groups: CounterGroup[]; op: string }
