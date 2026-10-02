@@ -173,7 +173,10 @@ export function buildNumberLine(spec: NumberLineSpec): SceneDiagram {
   for (const m of marks) {
     raw.push({ type: "circle", cx: r1(x(m.v)), cy: 0, r: 7, cls: m.cls ?? "dotp", enter: "pop", ...timing(m) });
     if (!m.label) continue;
-    const box = place(m.label, x(m.v), -22, -1, 17, windowOf(m));
+    // above any arc that lands on or passes over the mark, so the label never sits on a hop
+    const over = hops.filter(h => !h.below && Math.min(h.from, h.to) <= m.v && m.v <= Math.max(h.from, h.to))
+      .map(h => hopHeight(Math.abs(x(h.to) - x(h.from))) + 30);
+    const box = place(m.label, x(m.v), -Math.max(22, ...over), -1, 17, windowOf(m));
     raw.push({ type: "text", x: r1(box.x), y: r1(box.y), text: m.label, cls: "lbl", enter: "rise", ...timing(m, 0.2) });
   }
 

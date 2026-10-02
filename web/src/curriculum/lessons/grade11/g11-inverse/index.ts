@@ -46,7 +46,7 @@ export function explainInverse(p: InverseProblem, model: AnswerModel): Explanati
     diagram: buildPlane({
       alt: `Graph: y = ${fx}, its mirror image across y = x, and the points ${pt(x, y)} and ${pt(y, x)}.`,
       equal: true,
-      fit: [[x, y], [y, x], [0, 0]],
+      fit: [[x, y], [y, x], [0, 0], [Math.min(x, y) - 2, Math.min(x, y) - 2], [Math.max(x, y) + 2, Math.max(x, y) + 2]],
       items: [
         { kind: "line", m: 1, b: 0, cls: "ax dash", label: { text: "y = x", optional: true } },
         { kind: "line", m: a, b, cls: "ln", label: { text: `f`, optional: true } },

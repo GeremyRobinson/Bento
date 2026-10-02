@@ -53,7 +53,7 @@ export function explainDot(p: DotProblem, model: AnswerModel): Explanation {
         { kind: "segment", a: [0, 0], b: [a, b], arrow: true, label: { text: vt(a, b) } },
         { kind: "segment", a: [0, 0], b: [c, d], arrow: true, cls: "ln2", delay: 0.4, label: { text: vt(c, d), acc: true } },
         ...(D === 0 ? [{ kind: "rightAngle" as const, at: [0, 0] as const, u: [a, b] as const, v: [c, d] as const, from: 3 }]
-          : [{ kind: "angle" as const, at: [0, 0] as const, u: [a, b] as const, v: [c, d] as const, from: 3, cls: "arcline" }]),
+          : [{ kind: "angle" as const, at: [0, 0] as const, u: [a, b] as const, v: [c, d] as const, from: 3 }]),
       ],
     }),
     timeline: beats(4),

@@ -60,7 +60,7 @@ function explain(p: ProportionProblem, model: AnswerModel): Explanation {
       { id: "cross", state: 1, answerStep: "cross", result: cross, math: [num(a), op("×"), num(b * k), op("="), num(cross)],
         narration: `Cross multiply: the top-left times the bottom-right, ${a} × ${b * k} = ${cross}. That is x × ${b}.` },
       { id: "divide", state: 2, answerStep: "divide", result: x, math: [text("x"), op("="), num(cross), op("÷"), num(b), op("="), num(x)],
-        narration: `Divide by the ${b} across from x: ${cross} ÷ ${b} = ${x}. In the picture each box is ${k}, and x is ${a} boxes.` },
+        narration: `Divide by the ${b} across from x: ${cross} ÷ ${b} = ${x}. In the picture each box is ${k}, and x is ${a} box${a === 1 ? "" : "es"}.` },
     ],
   };
 }

@@ -54,3 +54,9 @@
 .foot button{color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-weight:var(--w-mid)}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .mline-in{display:contents}
+/* in a flex line vertical-align does nothing, so raise and lower by hand */
+.mline sup{font-size:.6em;line-height:1;align-self:flex-start;margin-top:-.1em}
+.mline sub{font-size:.6em;line-height:1;align-self:flex-end;margin-bottom:-.1em}
+.mline mark{background:color-mix(in srgb,var(--acc) 26%,transparent);color:inherit;border-radius:6px;padding:0 .12em}
+.label.formula{text-transform:none!important}
+.learn .math>.mline{flex-wrap:wrap;row-gap:.1em}

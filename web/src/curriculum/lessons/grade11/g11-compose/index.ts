@@ -42,7 +42,7 @@ export function explainComposition(p: Composition, model: AnswerModel) {
   const [g, out] = model.steps.map(s => s.slots[0]!.expected!) as [number, number];
   return beatExplanation({
     heading: "Inside out",
-    statement: [...fx(p), text(","), ...gx(p), text(","), ...call("f", call("g", [num(k)]))],
+    statement: [...fx(p), br(), ...gx(p), br(), ...call("f", call("g", [num(k)]))],
     caption: `g works on ${f(k)} first; f works on what g gives back.`,
     alt: `g(${f(k)}) = ${f(g)}, then f(${f(g)}) = ${f(out)}.`,
     steps: [

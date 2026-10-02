@@ -48,7 +48,7 @@ export function explainEvaluate(p: EvaluatePolynomial, model: AnswerModel) {
   ];
   return beatExplanation({
     heading: "Plug in, then simplify",
-    statement: [...fx(p), text(","), ...at(k)],
+    statement: [...fx(p), text(",  "), ...at(k)],
     caption: `Put ${f(k)} in for every x, then work out each part.`,
     alt: `f(${f(k)}) = ${f(A)} + ${fP(B)} + ${fP(c)} = ${f(total)}.`,
     steps: [

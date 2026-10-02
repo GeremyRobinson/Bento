@@ -48,7 +48,7 @@ export function explainNegativeExponent(p: NegativeExponent, model: AnswerModel)
     caption: `Each step down divides by ${f(a)}.`,
     alt: `Powers of ${f(a)} counting down from ${f(a)}${supText(n)} = ${f(power)} to ${f(a)}⁰ = 1, then ${f(a)}${supText(-n)} = 1/${f(flip)}.`,
     steps: [
-      { id: "positive", narration: `Start with the positive power: ${f(n)} copies of ${f(a)} make ${f(power)}.`, math: m(...pow(a, n), op("="), power), answerStep: "positive", result: power },
+      { id: "positive", narration: `Start with the positive power: ${f(n)} cop${n === 1 ? "y" : "ies"} of ${f(a)} make ${f(power)}.`, math: m(...pow(a, n), op("="), power), answerStep: "positive", result: power },
       { id: "down", narration: `Each step down divides by ${f(a)}, all the way to ${f(a)}⁰ = 1.`, math: m(...pow(a, 0), op("="), 1), lines: down },
       { id: "flip", narration: `Keep dividing past 0: ${f(a)}${supText(-n)} is 1 over ${f(a)}${supText(n)}, which is 1/${f(flip)}.`, math: m(...pow(a, -n), op("="), frac(1, flip)), lines: below, answerStep: "flip", result: flip },
     ],

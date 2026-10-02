@@ -39,9 +39,9 @@ function answers({ a, b, k }: RatioProblem): AnswerModel {
 export function ratioPicture({ a, b, k }: RatioProblem) {
   return buildTape({
     rows: [
-      { length: a, parts: a, fills: [{ a: 0, b: a, tone: "acc", from: 2 }], each: [{ text: () => `${k}`, from: 2 }], label: [{ text: `${a} parts` }],
+      { length: a, parts: a, fills: [{ a: 0, b: a, tone: "acc", from: 2 }], each: [{ text: () => `${k}`, from: 2 }], label: [{ text: `${a} part${a === 1 ? "" : "s"}` }],
         total: [{ text: "?", until: 1 }, { text: `${a * k}`, from: 2, acc: true }] },
-      { length: b, parts: b, fills: [{ a: 0, b, tone: "on", from: 1 }], each: [{ text: () => `${k}`, from: 1 }], label: [{ text: `${b} parts` }],
+      { length: b, parts: b, fills: [{ a: 0, b, tone: "on", from: 1 }], each: [{ text: () => `${k}`, from: 1 }], label: [{ text: `${b} part${b === 1 ? "" : "s"}` }],
         total: [{ text: `${b * k}` }] },
     ],
     alt: `A ratio tape: ${a} boxes and ${b} boxes of the same size. ${b} boxes make ${b * k}, so each box is ${k} and ${a} boxes make ${a * k}.`,

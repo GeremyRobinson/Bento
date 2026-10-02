@@ -63,9 +63,9 @@ export function explainRegroup(p: RegroupProblem, answers: AnswerModel): Explana
     timeline: beats(5),
     steps: [
       { id: "ones", narration: `Ones first: ${ao} + ${bo} = ${O}.`, math: [num(ao), op("+"), num(bo), op("="), num(O)], state: 1, answerStep: "ones", result: O },
-      { id: "regroup", narration: `${O} is 1 ten and ${left} ones. Write ${left} and carry the ten.`, math: [num(O), op("="), num(10), op("+"), num(left)], state: 2, answerStep: "regroup", result: left },
+      { id: "regroup", narration: `${O} is 1 ten and ${left} one${left === 1 ? "" : "s"}. Write ${left} and carry the ten.`, math: [num(O), op("="), num(10), op("+"), num(left)], state: 2, answerStep: "regroup", result: left },
       { id: "tens", narration: `Tens: ${at} + ${bt} + the 1 you carried = ${T}.`, math: [num(at), op("+"), num(bt), op("+"), num(1), op("="), num(T)], state: 3, answerStep: "tens", result: T },
-      { id: "answer", narration: `${T} tens and ${left} ones is ${sum}.`, math: [num(a), op("+"), num(b), op("="), num(sum)], state: 4, answerStep: "answer", result: sum },
+      { id: "answer", narration: `${T} tens and ${left} one${left === 1 ? "" : "s"} is ${sum}.`, math: [num(a), op("+"), num(b), op("="), num(sum)], state: 4, answerStep: "answer", result: sum },
     ],
   };
 }

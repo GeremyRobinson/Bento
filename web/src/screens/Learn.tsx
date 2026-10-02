@@ -101,7 +101,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
       <div className="blearn">
         <section className="panel learn walk">
           <div className="card">
-            <h2 className="label">{ex.heading}</h2>
+            <h2 className={`label${/[=²³√ⁿ₀-₉]/.test(ex.heading) ? " formula" : ""}`}>{ex.heading}</h2>
             {ex.idea?.map((t, i) => <p key={i} className="idea"><Rich text={t} /></p>)}
             <div className="math"><MathLine math={ex.statement} /></div>
             {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && playing ? last : at} />}
