@@ -13,6 +13,8 @@ export interface ChainBeat {
   math: MathText;
   /** the line this beat adds to the chain; defaults to `math`; null adds no line */
   line?: MathText | null;
+  /** several lines added at once (instead of `line`) */
+  lines?: MathText[];
   /** the answer-model step this beat arrives at, and its value */
   answerStep?: string;
   result?: number;
@@ -20,7 +22,7 @@ export interface ChainBeat {
 
 /** Lines of the chain, one per beat that adds one, each appearing at its own beat. */
 export function buildChain(steps: ChainBeat[], alt: string): ChainDiagram {
-  const lines = steps.flatMap((b, i) => (b.line === null ? [] : [{ math: b.line ?? b.math, from: i }]));
+  const lines = steps.flatMap((b, i) => (b.lines ?? (b.line === null ? [] : [b.line ?? b.math])).map(math => ({ math, from: i })));
   return { kind: "chain", lines, alt };
 }
 
