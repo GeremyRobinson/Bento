@@ -894,7 +894,7 @@ save.log = save.log || [];
 for (const k of ["stk","seen","reviews"]) save[k] = save[k] || {};
 save.tix = save.tix || 0; save.gold = save.gold || 0; save.dupe = save.dupe || 0;
 // stickers and tickets are built but switched off until the next big update
-const REWARDS = false;
+const REWARDS = true;
 if (REWARDS && !save.welcome){ save.welcome = 1; save.tix += 1; } // one ticket to try the sticker machine
 
 // ---- 0 to 4 proficiency, like a standards-based report card ----
