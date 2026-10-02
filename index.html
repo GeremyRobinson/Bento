@@ -126,6 +126,10 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .card .badge,.ctl .badge{background:var(--tint-soft);color:var(--tint)}
 .badge.on,.card .badge.on,.ctl .badge.on{background:var(--tint);color:var(--on-tint)}
 .bar{display:flex;align-items:center;gap:var(--s);padding:var(--inset);background:var(--well);border-radius:999px;min-width:0}
+.ctl.circ{width:var(--h);padding:0;flex:none;background:var(--card);color:var(--tint);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.ctl.circ:hover{background:var(--tint-soft)}
+.ctl.circ svg{width:22px;height:22px;display:block}
+.ctl.circ[disabled]{background:color-mix(in srgb,var(--card) 45%,transparent);box-shadow:none;color:var(--faint)}
 .bar .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--w-bold);padding:0 var(--s)}
 .wrap>*,.panel>*,.lessons>*,.card>*,.bento>*{min-width:0}
 .dot{width:12px;height:12px;border-radius:50%;flex:none;background:var(--faint);transition:background .3s,transform .3s var(--spring)}
@@ -3028,9 +3032,9 @@ const lessonDone = id => (save.lessons && save.lessons[id]) || 0;
 
 function lessonNav(){
   const g = inGrade(LESSONS[cur].grade), k = g.indexOf(cur);
-  return `<div class="bar"><button class="ctl" data-lesson="${g[k-1]}" ${k>0?"":"disabled"} aria-label="Previous lesson">‹</button>
+  return `<div class="bar"><button class="ctl circ" data-lesson="${g[k-1]}" ${k>0?"":"disabled"} aria-label="Previous lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <span class="grow" style="text-align:center">${LESSONS[cur].title}</span>
-    <button class="ctl" data-lesson="${g[k+1]}" ${k<g.length-1?"":"disabled"} aria-label="Next lesson">›</button></div>`;
+    <button class="ctl circ" data-lesson="${g[k+1]}" ${k<g.length-1?"":"disabled"} aria-label="Next lesson"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
 }
 // the lesson: idea cards with a moving picture, then one problem solved step by step, then practice
 function newExample(){ const l = LESSONS[cur]; learnEx = {id:l.id, p:l.make(rand(0, 3)), n:0, fresh:false}; }
