@@ -84,11 +84,23 @@ After two misses on one step, a **"Show me"** button walks through that step so 
 - **Summaries**: after every lesson or test, "What you did" lists every problem with the finished steps, and "For the grown-up" shows the score, mistake patterns with a tip for each, and every mistake (what was typed, the right answer, what kind of slip). The last summary for each lesson opens from its intro screen.
 - **For the grown-up page** (home screen): scores by grade, mistake patterns across recent sessions, hints used, guessing, lessons that need more practice, and recent sessions.
 
-## 7. Build order
+## 7. A look for each age
+
+One design that grows up with the grade. The layout, number pad, scores and reports stay the same, so moving up never feels like a new app.
+
+| Grades | Look |
+|---|---|
+| K–2 | Biggest type, buttons and number pad. Ten frames and base-ten blocks on the problems. No minus or decimal keys. Big 🎉 when a problem is solved. |
+| 3–5 | The kid-friendly System One look as first designed: rounded type, one soft colour per lesson, a ⭐ for each solve. |
+| 6–8 | A little smaller and calmer: more on screen, quieter praise ("Correct."), no stars. |
+| 9–12 | Close to plain System One: Helvetica, grey and black only, uppercase muted labels, outlined main button, small XP and streak badges. Once a skill scores 3 or more, "Skip steps" asks only for the final answer; a miss goes back to the full steps for that problem. |
+
+## 8. Build order
 
 1. ✅ Prototype: grade picker, lesson picker, saved progress and resume, a sideways (landscape) iPad layout, and a kid-friendly System One style.
 2. ✅ Full year for grades 5–12, unit tests and grade check-ups, 0–4 scores, limited hints, detailed mistake reports, adaptive practice length.
-3. Try it with her for a week. Note where she gets stuck or bored.
-4. Fill in the full year for K–4.
-5. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
-6. Optional: move to Swift once the lessons are settled.
+3. ✅ A look for each age band, pictures for K–2, and "Skip steps" for mastered 9–12 skills.
+4. Try it with her for a week. Note where she gets stuck or bored.
+5. Fill in the full year for K–4.
+6. Save progress across devices (needs a small backend) only if you need it; until then progress stays on the iPad.
+7. Optional: move to Swift once the lessons are settled.

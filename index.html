@@ -144,6 +144,7 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .workline+.workline{border-top:1px solid var(--rule)}
 .workline .k{font-family:var(--sans);font-size:15px;font-weight:800;color:var(--tint);width:56px;flex:none}
 .workline.shown{color:var(--muted)}
+.workline .wl{flex:1;min-width:0}
 .ask{font-family:var(--num);font-size:40px;line-height:1.2;display:flex;align-items:center;justify-content:center;gap:var(--u);flex-wrap:wrap;padding:var(--u) 0}
 .ask .q{font-family:var(--sans);font-weight:700;font-size:var(--fs);width:100%;text-align:center}
 .slot{min-width:84px;height:64px;padding:0 var(--u);border-radius:var(--r-box);background:var(--well);border:2px solid var(--rule);font-family:var(--num);font-size:40px;display:inline-grid;place-items:center;color:var(--text);transition:border-color .15s,background .15s}
@@ -186,7 +187,46 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .probs .math{--math:32px}
 .facts .pattern,.mlist>div{align-items:flex-start}
 .facts .pattern>span:first-child,.mlist>div>span{display:grid;gap:2px;min-width:0}
+
+/* pictures for K–2 */
+.tf{display:inline-grid;grid-template-columns:repeat(5,22px);grid-auto-rows:22px;border:1px solid var(--text);border-radius:8px;overflow:hidden;gap:1px;background:var(--text)}
+.tf i{background:var(--card);display:grid;place-items:center}
+.tf i.on::after{content:"";width:14px;height:14px;border-radius:50%;background:var(--tint)}
+.bb{display:inline-flex;align-items:flex-end;gap:3px;flex-wrap:wrap;max-width:150px}
+.bb .rod{width:10px;height:60px;border-radius:3px;background:var(--tint)}
+.bb .cube{width:10px;height:10px;border-radius:2px;background:color-mix(in srgb,var(--tint) 55%,var(--card))}
+
+/* grade bands: K–2 bigger and brighter, 3–5 as designed, 6–8 calmer, 9–12 close to plain System One */
+.wrap[data-band="little"]{--fs:21px;--lh:30px;--h:56px;--math:64px;--key:76px}
+.wrap[data-band="little"] .ask{font-size:48px}
+.wrap[data-band="little"] .slot{font-size:48px;height:76px;min-width:100px}
+.wrap[data-band="little"] .lesson{min-height:76px}
+.wrap[data-band="little"] .tray button:not(.wide){font-size:36px}
+.pop.big{font-size:44px;line-height:1}
+.wrap[data-band="middle"]{--fs:17px;--lh:24px;--h:44px;--math:46px;--key:58px;--r-panel:26px;--r-card:20px;--r-box:14px}
+.wrap[data-band="middle"] .ask{font-size:36px}
+.wrap[data-band="high"]{--fs:15px;--lh:22px;--s:6px;--u:12px;--sec:22px;--h:40px;--math:40px;--key:52px;--r-panel:22px;--r-card:18px;--r-box:12px;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;--num:"Helvetica Neue",Helvetica,Arial,sans-serif;font-family:var(--sans)}
+#app[data-band="high"],.wrap[data-band="high"] .t0,.wrap[data-band="high"] .t1,.wrap[data-band="high"] .t2{--tint:var(--text);--tint-soft:var(--hover)}
+.wrap[data-band="high"] *{font-weight:500}
+.wrap[data-band="high"] b,.wrap[data-band="high"] strong,.wrap[data-band="high"] h2,.wrap[data-band="high"] .lesson{font-weight:550}
+.wrap[data-band="high"] .label,.wrap[data-band="high"] .unit h3{text-transform:uppercase;color:var(--muted);font-size:12px}
+.wrap[data-band="high"] .ask{font-size:30px}
+.wrap[data-band="high"] .slot{font-size:30px;height:52px;min-width:72px;border-width:1px}
+.wrap[data-band="high"] .slot.active{border-color:var(--text);background:var(--card)}
+.wrap[data-band="high"] .lesson{min-height:52px}
+.wrap[data-band="high"] .lesson .badge{min-width:36px;height:36px;font-size:16px}
+.wrap[data-band="high"] .tray button:not(.wide){font-size:24px}
+.wrap[data-band="high"] .ctl.go,.wrap[data-band="high"] .panel .ctl.go{background:var(--card);color:var(--text);box-shadow:inset 0 0 0 1px var(--text)}
+.wrap[data-band="high"] .bar .badge{min-width:24px;height:24px;font-size:13px}
+.wrap[data-band="high"] .bar .ctl.badged{font-size:13px}
+.wrap[data-band="high"] .bento .v{font-size:26px}
 @media (max-width:480px){ :root{--fs:17px;--math:40px;--key:56px;--h:44px} .ask{font-size:32px} .slot{font-size:32px;height:54px;min-width:68px} .lesson{min-height:56px} .lesson .badge{min-width:40px;height:40px;font-size:18px} .bento .v{font-size:26px} }
+@media (max-width:480px){
+  .wrap[data-band="little"]{--fs:19px;--math:48px;--key:64px;--h:50px} .wrap[data-band="little"] .ask{font-size:38px} .wrap[data-band="little"] .slot{font-size:38px;height:64px;min-width:80px}
+  .wrap[data-band="middle"]{--fs:16px;--math:38px;--key:54px} .wrap[data-band="middle"] .ask{font-size:30px}
+  .wrap[data-band="high"]{--fs:15px;--math:34px;--key:50px} .wrap[data-band="high"] .ask{font-size:26px} .wrap[data-band="high"] .slot{font-size:26px;height:48px;min-width:64px}
+}
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
 </head>
@@ -400,9 +440,12 @@ const K_ADD = {
     <div class="prose"><p>Count the first group: 3. Then keep counting for each dot in the second group: 4, 5. So 3 + 2 = 5.</p></div>`}]
 };
 
+// pictures for the youngest: a ten frame, and base-ten blocks (a rod is ten, a cube is one)
+const tenFrame = n => `<span class="tf" aria-label="${n} in a ten frame">${Array.from({length:10},(_,i)=>`<i class="${i<n?"on":""}"></i>`).join("")}</span>`;
+const blocks = n => `<span class="bb" aria-label="${Math.floor(n/10)} tens and ${n%10} ones">${'<i class="rod"></i>'.repeat(Math.floor(n/10))}${'<i class="cube"></i>'.repeat(n%10)}</span>`;
 const G1_TEN = {
   make: () => { const a = rand(6,9); return {a, b: rand(11-a, 9)}; },
-  show: p => `<div class="math">${p.a} + ${p.b}</div>`,
+  show: p => `<div class="math">${p.a} + ${p.b}</div><div class="dotrow">${tenFrame(p.a)}<span>+</span>${tenFrame(p.b)}</div>`,
   steps: ({a,b}) => { const need = 10-a, left = b-need; return [
     numStep({label:"Make a ten", ask:s=>`${a} + ${s} = 10`, ans:need,
       hint:`Count up from ${a} to 10. How many did you count?`, explain:`${a} + ${need} = 10.`, work:()=>`${a} + <b>${need}</b> = 10`}),
@@ -418,7 +461,7 @@ const G1_TEN = {
 
 const G2_REGROUP = {
   make: () => { let a, b; do { a = rand(15,79); b = rand(15,79); } while (a%10 + b%10 < 10 || a+b > 99); return {a,b}; },
-  show: p => `<div class="math">${p.a} + ${p.b}</div>`,
+  show: p => `<div class="math">${p.a} + ${p.b}</div><div class="dotrow">${blocks(p.a)}<span>+</span>${blocks(p.b)}</div>`,
   steps: ({a,b}) => { const at=Math.floor(a/10), ao=a%10, bt=Math.floor(b/10), bo=b%10, O=ao+bo; return [
     numStep({label:"Add the ones", ask:s=>`${ao} + ${bo} = ${s}`, ans:O,
       wrong:[[at+bt,"Started with the tens","Start with the <b>ones</b>, the digits on the right."]],
@@ -679,11 +722,45 @@ function render(){
     : view === "report" ? reportViewHTML() : view === "parent" ? parentHTML() : doneHTML();
   if (view === "practice") saveRun();
   app.className = "wrap t" + (["home","parent"].includes(view) ? 0 : tintOf(cur));
+  app.dataset.band = bandOf(["home","parent"].includes(view) ? save.grade : LESSONS[cur].grade);
   app.innerHTML = html;
   const on = app.querySelector(".grades .on"); if (on) on.scrollIntoView({inline:"center", block:"nearest"});
   if (key !== lastKey){ app.querySelectorAll(".panel,.card").forEach((el,i)=>{ el.classList.add("rise"); el.style.animationDelay = Math.min(i,8)*60+"ms"; }); lastKey = key; window.scrollTo(0,0); }
 }
 
+// ---- the look grows up with the grade: same layout, four bands ----
+const bandOf = g => g <= 2 ? "little" : g <= 5 ? "kid" : g <= 8 ? "middle" : "high";
+const band = () => bandOf(LESSONS[cur].grade);
+const PRAISE = {little:["Great job!","You did it!","Super!","Yes!","Wow!"], kid:["Nice!","Yes!","Exactly.","You got it.","Good thinking."],
+  middle:["Correct.","Right.","Good.","Yes.","That's it."], high:["Correct.","Right.","Good.","Yes.","✓"]};
+// 9th–12th: once a skill scores 3 or more, she can skip straight to the final answer
+const canSkip = () => st.mode === "practice" && band() === "high" && (lastScore(st.key) ?? 0) >= 3;
+const answerIds = s => Object.keys(s.answer).filter(k => s.answer[k] != null);
+function slotsFor(s, sfx){
+  const ids = answerIds(s);
+  return ids.length === 2 && ids.includes("n") && ids.includes("d") ? `<span class="fr slots"><span>${slot("n"+sfx)}</span><span>${slot("d"+sfx)}</span></span>`
+    : ids.map(id => slot(id+sfx)).join('<span>,</span>');
+}
+// how many of the last steps make up the whole answer, when it's more than one
+const SKIP_LAST = {"g9-elim":2, "g9-polyadd":3, "g10-mid":2, "g10-circle":2, "g10-special":2, "g11-vertex":2, "g11-complex":2, "g12-anti":2};
+// one "final answer" step built from the last steps; each keeps its own check and mistake messages
+function finalStep(steps){
+  const parts = steps.map((s,j) => ({s, ids:answerIds(s), sfx: steps.length === 1 ? "" : String(j)}));
+  const many = parts.length > 1;
+  return { label:"Final answer", base:"Final answer", skipped:true, note:"Steps skipped. Miss it and we'll go step by step.", hint:parts.map(p => p.s.hint).join(" "),
+    ask: () => q("Type the final answer.") + parts.map(p => (many ? q(p.s.base) : "") + slotsFor(p.s, p.sfx)).join(""),
+    check: v => {
+      for (const p of parts){
+        const sub = Object.fromEntries(p.ids.map(id => [id, v[id+p.sfx]]));
+        if (Object.values(sub).some(x => x == null)) return {soft:true, msg:"Fill in every box."};
+        const r = p.s.check(sub);
+        if (!r.ok) return many && !r.soft ? {...r, generic:false, kind:`${p.s.base}: ${r.kind}`} : r;
+      }
+      return {ok:true};
+    },
+    answer:Object.fromEntries(parts.flatMap(p => p.ids.map(id => [id+p.sfx, p.s.answer[id]]))),
+    explain:parts.map(p => p.s.explain).join(" "), work:() => parts.map(p => p.s.work()).join(" &nbsp; ") };
+}
 function statsHTML(){
   return `<span class="ctl badged"><span class="badge on">${save.xp}</span>XP</span><span class="ctl badged"><span class="badge">${save.streak}</span>day${save.streak===1?"":"s"}</span>`;
 }
@@ -1903,7 +1980,7 @@ function practiceHTML(){
   <section class="panel split">
     <div class="col">
     <div class="card">${test ? `<div class="label">${lessonOf(it).title}</div>` : ""}${lessonOf(it).show(it.p)}
-      <div class="work">${st.work.map((w,k)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${k+1}</span>${w.html}</div>`).join("")}</div>
+      <div class="work">${st.work.map((w,k)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${k+1}</span><span class="wl">${w.html}</span></div>`).join("")}</div>
     </div>
     ${s ? `<div class="card"><div class="label">${s.label}</div>
       <div class="ask">${s.ask()}</div>
@@ -1912,11 +1989,12 @@ function practiceHTML(){
     <div class="col">
     ${fb ? `<div class="feedback fb-${fb.type}" role="status"><span class="dot ${dotFor[fb.type]}"></span><span>${fb.html}</span></div>` : ""}
     ${s ? `<div class="tray" style="background:none;padding:0">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-key="${n}">${n}</button>`).join("")}
-      <button data-key="−" aria-label="Negative">−</button><button data-key="0">0</button><button data-key="." aria-label="Decimal point">.</button>
+      ${band() === "little" ? `<span></span><button data-key="0">0</button><span></span>` : `<button data-key="−" aria-label="Negative">−</button><button data-key="0">0</button><button data-key="." aria-label="Decimal point">.</button>`}
       <button data-key="next" class="wide" aria-label="Next box">Next box ⇥</button><button data-key="back" aria-label="Erase">⌫</button></div>
     <div class="actions">
       ${test ? "" : `<button class="ctl badged" data-act="hint" ${st.hintsLeft || st.hinted ? "" : "disabled"}><span class="badge">${st.hintsLeft}</span>Hint${st.hintsLeft === 1 ? "" : "s"}</button>`}
       ${canShow() ? `<button class="ctl" data-act="show">Show me</button>` : ""}
+      ${canSkip() ? `<button class="ctl" data-act="skip">${st.skip ? "Show all steps" : "Skip steps"}</button>` : ""}
       <button class="ctl go" data-act="check">Check</button>
     </div>` : `<div class="actions"><button class="ctl go" data-act="nextprob">${st.i < n-1 ? "Next problem" : test ? "Finish test" : "Finish lesson"}</button></div>`}
     </div>
@@ -1944,7 +2022,7 @@ function startTest(key){
   cur = order[0];
   newRun("test", items, {key, title: kind === "unit" ? `${unit} test` : `${GRADE_NAME[+g]} check-up`, hintsLeft:0});
 }
-function startProblem(){ st.step = 0; st.work = []; st.prob = {wrong:0, hints:0, shown:0, t0:Date.now()}; cur = idx(item().id); loadStep(); }
+function startProblem(){ st.step = 0; st.work = []; st.prob = {wrong:0, hints:0, shown:0, t0:Date.now()}; st.skipThis = true; cur = idx(item().id); loadStep(); }
 
 // a run in progress is saved after every change, so leaving mid-lesson loses nothing
 function saveRun(){
@@ -1975,6 +2053,9 @@ function resumeRun(){
 }
 function loadStep(){
   st.steps = lessonOf(item()).steps(item().p).map((s,k) => ({...s, base:s.label.replace(/^Step \d+ · /,""), label: /^Step /.test(s.label) ? s.label : `Step ${k+1} · ${s.label}`}));
+  if (st.skip && st.skipThis && canSkip() && st.step === 0 && st.steps.length > 1){
+    st.steps = [finalStep(st.steps.slice(-(SKIP_LAST[item().id] || 1)))];
+  }
   st.vals = {};
   st.misses = 0; st.hinted = false; st.lastTry = 0; st.stepT0 = Date.now();
   st.active = slotIds()[0];
@@ -2048,6 +2129,11 @@ function check(){
   const cat = r.generic ? diagnose(s, v) : "concept";
   st.mistakes.push({n:st.i+1, step:st.step+1, label:s.base, id:item().id, typed:typed(v), want:typed(s.answer),
     kind: cat === "concept" ? r.kind : CATS[cat][0], cat, msg: cat === "concept" ? r.msg : CATS[cat][1], rushed});
+  if (s.skipped){ // the shortcut missed: do this one the long way
+    st.skipThis = false; st.pts += 0; st.maxPts++; loadStep();
+    st.feedback = {type:"bad", html:`<strong>Not quite.</strong> Let's do this one step by step.`};
+    return;
+  }
   if (st.mode === "test"){
     st.vals = Object.fromEntries(Object.entries(s.answer).filter(([k,x])=>x!=null).map(([k,x])=>[k, fmt(x)]));
     pass(true);
@@ -2074,7 +2160,7 @@ function pass(shown){
   st.work.push({html:s.work(), shown});
   st.step++;
   if (st.step < st.steps.length){
-    const praise = ["Nice!","Yes!","Exactly.","You got it.","Good thinking."][rand(0,4)];
+    const praise = PRAISE[band()][rand(0,4)];
     const msg = shown ? `Here's how: ${s.explain}` : praise;
     loadStep();
     st.feedback = {type: shown ? "hint" : "good", html:`<strong>${msg}</strong>`};
@@ -2092,6 +2178,8 @@ function pass(shown){
   }
   st.feedback = {type:"good", html: st.mode === "test" ? `<strong>Problem done. +${xp} XP</strong>`
     : shown ? `Here's how: ${s.explain} <br><strong>+${xp} XP.</strong> That one was tricky, and you finished it.${more}`
+    : band() === "little" ? `<span class="pop big">🎉</span> <strong>You solved it! +${xp} XP</strong>${more}`
+    : ["middle","high"].includes(band()) ? `<strong>Solved. +${xp} XP</strong>${clean ? " (no mistakes)" : ""}${more}`
     : `<span class="pop">⭐</span> <strong>Solved! +${xp} XP</strong>${clean ? " (no mistakes bonus)" : ""}${more}`};
 }
 function showMe(){
@@ -2145,7 +2233,7 @@ function reportHTML(rep){
     <div class="probs">${rep.probs.map((pr,k) => { const l = LESSONS[idx(pr.id)]; if (!l) return "";
       const tag = pr.shown ? ["busy", `shown ${pr.shown}×`] : pr.wrong ? ["err", plural(pr.wrong, "mistake")] : pr.hints ? ["busy", plural(pr.hints, "hint")] : ["ok", "no mistakes"];
       return `<details class="card"><summary><span class="badge">${k+1}</span><span class="name">${rep.mode === "test" ? l.title : `Problem ${k+1}`}</span><span class="dot ${tag[0]}"></span><span class="muted">${tag[1]}</span></summary>
-        ${l.show(pr.p)}<div class="work">${pr.work.map((w,j)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${j+1}</span>${w.html}</div>`).join("")}</div></details>`; }).join("")}</div>
+        ${l.show(pr.p)}<div class="work">${pr.work.map((w,j)=>`<div class="workline ${w.shown?"shown":""}"><span class="k">Step ${j+1}</span><span class="wl">${w.html}</span></div>`).join("")}</div></details>`; }).join("")}</div>
   </section>
   <section class="panel">
     <div class="head"><h2>For the grown-up</h2>${scoreChip(rep.level, true)}</div>
@@ -2236,6 +2324,7 @@ document.addEventListener("click", e => {
   else if (t.dataset.act === "show") showMe();
   else if (t.dataset.act === "nextprob") nextProblem();
   else if (t.dataset.act === "resume") resumeRun();
+  else if (t.dataset.act === "skip"){ st.skip = !st.skip; if (st.step === 0 && !st.work.length){ st.skipThis = true; loadStep(); } }
   else return; // a tap on a summary row opens it natively
   render();
 });

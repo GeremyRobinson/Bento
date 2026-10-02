@@ -5,6 +5,7 @@ A Duolingo-style math app for kindergarten through 12th grade, built for an iPad
 ## What's in it
 
 - **Grades K–12** with a grade picker. Grades 5–12 have the full year: 115 lessons grouped into units (fractions, decimals, ratios, integers, equations, functions, geometry, trig, logs, limits, derivatives, integrals and more). K–4 have one lesson each so far. Any lesson can be picked, so she can skip ahead or go back.
+- **A look for each age:** K–2 is the biggest and most playful, with ten frames and base-ten blocks; 3–5 is the original kid-friendly look; 6–8 is calmer; 9–12 is close to plain System One, with "Skip steps" for skills scored 3 or higher.
 - **Works upright or sideways.** Turned sideways, the iPad shows the problem and the number pad side by side.
 - **Short intro cards, then 8 random problems.** The numbers change every time. Each problem with a mistake adds one more like it (up to 12), and a lesson she scored low on last time starts with 10.
 - **Solve by steps:** every problem is split into the steps a teacher would want on paper. Finished steps stay on screen like written work. The number pad has a minus sign and a decimal point.
