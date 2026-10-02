@@ -178,37 +178,50 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .hero.welcome h1{font-size:calc(var(--fs) * 2)}
 
 
-/* ---- welcome: a clean landing page with the grade choice built in ---- */
-.land{max-width:980px;margin:0 auto;display:grid;gap:calc(var(--u) * 2.5);padding:0 4px calc(var(--u) * 2)}
+/* ---- welcome: a landing page that shows what Bento is, with the grade choice built in ---- */
+.land{max-width:1040px;margin:0 auto;display:grid;gap:calc(var(--u) * 2);padding:0 4px calc(var(--u) * 2)}
 .lnav{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);padding:6px 4px 0}
 .lnav b{font:700 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em}
 .lnav span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
-.lhero{position:relative;overflow:hidden;display:grid;justify-items:center;gap:var(--u);text-align:center;padding:calc(var(--u) * 3.5) var(--u) calc(var(--u) * 1.5);animation:rise .7s var(--ease) both}
-.lhero .pat{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;animation:drift 40s linear infinite;
-  -webkit-mask:radial-gradient(ellipse 70% 80% at 50% 45%,#0000 30%,#000 85%);mask:radial-gradient(ellipse 70% 80% at 50% 45%,#0000 30%,#000 85%)}
-.lhero>*:not(.pat){position:relative}
-.lhero h1{font:600 clamp(34px,6vw,56px)/1.08 var(--sans);letter-spacing:-.025em;max-width:14ch;text-wrap:balance}
-.lhero p{max-width:560px;font-size:calc(var(--fs) * 1.05);line-height:1.55;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
-.lsetup{display:grid;justify-items:center;gap:var(--u);text-align:center;background:var(--well);border-radius:var(--r-panel);padding:calc(var(--u) * 1.5) var(--u);animation:rise .7s var(--ease) .1s both}
-.lsetup h2{font-size:calc(var(--fs) * 1.15);font-weight:var(--w-bold)}
-.lsetup .muted{font-size:var(--small)}
-.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 2px;max-width:900px}
-.lg{display:grid;justify-items:center;gap:4px;padding:6px;border-radius:20px;transition:transform .2s var(--spring),background .15s;animation:pop .45s var(--spring) both;animation-delay:calc(.15s + var(--j) * 30ms)}
+.lhero{display:grid;justify-items:center;gap:calc(var(--u) + 4px);text-align:center;padding:calc(var(--u) * 3) var(--u) var(--u);animation:rise .7s var(--ease) both}
+.lhero h1{font:700 clamp(38px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;text-wrap:balance}
+.lhero p{max-width:540px;font-size:calc(var(--fs) * 1.1);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
+.lpick{margin-top:var(--s);display:grid;justify-items:center;gap:10px;background:var(--well);border-radius:var(--r-panel);padding:var(--u) calc(var(--u) - 4px) calc(var(--u) - 4px)}
+.lpick>span{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted);letter-spacing:.01em}
+.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 2px;max-width:900px}
+.lg{padding:4px;border-radius:999px;transition:transform .2s var(--spring),background .15s;animation:pop .45s var(--spring) both;animation-delay:calc(.2s + var(--j) * 30ms)}
 .lg:hover{background:var(--card);transform:translateY(-2px)}
 .lg:active{transform:scale(.94)}
-.lfeats{display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr))}
-.lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) .2s both}
-.lf h3{font-size:var(--fs);font-weight:var(--w-bold)}
+.lsec{display:grid;justify-items:center;gap:6px;text-align:center;padding:calc(var(--u) * 2) var(--u) 0}
+.lsec h2{font:700 clamp(28px,4.5vw,44px)/1.1 var(--sans);letter-spacing:-.03em}
+.lsec p{max-width:520px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.02)}
+.lshots{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.lshots{grid-template-columns:repeat(2,minmax(0,1fr))}.lshot.big{grid-column:1 / -1}}
+@media (min-width:960px){.lshots{grid-template-columns:repeat(3,minmax(0,1fr))}.lshot.big{grid-column:span 2;grid-row:span 2}}
+.lshot{margin:0;background:var(--card);border-radius:var(--r-panel);padding:var(--u);display:grid;grid-template-rows:1fr auto;gap:var(--s);cursor:pointer;box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) both;animation-delay:calc(var(--i) * 60ms)}
+.lshot .viz{align-self:center;align-content:center}
+.lshot .viz-cap,.lshot .replay{display:none}
+.lshot .viz-svg{max-height:220px;width:100%}
+.lshot.big .viz-svg{max-height:440px}
+.lshot figcaption{display:flex;align-items:center;gap:10px;font-weight:var(--w-bold);font-size:calc(var(--fs) * .95);min-width:0}
+.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--tint);font-weight:var(--w-bold)}
+.lpair{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.lpair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule)}
+.lf h3{font-size:calc(var(--fs) * 1.05);font-weight:var(--w-bold)}
 .lf p{color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * .95)}
-.lf.big,.lf.wide{grid-column:1 / -1}
-@media (max-width:519px){.lfeats{grid-template-columns:minmax(0,1fr)}}
-@media (min-width:760px){.lfeats{grid-template-columns:repeat(3,minmax(0,1fr))}.lf.big{grid-column:span 2;grid-row:span 2}.lf.wide{grid-column:auto}}
-.lsteps{margin-top:var(--s);display:grid;gap:6px;max-width:320px;font-family:var(--num)}
-.lsteps .q{font-size:calc(var(--fs) * 1.6);margin-bottom:4px}
-.lsteps>div:not(.q){display:flex;justify-content:space-between;gap:var(--u);padding:8px 14px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
+.lk{font-size:12px;font-weight:var(--w-bold);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
+.lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
+.lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
 .lsteps b{color:var(--tint);font-weight:600}
 .lsteps .sum{background:var(--tint-soft)}
-.lfoot{text-align:center;color:var(--faint);font-size:var(--small);font-weight:var(--w-mid)}
+.lmiss .bad{background:color-mix(in srgb,#ef4444 12%,var(--card))} .lmiss .bad b{color:#dc2626;font-weight:600;text-decoration:line-through 2px}
+.lmiss p{font-family:var(--sans);margin-top:6px;color:var(--text);line-height:1.5}
+.lmiss p b{color:#dc2626}
+.lfeats{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.lfeats{grid-template-columns:repeat(3,minmax(0,1fr))}.lf.wide{grid-column:1 / -1}}
+.lfoot{text-align:center;color:var(--faint);font-size:var(--small);font-weight:var(--w-mid);padding-top:var(--u)}
 /* ---- grade hero ---- */
 .hero{position:relative;overflow:hidden;background:var(--tint-soft);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:var(--u)}
 .hero .pat{position:absolute;inset:0;opacity:.55;pointer-events:none;background-repeat:repeat;animation:drift 40s linear infinite}
@@ -1067,8 +1080,16 @@ function paint(key, nav){
     if (!document.startViewTransition && !reduceMotion()) app.querySelectorAll(":scope > *").forEach((el, i) => { el.classList.add("rise"); el.style.animationDelay = Math.min(i, 6)*50 + "ms"; });
   }
   app.querySelectorAll("[data-count]").forEach(countUp);
+  if (view === "welcome") watchShots(app);
   if (st) st.fx = null;
   if (learnEx) learnEx.fresh = false;
+}
+// landing pictures play when they scroll into view, not before
+function watchShots(app){
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target);
+    const pic = e.target.querySelector(".viz-svg,.rs"); if (pic && e.target.dataset.seen) pic.replaceWith(pic.cloneNode(true)); }), {threshold:.35});
+  app.querySelectorAll(".lshot").forEach(f => { const r = f.getBoundingClientRect(); if (r.top > innerHeight) f.dataset.seen = 1; io.observe(f); });
 }
 function countUp(el){
   const to = +el.dataset.count, pre = el.dataset.pre || "", t0 = performance.now(), dur = 900;
@@ -1176,28 +1197,36 @@ function introPattern(){
     m(24,132,"#ec4899",eq), m(78,146,"#3b82f6",div), m(146,140,"#f2683c",ring)].join("");
   return `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" opacity=".35">${sh}</svg>`)}')`;
 }
+// the landing page: what Bento is, real lesson pictures, and the grade choice built in
+const SHOWCASE = [["g8-pyth", "big", "#3b82f6"], ["g4-equiv", "", "#10b981"], ["g12-tangent", "", "#8b5cf6"], ["g8-translate", "", "#f2683c"], ["g12-defint", "", "#0ea5e9"], ["g8-slope", "", "#ec4899"]];
 function welcomeHTML(){
-  const feat = (cls, h, p, extra = "") => `<article class="lf ${cls}"><h3>${h}</h3><p>${p}</p>${extra}</article>`;
+  const shot = ([id, cls, col], k) => { const l = LESSONS.find(x => x.id === id), g = l.grade;
+    return `<figure class="lshot ${cls}" style="--tint:${col};--acc:#f59e0b;--i:${k}">${VIZ[id]()}<figcaption><span class="lchip">${GRADE_NAME[g].split(" · ")[0]}</span>${l.title}</figcaption></figure>`; };
   return `<div class="land">
-  <nav class="lnav"><b>Bento</b><span>Math, K through 12</span></nav>
-  <section class="lhero"><div class="pat" style="background-image:${introPattern()}"></div>
-    <h1>Learn math, one step at a time.</h1>
-    <p>Bento explains each idea, then has you solve real problems step by step. It spots exactly where a mistake happened and tells you why.</p>
+  <nav class="lnav"><b>Bento</b><span>Kindergarten to 12th grade</span></nav>
+  <section class="lhero">
+    <h1>Math that finally clicks.</h1>
+    <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
+    <div class="lpick"><span>Pick your grade to start</span>
+      <div class="lgrades">${GRADES.map((n, g) => `<button class="lg" data-grade="${g}" style="--tint:${GRADE_COLOR[g]};--j:${g}" aria-label="${GRADE_NAME[g]}">${gradeBadge(g).html}</button>`).join("")}</div></div>
   </section>
-  <section class="lsetup"><h2>Choose your grade to begin</h2>
-    <div class="lgrades">${GRADES.map((n, g) => `<button class="lg" data-grade="${g}" style="--tint:${GRADE_COLOR[g]};--j:${g}" aria-label="${GRADE_NAME[g]}">${gradeBadge(g).html}</button>`).join("")}</div>
-    <p class="muted">Saved on this device. You can switch grades any time.</p>
+  <section class="lsec"><h2>See it first.</h2><p>Every lesson opens with a picture that moves, so the idea makes sense before the numbers show up.</p></section>
+  <section class="lshots">${SHOWCASE.map(shot).join("")}</section>
+  <section class="lsec"><h2>One step at a time.</h2><p>Big problems get split into small moves. Each one is checked the moment you enter it.</p></section>
+  <section class="lpair">
+    <article class="lf"><span class="lk">Solve it</span>
+      <div class="lsteps"><div class="q">47 × 36</div><div><span>47 × 30</span><b>1410</b></div><div><span>47 × 6</span><b>282</b></div><div class="sum"><span>1410 + 282</span><b>1692</b></div></div></article>
+    <article class="lf"><span class="lk">Slip up</span>
+      <div class="lmiss"><div class="q">47 × 6</div><div class="bad"><span>Your answer</span><b>242</b></div>
+      <p><b>You dropped a carry.</b> 7 × 6 is 42, so the 4 carries over. 40 × 6 = 240, plus 42 makes 282.</p></div></article>
   </section>
   <section class="lfeats">
-    ${feat("big", "Solve it step by step", "Every problem is broken into small steps, and each one is checked as you go.",
-      `<div class="lsteps"><div class="q">47 × 36</div><div><span>47 × 30</span><b>1410</b></div><div><span>47 × 6</span><b>282</b></div><div class="sum"><span>1410 + 282</span><b>1692</b></div></div>`)}
-    ${feat("", "Mistakes explained", "Not just “wrong.” Bento names the slip, like a dropped carry or a flipped sign.")}
-    ${feat("", "Help that fades", "Hints and worked steps step back as you get stronger.")}
-    ${feat("", "Daily review", "A few old problems each day, so skills stick.")}
-    ${feat("", "Kindergarten to 12th", "From counting to calculus, with unit tests and check-ups.")}
-    ${feat("wide", "For the grown-up", "A clear report of scores, time and the exact mistakes made, so you know what to work on together.")}
+    <article class="lf"><h3>Help that steps back.</h3><p>Hints and worked steps fade as you get stronger, until it's just you and the problem.</p></article>
+    <article class="lf"><h3>Review that sticks.</h3><p>A few old problems every day, picked from the skills you're shakiest on.</p></article>
+    <article class="lf"><h3>K through 12.</h3><p>Counting to calculus. ${LESSONS.length} lessons, unit tests and a check-up for every grade.</p></article>
+    <article class="lf wide"><h3>A report for your grown-up.</h3><p>Scores, time spent and the exact mistakes made, so everyone knows what to work on next.</p></article>
   </section>
-  <footer class="lfoot">Bento · free, private, no account needed</footer>
+  <footer class="lfoot">Bento · Free. Private. No account needed.</footer>
 </div>`;
 }
 // a soft repeating pattern for each grade's hero, in that grade's colour
@@ -2573,7 +2602,7 @@ function rightTri({a, b, labels = {}, squares = false, angle = null, hl = [], u}
   const A = [0, 0], B = [b*u, 0], C = [0, -a*u]; // right angle at A
   let pts = [A, B, C];
   const sq = (p, q, side) => { // square built outward on segment p→q
-    const dx = q[0] - p[0], dy = q[1] - p[1], nx = dy, ny = -dx; // outward normal for clockwise order
+    const dx = q[0] - p[0], dy = q[1] - p[1], nx = -dy, ny = dx; // outward normal (A→B→C runs counterclockwise on screen)
     return [p, q, [q[0] + nx, q[1] + ny], [p[0] + nx, p[1] + ny]];
   };
   const S = squares ? [sq(C, A), sq(A, B), sq(B, C)] : [];
@@ -2588,9 +2617,10 @@ function rightTri({a, b, labels = {}, squares = false, angle = null, hl = [], u}
   body += P(`M${f(A)} L${f(B)} L${f(C)} Z`, "ln fillsoft a-draw", .1);
   const k = 16; body += `<path d="M${f([0, -k])} L${f([k, -k])} L${f([k, 0])}" class="ax thin a-fade" ${D(.6)}/>`;
   const side = (p, q, txt, i, off, al = "") => { const [mx, my] = mid(p, q); return T(mx + off[0], my + off[1], txt, `lbl ${al} a-rise${hl.includes(i) ? " acc" : ""}`, .8 + i*.25); };
-  if (labels.a) body += side(A, C, labels.a, 0, [-12, 0], "end");
-  if (labels.b) body += side(A, B, labels.b, 1, [0, 20]);
-  if (labels.c) body += side(B, C, labels.c, 2, [10, -12], "start");
+  // with squares drawn outside, the side lengths sit just inside the triangle
+  if (labels.a) body += squares ? side(A, C, labels.a, 0, [12, 0], "start") : side(A, C, labels.a, 0, [-12, 0], "end");
+  if (labels.b) body += side(A, B, labels.b, 1, squares ? [0, -16] : [0, 20]);
+  if (labels.c) body += squares ? side(B, C, labels.c, 2, [-12, 14], "end") : side(B, C, labels.c, 2, [10, -12], "start");
   if (angle){ const r = 34, ang = Math.atan2(a, b);
     body += P(`M${f([b*u - r, 0])} A${r} ${r} 0 0 1 ${f([b*u - r*Math.cos(ang), -r*Math.sin(ang)])}`, "ln2 a-draw", 1.6) + T(b*u - r - 18 - minx, -12 - miny, angle, "lbl acc a-rise", 1.9); }
   hl.forEach((i, j) => { const seg = [[A, C], [A, B], [B, C]][i]; body += P(`M${f(seg[0])} L${f(seg[1])}`, "hlline a-draw", 2.2 + j*.8); });
@@ -3646,6 +3676,7 @@ function goLearn(step){
 document.addEventListener("click", e => {
   if (e.target.dataset && e.target.dataset.close){ sheetOpen = false; return render(); }
   if (e.target.closest(".reveal")){ pulled = null; return render(); }
+  const shot = e.target.closest(".lshot"); if (shot){ const pic = shot.querySelector(".viz-svg,.rs"); if (pic) pic.replaceWith(pic.cloneNode(true)); return; }
   const t = e.target.closest("button"); if (!t || t.disabled) return;
   if (t.dataset.act === "replay"){ const v = t.closest(".viz"), pic = v.querySelector(".viz-svg,.rs"); if (pic) pic.replaceWith(pic.cloneNode(true)); return; }
   if (t.dataset.slot){ st.active = t.dataset.slot; return updateSlots(); }
