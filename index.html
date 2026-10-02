@@ -178,13 +178,37 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .hero.welcome h1{font-size:calc(var(--fs) * 2)}
 
 
-/* ---- welcome: first-run intro ---- */
-.wintro{position:relative;overflow:hidden;border-radius:var(--r-panel);background:var(--tint-soft);min-height:calc(100dvh - 56px);display:grid;place-items:center;padding:calc(var(--u) * 2);text-align:center}
-.wintro .pat{position:absolute;inset:0;opacity:1;pointer-events:none;background-repeat:repeat;animation:drift 40s linear infinite}
-.wintro .wtext{position:relative;display:grid;gap:var(--u);justify-items:center;max-width:560px;animation:rise .7s var(--ease) .1s both}
-.wintro h1{font:600 calc(var(--fs) * 2.4)/1.1 var(--sans);letter-spacing:-.02em;color:var(--text)}
-.wintro p{font-size:calc(var(--fs) * 1.1);line-height:1.5;color:var(--muted);font-weight:var(--w-mid)}
-.wintro .ctl.go{height:52px;padding:0 28px;font-size:calc(var(--fs) * 1.05)}
+/* ---- welcome: a clean landing page with the grade choice built in ---- */
+.land{max-width:980px;margin:0 auto;display:grid;gap:calc(var(--u) * 2.5);padding:0 4px calc(var(--u) * 2)}
+.lnav{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);padding:6px 4px 0}
+.lnav b{font:700 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em}
+.lnav span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
+.lhero{position:relative;overflow:hidden;display:grid;justify-items:center;gap:var(--u);text-align:center;padding:calc(var(--u) * 3.5) var(--u) calc(var(--u) * 1.5);animation:rise .7s var(--ease) both}
+.lhero .pat{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;animation:drift 40s linear infinite;
+  -webkit-mask:radial-gradient(ellipse 70% 80% at 50% 45%,#0000 30%,#000 85%);mask:radial-gradient(ellipse 70% 80% at 50% 45%,#0000 30%,#000 85%)}
+.lhero>*:not(.pat){position:relative}
+.lhero h1{font:600 clamp(34px,6vw,56px)/1.08 var(--sans);letter-spacing:-.025em;max-width:14ch;text-wrap:balance}
+.lhero p{max-width:560px;font-size:calc(var(--fs) * 1.05);line-height:1.55;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
+.lsetup{display:grid;justify-items:center;gap:var(--u);text-align:center;background:var(--well);border-radius:var(--r-panel);padding:calc(var(--u) * 1.5) var(--u);animation:rise .7s var(--ease) .1s both}
+.lsetup h2{font-size:calc(var(--fs) * 1.15);font-weight:var(--w-bold)}
+.lsetup .muted{font-size:var(--small)}
+.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 2px;max-width:900px}
+.lg{display:grid;justify-items:center;gap:4px;padding:6px;border-radius:20px;transition:transform .2s var(--spring),background .15s;animation:pop .45s var(--spring) both;animation-delay:calc(.15s + var(--j) * 30ms)}
+.lg:hover{background:var(--card);transform:translateY(-2px)}
+.lg:active{transform:scale(.94)}
+.lfeats{display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr))}
+.lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) .2s both}
+.lf h3{font-size:var(--fs);font-weight:var(--w-bold)}
+.lf p{color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * .95)}
+.lf.big,.lf.wide{grid-column:1 / -1}
+@media (max-width:519px){.lfeats{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:760px){.lfeats{grid-template-columns:repeat(3,minmax(0,1fr))}.lf.big{grid-column:span 2;grid-row:span 2}.lf.wide{grid-column:auto}}
+.lsteps{margin-top:var(--s);display:grid;gap:6px;max-width:320px;font-family:var(--num)}
+.lsteps .q{font-size:calc(var(--fs) * 1.6);margin-bottom:4px}
+.lsteps>div:not(.q){display:flex;justify-content:space-between;gap:var(--u);padding:8px 14px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
+.lsteps b{color:var(--tint);font-weight:600}
+.lsteps .sum{background:var(--tint-soft)}
+.lfoot{text-align:center;color:var(--faint);font-size:var(--small);font-weight:var(--w-mid)}
 /* ---- grade hero ---- */
 .hero{position:relative;overflow:hidden;background:var(--tint-soft);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:var(--u)}
 .hero .pat{position:absolute;inset:0;opacity:.55;pointer-events:none;background-repeat:repeat;animation:drift 40s linear infinite}
@@ -1153,9 +1177,28 @@ function introPattern(){
   return `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" opacity=".35">${sh}</svg>`)}')`;
 }
 function welcomeHTML(){
-  return `<section class="wintro"><div class="pat" style="background-image:${introPattern()}"></div>
-    <div class="wtext"><h1>Welcome to Bento</h1><p>Math, one step at a time.</p>
-      <button class="ctl go" data-act="grades">Choose your grade</button></div></section>`;
+  const feat = (cls, h, p, extra = "") => `<article class="lf ${cls}"><h3>${h}</h3><p>${p}</p>${extra}</article>`;
+  return `<div class="land">
+  <nav class="lnav"><b>Bento</b><span>Math, K through 12</span></nav>
+  <section class="lhero"><div class="pat" style="background-image:${introPattern()}"></div>
+    <h1>Learn math, one step at a time.</h1>
+    <p>Bento explains each idea, then has you solve real problems step by step. It spots exactly where a mistake happened and tells you why.</p>
+  </section>
+  <section class="lsetup"><h2>Choose your grade to begin</h2>
+    <div class="lgrades">${GRADES.map((n, g) => `<button class="lg" data-grade="${g}" style="--tint:${GRADE_COLOR[g]};--j:${g}" aria-label="${GRADE_NAME[g]}">${gradeBadge(g).html}</button>`).join("")}</div>
+    <p class="muted">Saved on this device. You can switch grades any time.</p>
+  </section>
+  <section class="lfeats">
+    ${feat("big", "Solve it step by step", "Every problem is broken into small steps, and each one is checked as you go.",
+      `<div class="lsteps"><div class="q">47 × 36</div><div><span>47 × 30</span><b>1410</b></div><div><span>47 × 6</span><b>282</b></div><div class="sum"><span>1410 + 282</span><b>1692</b></div></div>`)}
+    ${feat("", "Mistakes explained", "Not just “wrong.” Bento names the slip, like a dropped carry or a flipped sign.")}
+    ${feat("", "Help that fades", "Hints and worked steps step back as you get stronger.")}
+    ${feat("", "Daily review", "A few old problems each day, so skills stick.")}
+    ${feat("", "Kindergarten to 12th", "From counting to calculus, with unit tests and check-ups.")}
+    ${feat("wide", "For the grown-up", "A clear report of scores, time and the exact mistakes made, so you know what to work on together.")}
+  </section>
+  <footer class="lfoot">Bento · free, private, no account needed</footer>
+</div>`;
 }
 // a soft repeating pattern for each grade's hero, in that grade's colour
 function gradePattern(g){
