@@ -1,5 +1,6 @@
 // The number-line family (the current app's numberLine()): ticks, hops, points and highlighted stretches,
-// every position computed from the values. Lessons pass values and beats; this decides all the geometry.
+// every position computed from the values. Lessons pass values and beats; this decides all the geometry,
+// including where labels go so that no two labels shown at the same time overlap.
 import { formatNumber } from "../../../curriculum/schemas/math-text";
 import type { SceneDiagram, SceneItem } from "../scene/schema";
 import { r1 } from "../scene/helpers";
@@ -46,7 +47,7 @@ export interface NumberLineSpec {
   step?: number;
   /** label every n-th tick; default: as often as the labels fit */
   every?: number;
-  /** extra tick values to label even when `every` skips them (e.g. a halfway mark) */
+  /** tick values that are always labelled (e.g. a halfway mark); regular labels that would touch them step aside */
   labelAt?: number[];
   width?: number;
   hops?: Hop[];
@@ -83,6 +84,10 @@ export function fitRange(values: number[], opts: { maxTicks?: number; pad?: numb
   throw new Error("values too far apart for a number line");
 }
 
+type Box = { x: number; y: number; w: number; h: number; from: number; until: number };
+type Arc = { x1: number; x2: number; mx: number; c: number };
+type Draft = SceneItem | (Omit<Extract<SceneItem, { type: "path" }>, "type" | "d"> & { type: "arc"; arc: Arc });
+
 /** Builds the scene. Throws when a value lies off the line, so a lesson can never draw a wrong picture silently. */
 export function buildNumberLine(spec: NumberLineSpec): SceneDiagram {
   const { min, max, step = 1, hops = [], marks = [], spans = [], labelAt = [] } = spec;
@@ -106,29 +111,34 @@ export function buildNumberLine(spec: NumberLineSpec): SceneDiagram {
     every = options.find(k => k * px >= widest + 6) ?? n;
   }
 
-  // vertical room: arcs and labels above, tick numbers and labels below
-  const above = hops.filter(h => !h.below && h.from !== h.to).map(h => hopHeight(x(h.to) - x(h.from)));
-  const belowHops = hops.filter(h => h.below && h.from !== h.to).map(h => hopHeight(x(h.to) - x(h.from)));
-  const topRoom = Math.max(
-    above.length ? Math.max(...above) + 14 + 14 : 0,
-    marks.some(m => m.label) ? 22 + 14 : 0,
-    18,
-  );
-  const y = r1(topRoom + 8);
-  const belowLabelY = (hh: number) => y + Math.max(hh + 16, 44);
-  const spanLabelY = y + 44 + (belowHops.length ? Math.max(...belowHops) + 4 : 0);
-  const bottom = Math.max(
-    y + 22 + 12,
-    belowHops.length ? Math.max(...belowHops.map(belowLabelY)) + 12 : 0,
-    spans.some(s => s.label) ? spanLabelY + 12 : 0,
-  );
+  // Everything is laid out with the axis at height 0 (negative is up), then moved down to fit the canvas.
+  const placed: Box[] = [];
+  const meets = (a: Box, b: Box) => a.from <= b.until && b.from <= a.until
+    && Math.abs(a.x - b.x) < (a.w + b.w) / 2 + 2 && Math.abs(a.y - b.y) < (a.h + b.h) / 2 + 1;
+  const windowOf = (o: { beat: number; until?: number }) => ({ from: o.beat, until: o.until ?? Infinity });
+  const clampX = (cx: number, w: number) => Math.min(W - w / 2 - 2, Math.max(w / 2 + 2, cx));
+  /** finds a free spot for a label, moving away from the line (dir −1 up, +1 down) until nothing is in the way */
+  const place = (s: string, cx: number, y0: number, dir: -1 | 1, size: number, win: { from: number; until: number }) => {
+    const w = textWidth(s, size), h = size + 4;
+    const box: Box = { x: clampX(cx, w), y: y0, w, h, ...win };
+    for (let k = 0; k < 8 && placed.some(o => meets(o, box)); k++) box.y += dir * (h + 2);
+    placed.push(box);
+    return box;
+  };
 
-  const items: SceneItem[] = [{ type: "line", x1: 16, y1: y, x2: W - 16, y2: y, cls: "ax", enter: "fade" }];
-  const labelled = new Set(labelAt.map(v => Math.round((v - min) / step)));
+  const raw: Draft[] = [{ type: "line", x1: 16, y1: 0, x2: W - 16, y2: 0, cls: "ax", enter: "fade" }];
+  const forced = labelAt.map(v => Math.round((v - min) / step)).filter(i => i >= 0 && i <= n);
+  const clash = (i: number, j: number) => Math.abs(i - j) * px < (textWidth(tickLabel(i)) + textWidth(tickLabel(j))) / 2 + 4;
+  // regular labels sit on round values (multiples of every × step), not just every n-th tick from the left end
+  const first = Math.round(min / step);
+  const shown = (i: number) => forced.includes(i) || ((((first + i) % every) + every) % every === 0 && !forced.some(j => clash(i, j)));
   for (let i = 0; i <= n; i++) {
-    const xv = r1(x(min + i * step));
-    items.push({ type: "line", x1: xv, y1: y - 6, x2: xv, y2: y + 6, cls: "tk", enter: "fade", delay: r1(i * 0.02 * Math.min(1, 24 / n)) });
-    if (i % every === 0 || labelled.has(i)) items.push({ type: "text", x: xv, y: y + 22, text: tickLabel(i), cls: "sm", enter: "fade", delay: r1(i * 0.02 * Math.min(1, 24 / n)) });
+    const xv = r1(x(min + i * step)), delay = r1(i * 0.02 * Math.min(1, 24 / n));
+    raw.push({ type: "line", x1: xv, y1: -6, x2: xv, y2: 6, cls: "tk", enter: "fade", delay });
+    if (shown(i)) {
+      placed.push({ x: xv, y: 22, w: textWidth(tickLabel(i)), h: 18, from: 0, until: Infinity });
+      raw.push({ type: "text", x: xv, y: 22, text: tickLabel(i), cls: "sm", enter: "fade", delay });
+    }
   }
   const timing = (o: { beat: number; until?: number; delay?: number }, extra = 0) => ({
     from: o.beat,
@@ -136,24 +146,60 @@ export function buildNumberLine(spec: NumberLineSpec): SceneDiagram {
     ...(o.delay != null || extra ? { delay: r1((o.delay ?? 0) + extra) } : {}),
   });
 
-  for (const s of spans) {
-    items.push({ type: "line", x1: r1(x(s.from)), y1: y, x2: r1(x(s.to)), y2: y, cls: "hl", enter: "growx", ...timing(s) });
-    if (s.label) items.push({ type: "text", x: r1((x(s.from) + x(s.to)) / 2), y: r1(spanLabelY), text: s.label, cls: "lbl acc", enter: "rise", ...timing(s, 0.3) });
-  }
+  // hops: arcs and dots, then labels; in a run of short hops a label that would hit its neighbour's is left off
+  const hopLabels: Box[] = [];
   for (const h of hops) {
     if (h.from === h.to) continue;
-    const x1 = x(h.from), x2 = x(h.to), hh = hopHeight(x2 - x1) * (h.below ? -1 : 1), mx = (x1 + x2) / 2;
-    if (h.start !== false) items.push({ type: "circle", cx: r1(x1), cy: y, r: 7, cls: "dotp", enter: "pop", ...timing(h) });
-    items.push({ type: "path", d: `M${r1(x1)} ${y} Q${r1(mx)} ${r1(y - hh * 2)} ${r1(x2)} ${y}`, cls: h.below ? "ln2" : "ln", enter: "draw", ...timing(h, 0.1) });
-    if (h.label) {
-      const ly = h.below ? belowLabelY(-hh) : y - hh - 14;
-      items.push({ type: "text", x: r1(mx), y: r1(ly), text: h.label, cls: h.below ? "lbl acc" : "lbl", enter: "rise", ...timing(h, 0.35) });
-    }
-    if (h.land !== false) items.push({ type: "circle", cx: r1(x2), cy: y, r: 7, cls: h.below ? "dota" : "dotp", enter: "pop", ...timing(h, 0.55) });
+    const x1 = x(h.from), x2 = x(h.to), hh = hopHeight(x2 - x1), mx = (x1 + x2) / 2, dir = h.below ? 1 : -1;
+    if (h.start !== false) raw.push({ type: "circle", cx: r1(x1), cy: 0, r: 7, cls: "dotp", enter: "pop", ...timing(h) });
+    raw.push({ type: "arc", arc: { x1, x2, mx, c: dir * hh * 2 }, cls: h.below ? "ln2" : "ln", enter: "draw", ...timing(h, 0.1) });
+    if (h.land !== false) raw.push({ type: "circle", cx: r1(x2), cy: 0, r: 7, cls: h.below ? "dota" : "dotp", enter: "pop", ...timing(h, 0.55) });
+    if (!h.label) continue;
+    const w = textWidth(h.label, 17), ly = h.below ? Math.max(hh + 16, 44) : -hh - 14;
+    const probe: Box = { x: clampX(mx, w), y: ly, w, h: 60, ...windowOf(h) };
+    if (hopLabels.some(o => meets(o, probe))) continue;
+    const box = place(h.label, mx, ly, h.below ? 1 : -1, 17, windowOf(h));
+    hopLabels.push(box);
+    raw.push({ type: "text", x: r1(box.x), y: r1(box.y), text: h.label, cls: h.below ? "lbl acc" : "lbl", enter: "rise", ...timing(h, 0.35) });
+  }
+  // span labels go under the tick numbers, and under any arcs below the line
+  const belowDepth = Math.max(0, ...hops.filter(h => h.below && h.from !== h.to).map(h => Math.max(hopHeight(x(h.to) - x(h.from)) + 16, 44) + 22));
+  for (const s of spans) {
+    raw.push({ type: "line", x1: r1(x(s.from)), y1: 0, x2: r1(x(s.to)), y2: 0, cls: "hl", enter: "growx", ...timing(s) });
+    if (!s.label) continue;
+    const box = place(s.label, (x(s.from) + x(s.to)) / 2, Math.max(44, belowDepth), 1, 17, windowOf(s));
+    raw.push({ type: "text", x: r1(box.x), y: r1(box.y), text: s.label, cls: "lbl acc", enter: "rise", ...timing(s, 0.3) });
   }
   for (const m of marks) {
-    items.push({ type: "circle", cx: r1(x(m.v)), cy: y, r: 7, cls: m.cls ?? "dotp", enter: "pop", ...timing(m) });
-    if (m.label) items.push({ type: "text", x: r1(x(m.v)), y: r1(y - 22), text: m.label, cls: "lbl", enter: "rise", ...timing(m, 0.2) });
+    raw.push({ type: "circle", cx: r1(x(m.v)), cy: 0, r: 7, cls: m.cls ?? "dotp", enter: "pop", ...timing(m) });
+    if (!m.label) continue;
+    const box = place(m.label, x(m.v), -22, -1, 17, windowOf(m));
+    raw.push({ type: "text", x: r1(box.x), y: r1(box.y), text: m.label, cls: "lbl", enter: "rise", ...timing(m, 0.2) });
   }
-  return { kind: "scene", family: "number-line", width: W, height: r1(bottom), items, alt: spec.alt };
+
+  // fit the canvas around everything: an arc reaches half its control height, a label half its size
+  const extent = (it: Draft): [number, number] => {
+    switch (it.type) {
+      case "arc": return [Math.min(0, it.arc.c / 2), Math.max(0, it.arc.c / 2)];
+      case "text": return [it.y - 11, it.y + 11];
+      case "circle": return [it.cy - it.r, it.cy + it.r];
+      case "line": return [Math.min(it.y1, it.y2), Math.max(it.y1, it.y2)];
+      default: return [0, 0];
+    }
+  };
+  const top = Math.min(...raw.map(it => extent(it)[0])), bottom = Math.max(...raw.map(it => extent(it)[1]));
+  const dy = r1(12 - top);
+  const items: SceneItem[] = raw.map((it): SceneItem => {
+    switch (it.type) {
+      case "arc": {
+        const { arc, type: _t, ...rest } = it;
+        return { ...rest, type: "path", d: `M${r1(arc.x1)} ${dy} Q${r1(arc.mx)} ${r1(dy + arc.c)} ${r1(arc.x2)} ${dy}` };
+      }
+      case "line": return { ...it, y1: r1(it.y1 + dy), y2: r1(it.y2 + dy) };
+      case "circle": return { ...it, cy: r1(it.cy + dy) };
+      case "text": return { ...it, y: r1(it.y + dy) };
+      default: return it;
+    }
+  });
+  return { kind: "scene", family: "number-line", width: W, height: r1(bottom - top + 24), items, alt: spec.alt };
 }
