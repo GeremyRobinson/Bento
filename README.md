@@ -2,7 +2,7 @@
 
 Bento is a Duolingo-style math app for kindergarten through 12th grade, built for an iPad. She solves each problem one step at a time instead of on paper, and the app explains the specific mistake when a step is wrong.
 
-**Live app:** https://geremyrobinson.github.io/Bento/ (repo: https://github.com/GeremyRobinson/Bento)
+**Live app:** https://geremyrobinson.github.io/bento/ (repo: https://github.com/GeremyRobinson/bento)
 
 ## What's in it
 
