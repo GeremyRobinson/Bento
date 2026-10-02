@@ -2,6 +2,8 @@
 
 Bento is a Duolingo-style math app for kindergarten through 12th grade, built for an iPad. She solves each problem one step at a time instead of on paper, and the app explains the specific mistake when a step is wrong.
 
+**Live app:** https://geremyrobinson.github.io/Bento/ (repo: https://github.com/GeremyRobinson/Bento)
+
 ## What's in it
 
 - **Grades K–12** with a grade picker. Grades 5–12 have the full year: 115 lessons grouped into units (fractions, decimals, ratios, integers, equations, functions, geometry, trig, logs, limits, derivatives, integrals and more). 4th grade has 8 lessons across whole numbers, fractions, decimals and measurement; K–3 have one lesson each so far. Any lesson can be picked, so she can skip ahead or go back.
