@@ -1,4 +1,4 @@
-# Step-by-Step Math: plan
+# Mathbook: plan
 
 A Duolingo-style math app for kindergarten through 12th grade, built around solving problems one step at a time instead of on paper. Her starting point is 5th grade; a grade picker on the home screen switches grades.
 
