@@ -1,0 +1,23 @@
+/* One motion language. Everything here is switched off under reduced motion (see the end of the file). */
+/* ---- motion ---- */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes popIn{from{opacity:0;transform:scale(.4)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes enter{from{opacity:0;transform:translateY(-8px)}}
+@keyframes glow{0%{background:color-mix(in srgb,var(--ok) 30%,transparent)}100%{background:transparent}}
+.rise{animation:rise .5s var(--ease) both}
+.pop{display:inline-block;animation:pop .45s var(--spring) both}
+.pop.big{font-size:44px;line-height:1}
+.shake{animation:shake .4s ease}
+.enter{animation:enter .45s var(--ease) both}
+.workline.enter{animation:enter .45s var(--ease) both, glow 1.2s ease .2s}
+::view-transition-old(root){animation:.22s ease both vtOut}
+::view-transition-new(root){animation:.38s var(--ease) both vtIn}
+@keyframes vtOut{to{opacity:0;transform:scale(.99)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(10px)}}
+:root[data-dir="fwd"]::view-transition-new(root){animation-name:vtFwd} :root[data-dir="back"]::view-transition-new(root){animation-name:vtBack}
+@keyframes vtFwd{from{opacity:0;transform:translateX(28px)}} @keyframes vtBack{from{opacity:0;transform:translateX(-28px)}}
+
+@media (prefers-reduced-motion:reduce){ *,::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){transition:none!important;animation:none!important} .a-outsoon,.a-flash:not(:last-of-type){opacity:0} .a-move{transform:translateX(var(--dx))} .viz-svg .bar.mid{fill:var(--acc)} }

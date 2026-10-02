@@ -1,0 +1,2100 @@
+[
+ {
+  "id": "k-add",
+  "grade": 0,
+  "unit": "Skills",
+  "title": "Adding within 10",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Count on",
+    "text": "3 + 2● ● ●+● ● Count the first group: 3. Then keep counting for each dot in the second group: 4, 5. So 3 + 2 = 5."
+   }
+  ]
+ },
+ {
+  "id": "g1-ten",
+  "grade": 1,
+  "unit": "Skills",
+  "title": "Make a ten to add",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Make a ten first",
+    "text": "8 + 58 needs 2 more to make 10. Break 5 into 2 and 3. Now it's 10 + 3 = 13. Tens are easy to add!"
+   }
+  ]
+ },
+ {
+  "id": "g2-regroup",
+  "grade": 2,
+  "unit": "Skills",
+  "title": "Adding with regrouping",
+  "pre": null,
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Carry the ten",
+    "text": "47 + 38Ones first: 7 + 8 = 15. That's 1 ten and 5 ones. Write 5 and carry the 1 to the tens.Tens: 4 + 3 + 1 = 8. The answer is 85."
+   }
+  ]
+ },
+ {
+  "id": "g3-split",
+  "grade": 3,
+  "unit": "Skills",
+  "title": "Multiply by breaking apart",
+  "pre": null,
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Break a hard fact apart",
+    "text": "7 × 88 is 5 + 3. So 7 × 8 is 7 × 5 plus 7 × 3.35 + 21 = 56."
+   }
+  ]
+ },
+ {
+  "id": "g4-partial",
+  "grade": 4,
+  "unit": "Whole numbers",
+  "title": "Multiply big numbers",
+  "pre": "g3-split",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply one place at a time",
+    "text": "346 × 7346 is 300 + 40 + 6. Multiply each part by 7: 2100, 280 and 42. Then add: 2422."
+   }
+  ]
+ },
+ {
+  "id": "g4-divide",
+  "grade": 4,
+  "unit": "Whole numbers",
+  "title": "Dividing with remainders",
+  "pre": null,
+  "story": true,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Share, then see what's left",
+    "text": "75 ÷ 44 × 10 = 40 fits, leaving 35. 4 × 8 = 32 fits in 35, leaving 3.So 75 ÷ 4 = 18 with 3 left over: 18 R 3."
+   }
+  ]
+ },
+ {
+  "id": "g4-equiv",
+  "grade": 4,
+  "unit": "Fractions",
+  "title": "Equivalent fractions",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Same amount, smaller pieces",
+    "text": "(1)/(2) = (2)/(4) = (4)/(8)Cut every piece in 2 and you get twice as many pieces, each half as big.So multiply the top and the bottom by the same number."
+   }
+  ]
+ },
+ {
+  "id": "g4-likefrac",
+  "grade": 4,
+  "unit": "Fractions",
+  "title": "Adding like fractions",
+  "pre": "g4-equiv",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Same pieces: add the tops",
+    "text": "(2)/(8) + (3)/(8) = (5)/(8)2 eighths and 3 eighths make 5 eighths.The bottom tells the size of the pieces, so it stays the same."
+   }
+  ]
+ },
+ {
+  "id": "g4-fracwhole",
+  "grade": 4,
+  "unit": "Fractions",
+  "title": "Fraction times a whole number",
+  "pre": null,
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Groups of pieces",
+    "text": "3 × (2)/(5) = (6)/(5)3 groups of 2 fifths is 6 fifths.6 fifths is more than one whole: 1 (1)/(5)."
+   }
+  ]
+ },
+ {
+  "id": "g4-dec",
+  "grade": 4,
+  "unit": "Decimals",
+  "title": "Tenths and hundredths",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Make the pieces match",
+    "text": "(3)/(10) + (25)/(100)(3)/(10) is the same as (30)/(100). Then 30 + 25 = 55 hundredths.55 hundredths is written 0.55."
+   }
+  ]
+ },
+ {
+  "id": "g4-area",
+  "grade": 4,
+  "unit": "Measurement",
+  "title": "Area and perimeter",
+  "pre": null,
+  "story": false,
+  "final": [
+   0,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Inside and around",
+    "text": "5 m by 3 mArea counts the squares inside: 5 × 3 = 15 square meters.Perimeter walks around the edge: 5 + 3 + 5 + 3 = 16 meters."
+   }
+  ]
+ },
+ {
+  "id": "g4-angles",
+  "grade": 4,
+  "unit": "Measurement",
+  "title": "Angles add up",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Angle parts add up",
+    "text": "35° + ? = 90°A right angle is 90°. If one part is 35°, the other part is 90 − 35 = 55°.A straight line is 180°."
+   }
+  ]
+ },
+ {
+  "id": "g5-mult2",
+  "grade": 5,
+  "unit": "Whole numbers",
+  "title": "Multiply two-digit numbers",
+  "pre": "g4-partial",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Split the second number",
+    "text": "47 × 3636 is 30 + 6. Multiply 47 × 30 = 1410 and 47 × 6 = 282.Then add them: 1410 + 282 = 1692."
+   }
+  ]
+ },
+ {
+  "id": "g5-divide",
+  "grade": 5,
+  "unit": "Whole numbers",
+  "title": "Long division",
+  "pre": "g4-divide",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Divide in chunks",
+    "text": "864 ÷ 12How many tens of 12 fit? 12 × 70 = 840. That leaves 864 − 840 = 24.24 ÷ 12 = 2. So the answer is 70 + 2 = 72."
+   }
+  ]
+ },
+ {
+  "id": "g5-order",
+  "grade": 5,
+  "unit": "Whole numbers",
+  "title": "Order of operations",
+  "pre": "g5-mult2",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Parentheses, then × and ÷, then + and −",
+    "text": "3 + 4 × (6 − 2)Parentheses first: 6 − 2 = 4. Then multiply: 4 × 4 = 16. Then add: 3 + 16 = 19.Going left to right would give 28, which is wrong."
+   }
+  ]
+ },
+ {
+  "id": "g5-pow10",
+  "grade": 5,
+  "unit": "Decimals",
+  "title": "Multiply by 10, 100, 1000",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Each zero moves the point",
+    "text": "3.47 × 100 = 347100 has two zeros, so the decimal point moves two places to the right.Multiplying by 10, 100 or 1000 always makes the number bigger."
+   }
+  ]
+ },
+ {
+  "id": "g5-round",
+  "grade": 5,
+  "unit": "Decimals",
+  "title": "Rounding decimals",
+  "pre": "g4-dec",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Look one place to the right",
+    "text": "3.476 ≈ 3.48To round to the nearest hundredth, look at the thousandths digit: 6.6 is 5 or more, so the 7 goes up to 8."
+   }
+  ]
+ },
+ {
+  "id": "g5-adddec",
+  "grade": 5,
+  "unit": "Decimals",
+  "title": "Adding decimals",
+  "pre": "g4-dec",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Line up the decimal points",
+    "text": "12.5 + 3.75Write 12.5 as 12.50 so both numbers have hundredths.Whole parts: 12 + 3 = 15. Decimal parts: 0.50 + 0.75 = 1.25. Total: 16.25."
+   }
+  ]
+ },
+ {
+  "id": "g5-multdec",
+  "grade": 5,
+  "unit": "Decimals",
+  "title": "Multiplying decimals",
+  "pre": "g5-mult2",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply, then place the point",
+    "text": "2.4 × 0.324 × 3 = 72. There are 2 decimal places in all, so the answer is 0.72."
+   }
+  ]
+ },
+ {
+  "id": "g5-divdec",
+  "grade": 5,
+  "unit": "Decimals",
+  "title": "Dividing by a decimal",
+  "pre": "g5-divide",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Make the divisor a whole number",
+    "text": "4.8 ÷ 0.6Multiply both numbers by 10: 48 ÷ 6. That's 8.Moving both points the same way doesn't change the answer."
+   }
+  ]
+ },
+ {
+  "id": "add",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Adding fractions",
+  "pre": "g4-likefrac",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Why can't we just add the bottoms?",
+    "text": "(1)/(2) + (1)/(3) One halfOne third The bottom number tells you the size of the pieces. Halves and thirds are different sizes, so we can't add them yet.And 2/5 is wrong: it's less than one half!"
+   },
+   {
+    "h": "Cut them into same size pieces",
+    "text": "1/2 = 3/61/3 = 2/6 Find the smallest number both bottoms go into. 2 and 3 both go into 6. That's the least common denominator. To turn halves into sixths we multiply the bottom by 3, so we multiply the top by 3 too."
+   },
+   {
+    "h": "Now add the tops",
+    "text": "(3)/(6) + (2)/(6) = (5)/(6) Same size pieces: 3 sixths + 2 sixths = 5 sixths. The bottom stays 6. Every problem goes in 5 steps: find the LCD, rewrite the first, rewrite the second, add, simplify. Your finished steps stay on the page like written work."
+   }
+  ]
+ },
+ {
+  "id": "sub",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Subtracting fractions",
+  "pre": "g4-likefrac",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Subtracting works the same way",
+    "text": "(1)/(2) − (1)/(3) 1/2 = 3/61/3 = 2/6 Before we can take away, the pieces have to be the same size. Find the least common denominator, 6, and rewrite both fractions."
+   },
+   {
+    "h": "Take away the tops",
+    "text": "(3)/(6) − (2)/(6) = (1)/(6) 3 sixths take away 2 sixths leaves 1 sixth. The bottom stays 6. Never subtract the bottoms: 6 − 6 would make 0, and you can't cut something into 0 pieces."
+   }
+  ]
+ },
+ {
+  "id": "mix",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Adding and subtracting",
+  "pre": "add",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Watch the sign",
+    "text": "(2)/(3) + (1)/(4) (2)/(3) − (1)/(4) This lesson mixes plus and minus problems. The first three steps are exactly the same. At step 4, look at the sign before you add or take away."
+   }
+  ]
+ },
+ {
+  "id": "g5-multfrac",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Multiplying fractions",
+  "pre": "g4-fracwhole",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Top times top, bottom times bottom",
+    "text": "(2)/(3) × (3)/(4) = (6)/(12) = (1)/(2)Multiply the tops and the bottoms. Then simplify."
+   }
+  ]
+ },
+ {
+  "id": "g5-improper",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Mixed numbers to fractions",
+  "pre": "g4-equiv",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Count all the pieces",
+    "text": "2 (3)/(4) = (11)/(4)Each whole is 4 fourths, so 2 wholes are 8 fourths. Add the 3 extra: 11 fourths."
+   }
+  ]
+ },
+ {
+  "id": "g5-fracof",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Fraction of a number",
+  "pre": "g4-fracwhole",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Divide by the bottom, multiply by the top",
+    "text": "(3)/(4) of 20Split 20 into 4 equal groups: 5 each. Take 3 groups: 15."
+   }
+  ]
+ },
+ {
+  "id": "g5-unitdiv",
+  "grade": 5,
+  "unit": "Fractions",
+  "title": "Dividing by a unit fraction",
+  "pre": "g5-fracof",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "How many pieces fit?",
+    "text": "3 ÷ (1)/(4) = 12Each whole holds 4 fourths, so 3 wholes hold 12 fourths."
+   }
+  ]
+ },
+ {
+  "id": "g5-volume",
+  "grade": 5,
+  "unit": "Measurement",
+  "title": "Volume of a box",
+  "pre": "g4-area",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Volume = length × width × height",
+    "text": "4 × 3 × 2 = 24The bottom layer has 4 × 3 = 12 cubes. There are 2 layers, so 24 cubes."
+   }
+  ]
+ },
+ {
+  "id": "g5-units",
+  "grade": 5,
+  "unit": "Measurement",
+  "title": "Converting units",
+  "pre": null,
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Big to small: multiply",
+    "text": "3 feet = 36 inches1 foot is 12 inches, so 3 feet is 3 × 12 = 36 inches."
+   }
+  ]
+ },
+ {
+  "id": "g6-ratio",
+  "grade": 6,
+  "unit": "Ratios and percents",
+  "title": "Equivalent ratios",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply both parts the same",
+    "text": "2 : 3 = 8 : 123 × 4 = 12, so multiply the 2 by 4 too: 8."
+   }
+  ]
+ },
+ {
+  "id": "g6-rate",
+  "grade": 6,
+  "unit": "Ratios and percents",
+  "title": "Unit rates",
+  "pre": "g5-divide",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Find the cost of one first",
+    "text": "4 apples cost $12One apple costs $12 ÷ 4 = $3. So 7 apples cost 7 × $3 = $21."
+   }
+  ]
+ },
+ {
+  "id": "g6-pctof",
+  "grade": 6,
+  "unit": "Ratios and percents",
+  "title": "Percent of a number",
+  "pre": "g5-fracof",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Start from 10%",
+    "text": "30% of 8010% of 80 is 8. 30% is three of those: 24."
+   }
+  ]
+ },
+ {
+  "id": "g6-pctwhole",
+  "grade": 6,
+  "unit": "Ratios and percents",
+  "title": "Find the whole",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Count up to 100%",
+    "text": "15 is 25% of ?25% four times makes 100%. So the whole is 15 × 4 = 60."
+   }
+  ]
+ },
+ {
+  "id": "g6-divide",
+  "grade": 6,
+  "unit": "Number system",
+  "title": "Dividing fractions",
+  "pre": "g5-multfrac",
+  "story": true,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Keep, change, flip",
+    "text": "(2)/(3) ÷ (1)/(4) = (2)/(3) × (4)/(1) = (8)/(3)Keep the first fraction, change ÷ to ×, and flip the second fraction. Then multiply and simplify: (8)/(3) = 2 (2)/(3)."
+   }
+  ]
+ },
+ {
+  "id": "g6-gcf",
+  "grade": 6,
+  "unit": "Number system",
+  "title": "Factor out the GCF",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Pull out the biggest shared factor",
+    "text": "24 + 36 = 12(2 + 3)12 is the biggest number that divides both. 24 ÷ 12 = 2 and 36 ÷ 12 = 3."
+   }
+  ]
+ },
+ {
+  "id": "g6-lcm",
+  "grade": 6,
+  "unit": "Number system",
+  "title": "Least common multiple",
+  "pre": null,
+  "story": false,
+  "final": [
+   0
+  ],
+  "learn": [
+   {
+    "h": "The first number both go into",
+    "text": "LCM(4, 6) = 12Count by 6s: 6, 12. 4 goes into 12, so the LCM is 12."
+   }
+  ]
+ },
+ {
+  "id": "g6-numline",
+  "grade": 6,
+  "unit": "Number system",
+  "title": "Distance on a number line",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Cross zero, add the distances",
+    "text": "−3 to 5 is 8 apartFrom −3 to 0 is 3 steps. From 0 to 5 is 5 steps. 3 + 5 = 8."
+   }
+  ]
+ },
+ {
+  "id": "g6-expo",
+  "grade": 6,
+  "unit": "Expressions and equations",
+  "title": "Exponents and order",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Exponents come before × and +",
+    "text": "2³ + 4 × 32³ = 2 × 2 × 2 = 8. Then 4 × 3 = 12. Then 8 + 12 = 20."
+   }
+  ]
+ },
+ {
+  "id": "g6-eval",
+  "grade": 6,
+  "unit": "Expressions and equations",
+  "title": "Evaluate expressions",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Swap in the numbers",
+    "text": "3x + 2y, x = 4, y = 53 × 4 = 12 and 2 × 5 = 10. So 3x + 2y = 22."
+   }
+  ]
+ },
+ {
+  "id": "g6-onestep",
+  "grade": 6,
+  "unit": "Expressions and equations",
+  "title": "One-step equations",
+  "pre": "g5-order",
+  "story": false,
+  "final": [
+   0
+  ],
+  "learn": [
+   {
+    "h": "Do the opposite",
+    "text": "x + 7 = 15To undo + 7, subtract 7 from both sides: x = 8.Check: 8 + 7 = 15. ✓"
+   }
+  ]
+ },
+ {
+  "id": "g6-tri",
+  "grade": 6,
+  "unit": "Geometry",
+  "title": "Area of a triangle",
+  "pre": "g4-area",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Half a rectangle",
+    "text": "base 6, height 46 × 4 = 24 for the whole rectangle. The triangle is half: 12."
+   }
+  ]
+ },
+ {
+  "id": "g6-trap",
+  "grade": 6,
+  "unit": "Geometry",
+  "title": "Area of a trapezoid",
+  "pre": "g6-tri",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Average the bases",
+    "text": "bases 4 and 8, height 54 + 8 = 12. 12 × 5 = 60. Half of that: 30."
+   }
+  ]
+ },
+ {
+  "id": "g6-mean",
+  "grade": 6,
+  "unit": "Statistics",
+  "title": "Find the mean",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Share it out equally",
+    "text": "4, 6, 84 + 6 + 8 = 18. There are 3 numbers. 18 ÷ 3 = 6."
+   }
+  ]
+ },
+ {
+  "id": "g7-prop",
+  "grade": 7,
+  "unit": "Proportions and percents",
+  "title": "Solve a proportion",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Cross multiply, then divide",
+    "text": "(3)/(4) = (x)/(20)3 × 20 = 60. Then x = 60 ÷ 4 = 15."
+   }
+  ]
+ },
+ {
+  "id": "g7-scale",
+  "grade": 7,
+  "unit": "Proportions and percents",
+  "title": "Scale drawings",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Count the groups",
+    "text": "2 cm = 5 km, 8 cm = ?8 cm is 4 groups of 2 cm. 4 × 5 = 20 km."
+   }
+  ]
+ },
+ {
+  "id": "g7-discount",
+  "grade": 7,
+  "unit": "Proportions and percents",
+  "title": "Discounts, tax and tips",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Find the percent, then add or subtract",
+    "text": "$80, 25% off25% of $80 is $20. The sale price is $80 − $20 = $60."
+   }
+  ]
+ },
+ {
+  "id": "g7-pctchange",
+  "grade": 7,
+  "unit": "Proportions and percents",
+  "title": "Percent change",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Change ÷ original",
+    "text": "50 → 65The change is 15. 15 ÷ 50 = 0.3, which is 30%."
+   }
+  ]
+ },
+ {
+  "id": "g7-addint",
+  "grade": 7,
+  "unit": "Integers",
+  "title": "Adding integers",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Sizes and signs",
+    "text": "−7 + 12Different signs: 12 − 7 = 5. 12 is farther from 0 and it's positive, so the answer is 5.−4 + (−6): same signs, add: −10."
+   }
+  ]
+ },
+ {
+  "id": "g7-subint",
+  "grade": 7,
+  "unit": "Integers",
+  "title": "Subtracting integers",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Subtracting is adding the opposite",
+    "text": "5 − (−3) = 5 + 3 = 8Change − to + and flip the sign of the second number."
+   }
+  ]
+ },
+ {
+  "id": "g7-mulint",
+  "grade": 7,
+  "unit": "Integers",
+  "title": "Multiplying and dividing integers",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Same signs: positive. Different: negative.",
+    "text": "−6 × 4 = −246 × 4 = 24. The signs are different, so the answer is negative.−6 × −4 = 24, because the signs match."
+   }
+  ]
+ },
+ {
+  "id": "g7-eq",
+  "grade": 7,
+  "unit": "Expressions and equations",
+  "title": "Two-step equations",
+  "pre": "g6-onestep",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Undo in reverse order",
+    "text": "3x + 5 = 20Undo the + 5 first by subtracting 5 from both sides: 3x = 15.Then undo the × 3 by dividing both sides by 3: x = 5."
+   }
+  ]
+ },
+ {
+  "id": "g7-distribute",
+  "grade": 7,
+  "unit": "Expressions and equations",
+  "title": "Distribute and combine",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply everything inside",
+    "text": "3(x + 4) + 2x3 × x = 3x and 3 × 4 = 12. Then 3x + 2x = 5x.So it's 5x + 12."
+   }
+  ]
+ },
+ {
+  "id": "g7-circum",
+  "grade": 7,
+  "unit": "Geometry",
+  "title": "Circumference",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "C = π × d",
+    "text": "radius 5The diameter is 10. 10 × 3.14 = 31.4."
+   }
+  ]
+ },
+ {
+  "id": "g7-circarea",
+  "grade": 7,
+  "unit": "Geometry",
+  "title": "Area of a circle",
+  "pre": "g6-expo",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A = π × r × r",
+    "text": "radius 33 × 3 = 9. 9 × 3.14 = 28.26."
+   }
+  ]
+ },
+ {
+  "id": "g7-angles",
+  "grade": 7,
+  "unit": "Geometry",
+  "title": "Complementary and supplementary",
+  "pre": "g4-angles",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "90 or 180",
+    "text": "35° and ?, supplementarySupplementary angles make 180°. 180 − 35 = 145°."
+   }
+  ]
+ },
+ {
+  "id": "g7-prob",
+  "grade": 7,
+  "unit": "Probability",
+  "title": "Probability",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Winners over everything",
+    "text": "3 red, 5 blue3 of the 8 marbles are red, so P(red) = 3/8."
+   }
+  ]
+ },
+ {
+  "id": "g8-exp",
+  "grade": 8,
+  "unit": "Exponents and roots",
+  "title": "Exponent rules",
+  "pre": null,
+  "story": false,
+  "final": [
+   0
+  ],
+  "learn": [
+   {
+    "h": "Three exponent rules",
+    "text": "x² · x³ = x⁵Multiply: add the exponents. Divide: subtract them. Power of a power: multiply them."
+   }
+  ]
+ },
+ {
+  "id": "g8-sci",
+  "grade": 8,
+  "unit": "Exponents and roots",
+  "title": "Scientific notation",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A number from 1 to 10, times a power of 10",
+    "text": "45,000 = 4.5 × 10⁴Move the point after the 4: it moves 4 places. So 4.5 × 10⁴."
+   }
+  ]
+ },
+ {
+  "id": "g8-roots",
+  "grade": 8,
+  "unit": "Exponents and roots",
+  "title": "Square and cube roots",
+  "pre": null,
+  "story": false,
+  "final": [
+   0
+  ],
+  "learn": [
+   {
+    "h": "Undo the square",
+    "text": "√81 = 99 × 9 = 81, so the square root of 81 is 9. ∛64 = 4 because 4 × 4 × 4 = 64."
+   }
+  ]
+ },
+ {
+  "id": "g8-both",
+  "grade": 8,
+  "unit": "Linear equations",
+  "title": "Variables on both sides",
+  "pre": "g7-eq",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Gather the x's, then solve",
+    "text": "5x + 3 = 2x + 18Subtract 2x: 3x + 3 = 18. Subtract 3: 3x = 15. Divide: x = 5."
+   }
+  ]
+ },
+ {
+  "id": "g8-system",
+  "grade": 8,
+  "unit": "Linear equations",
+  "title": "Systems by substitution",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Swap one equation into the other",
+    "text": "y = 2x and x + y = 15x + 2x = 15, so 3x = 15 and x = 5. Then y = 2 × 5 = 10."
+   }
+  ]
+ },
+ {
+  "id": "g8-slope",
+  "grade": 8,
+  "unit": "Functions and slope",
+  "title": "Slope from two points",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Rise over run",
+    "text": "(1, 2) and (3, 8)Rise: 8 − 2 = 6. Run: 3 − 1 = 2. Slope: 6 ÷ 2 = 3."
+   }
+  ]
+ },
+ {
+  "id": "g8-intercept",
+  "grade": 8,
+  "unit": "Functions and slope",
+  "title": "Slope-intercept form",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Find b with the point",
+    "text": "slope 2, through (3, 7)7 = 2 × 3 + b, so b = 7 − 6 = 1. The line is y = 2x + 1."
+   }
+  ]
+ },
+ {
+  "id": "g8-func",
+  "grade": 8,
+  "unit": "Functions and slope",
+  "title": "Evaluate a function",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Plug in x",
+    "text": "f(x) = 3x − 5, f(4)3 × 4 = 12. 12 − 5 = 7. So f(4) = 7."
+   }
+  ]
+ },
+ {
+  "id": "g8-pyth",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Pythagorean theorem",
+  "pre": "g8-roots",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "a² + b² = c²",
+    "text": "3² + 4² = c²In a right triangle, square the two short sides and add: 9 + 16 = 25.Then take the square root: c = 5, because 5 × 5 = 25."
+   }
+  ]
+ },
+ {
+  "id": "g8-leg",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Find a missing leg",
+  "pre": "g8-pyth",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Subtract to find a leg",
+    "text": "a = 6, c = 1010² − 6² = 100 − 36 = 64. √64 = 8, so b = 8."
+   }
+  ]
+ },
+ {
+  "id": "g8-cyl",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Volume of a cylinder",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Base area × height",
+    "text": "radius 2, height 52² = 4. 4 × 5 = 20. 20 × 3.14 = 62.8."
+   }
+  ]
+ },
+ {
+  "id": "g8-cone",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Volume of a cone",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A third of a cylinder",
+    "text": "radius 3, height 43² × 4 = 36. 36 ÷ 3 = 12. 12 × 3.14 = 37.68."
+   }
+  ]
+ },
+ {
+  "id": "g8-translate",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Translations",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Slide the point",
+    "text": "(2, 3), 4 right and 5 downx: 2 + 4 = 6. y: 3 − 5 = −2. The new point is (6, −2)."
+   }
+  ]
+ },
+ {
+  "id": "g8-tri",
+  "grade": 8,
+  "unit": "Geometry",
+  "title": "Angles in a triangle",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Triangles add up to 180°",
+    "text": "50°, 60°, ?50 + 60 = 110. 180 − 110 = 70°."
+   }
+  ]
+ },
+ {
+  "id": "g9-multistep",
+  "grade": 9,
+  "unit": "Equations",
+  "title": "Multi-step equations",
+  "pre": "g8-both",
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Distribute, then undo",
+    "text": "3(x + 4) = 273x + 12 = 27. Subtract 12: 3x = 15. Divide by 3: x = 5."
+   }
+  ]
+ },
+ {
+  "id": "g9-elim",
+  "grade": 9,
+  "unit": "Equations",
+  "title": "Systems by elimination",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Add to cancel a variable",
+    "text": "x + y = 10, x − y = 4Add them: 2x = 14, so x = 7. Then 7 + y = 10, so y = 3."
+   }
+  ]
+ },
+ {
+  "id": "g9-twopoint",
+  "grade": 9,
+  "unit": "Linear functions",
+  "title": "Line through two points",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Slope first, then b",
+    "text": "(1, 5) and (3, 9)m = (9 − 5) ÷ (3 − 1) = 2. b = 5 − 2 × 1 = 3. So y = 2x + 3."
+   }
+  ]
+ },
+ {
+  "id": "g9-negexp",
+  "grade": 9,
+  "unit": "Exponents",
+  "title": "Zero and negative exponents",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Negative exponent = flip",
+    "text": "2^(−3) = (1)/(8)2³ = 8, so 2⁻³ = 1/8. And anything to the 0 power is 1."
+   }
+  ]
+ },
+ {
+  "id": "g9-growth",
+  "grade": 9,
+  "unit": "Exponents",
+  "title": "Exponential growth",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply again and again",
+    "text": "100 × 2³Doubling 3 times is × 2 × 2 × 2 = × 8. So 100 becomes 800."
+   }
+  ]
+ },
+ {
+  "id": "g9-radical",
+  "grade": 9,
+  "unit": "Exponents",
+  "title": "Simplify square roots",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Pull out the perfect square",
+    "text": "√72 = 6√272 = 36 × 2. √36 = 6 comes out, and the 2 stays under the root."
+   }
+  ]
+ },
+ {
+  "id": "g9-factor",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "Factoring quadratics",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply to c, add to b",
+    "text": "x² + 7x + 12Find two numbers that multiply to 12 and add to 7. Try pairs: 1 and 12, 2 and 6, 3 and 4. 3 + 4 = 7.So it factors to (x + 3)(x + 4)."
+   }
+  ]
+ },
+ {
+  "id": "g9-polyadd",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "Add and subtract polynomials",
+  "pre": null,
+  "story": false,
+  "final": [
+   -3,
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Combine like terms",
+    "text": "(2x² + 3x − 1) + (x² − 5x + 4)x²: 2 + 1 = 3. x: 3 − 5 = −2. Numbers: −1 + 4 = 3.So 3x² − 2x + 3. For subtraction, flip every sign in the second one first."
+   }
+  ]
+ },
+ {
+  "id": "g9-foil",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "Multiply binomials",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "First, outer, inner, last",
+    "text": "(x + 3)(x + 4)First: x². Outer + inner: 4x + 3x = 7x. Last: 12.So x² + 7x + 12."
+   }
+  ]
+ },
+ {
+  "id": "g9-gcf",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "Factor out the GCF",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Take out what they share",
+    "text": "6x² + 9x = 3x(2x + 3)Both numbers divide by 3, and both terms have an x."
+   }
+  ]
+ },
+ {
+  "id": "g9-solvefactor",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "Solve by factoring",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Factor, then set each part to 0",
+    "text": "x² − 5x + 6 = 0(x − 2)(x − 3) = 0. So x − 2 = 0 or x − 3 = 0.x = 2 or x = 3."
+   }
+  ]
+ },
+ {
+  "id": "g9-quadform",
+  "grade": 9,
+  "unit": "Polynomials and quadratics",
+  "title": "The quadratic formula",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Discriminant first",
+    "text": "x² − 2x − 8 = 0b² − 4ac = 4 + 32 = 36, and √36 = 6.x = (2 + 6) ÷ 2 = 4 or x = (2 − 6) ÷ 2 = −2."
+   }
+  ]
+ },
+ {
+  "id": "g9-median",
+  "grade": 9,
+  "unit": "Data",
+  "title": "Find the median",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Sort, then take the middle",
+    "text": "7, 2, 9, 4, 5Sorted: 2, 4, 5, 7, 9. The middle one is 5."
+   }
+  ]
+ },
+ {
+  "id": "g10-mid",
+  "grade": 10,
+  "unit": "Coordinate geometry",
+  "title": "Midpoint",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Average each coordinate",
+    "text": "(2, 3) and (6, 9)x: (2 + 6) ÷ 2 = 4. y: (3 + 9) ÷ 2 = 6. The midpoint is (4, 6)."
+   }
+  ]
+ },
+ {
+  "id": "g10-perp",
+  "grade": 10,
+  "unit": "Coordinate geometry",
+  "title": "Perpendicular slopes",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Flip and change the sign",
+    "text": "m = (2)/(3) → −(3)/(2)Perpendicular slopes multiply to −1."
+   }
+  ]
+ },
+ {
+  "id": "g10-dist",
+  "grade": 10,
+  "unit": "Coordinate geometry",
+  "title": "Distance between points",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "It's a hidden right triangle",
+    "text": "(1, 2) to (4, 6)Go across 4 − 1 = 3 and up 6 − 2 = 4. Those are the legs of a right triangle.3² + 4² = 25, and √25 = 5. The points are 5 apart."
+   }
+  ]
+ },
+ {
+  "id": "g10-circle",
+  "grade": 10,
+  "unit": "Coordinate geometry",
+  "title": "Equation of a circle",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "(x − h)² + (y − k)² = r²",
+    "text": "(x − 2)² + (y + 3)² = 16Center (2, −3). Radius √16 = 4."
+   }
+  ]
+ },
+ {
+  "id": "g10-polygon",
+  "grade": 10,
+  "unit": "Angles and triangles",
+  "title": "Angles in a polygon",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "(n − 2) × 180°",
+    "text": "hexagonA hexagon splits into 4 triangles: 4 × 180 = 720°. Each angle: 720 ÷ 6 = 120°."
+   }
+  ]
+ },
+ {
+  "id": "g10-exterior",
+  "grade": 10,
+  "unit": "Angles and triangles",
+  "title": "Exterior angle",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Exterior = the two far angles added",
+    "text": "50° and 60°The outside angle is 50 + 60 = 110°."
+   }
+  ]
+ },
+ {
+  "id": "g10-similar",
+  "grade": 10,
+  "unit": "Angles and triangles",
+  "title": "Similar triangles",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Same shape, scaled",
+    "text": "small 4 and 6, big 8 and ?8 ÷ 4 = 2, so everything doubles. 6 × 2 = 12."
+   }
+  ]
+ },
+ {
+  "id": "g10-special",
+  "grade": 10,
+  "unit": "Right triangles and trig",
+  "title": "Special right triangles",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Two triangles to remember",
+    "text": "45-45-90: x, x, x√230-60-90: short leg x, hypotenuse 2x, long leg x√3."
+   }
+  ]
+ },
+ {
+  "id": "g10-trig",
+  "grade": 10,
+  "unit": "Right triangles and trig",
+  "title": "Sine, cosine and tangent",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "SOH CAH TOA",
+    "text": "3-4-5 trianglesin = opposite ÷ hypotenuse = 3/5. cos = adjacent ÷ hypotenuse = 4/5. tan = opposite ÷ adjacent = 3/4."
+   }
+  ]
+ },
+ {
+  "id": "g10-sector",
+  "grade": 10,
+  "unit": "Circles",
+  "title": "Area of a sector",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A fraction of the circle",
+    "text": "radius 4, 90°90° is 1/4 of the circle. The whole area is 3.14 × 16 = 50.24. A quarter is 12.56."
+   }
+  ]
+ },
+ {
+  "id": "g10-arc",
+  "grade": 10,
+  "unit": "Circles",
+  "title": "Arc length",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A fraction of the circumference",
+    "text": "radius 5, 180°180° is half. The circumference is 2 × 3.14 × 5 = 31.4. Half is 15.7."
+   }
+  ]
+ },
+ {
+  "id": "g10-surface",
+  "grade": 10,
+  "unit": "Area and volume",
+  "title": "Surface area of a box",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Three pairs of faces",
+    "text": "2 × 3 × 42×3 = 6, 2×4 = 8, 3×4 = 12. Add: 26. Double it: 52."
+   }
+  ]
+ },
+ {
+  "id": "g10-pyramid",
+  "grade": 10,
+  "unit": "Area and volume",
+  "title": "Volume of a pyramid",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A third of a box",
+    "text": "base 6, height 56 × 6 = 36. 36 × 5 = 180. 180 ÷ 3 = 60."
+   }
+  ]
+ },
+ {
+  "id": "g11-seq",
+  "grade": 11,
+  "unit": "Sequences",
+  "title": "Arithmetic sequences",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "aₙ = a₁ + (n − 1)d",
+    "text": "5, 9, 13, 17, …Start at 5 and jump by 4 each time. To reach term 20 you make 19 jumps: 19 × 4 = 76.So term 20 is 5 + 76 = 81."
+   }
+  ]
+ },
+ {
+  "id": "g11-geo",
+  "grade": 11,
+  "unit": "Sequences",
+  "title": "Geometric sequences",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "aₙ = a₁ · rⁿ⁻¹",
+    "text": "3, 6, 12, 24, …Each term doubles, so r = 2.Term 6 is 5 jumps away: 3 × 2⁵ = 3 × 32 = 96."
+   }
+  ]
+ },
+ {
+  "id": "g11-log",
+  "grade": 11,
+  "unit": "Exponents and logs",
+  "title": "Evaluating logarithms",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "A log is an exponent",
+    "text": "log₂ 8 = 3because 2³ = 8.Adding logs with the same base is the log of the product: log₂ 8 + log₂ 4 = 3 + 2 = 5."
+   }
+  ]
+ },
+ {
+  "id": "g11-expeq",
+  "grade": 11,
+  "unit": "Exponents and logs",
+  "title": "Exponential equations",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Make the bases match",
+    "text": "2ˣ⁺¹ = 1616 = 2⁴, so x + 1 = 4 and x = 3."
+   }
+  ]
+ },
+ {
+  "id": "g11-ratexp",
+  "grade": 11,
+  "unit": "Exponents and logs",
+  "title": "Rational exponents",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Bottom is the root, top is the power",
+    "text": "8^(2/3)∛8 = 2, then 2² = 4."
+   }
+  ]
+ },
+ {
+  "id": "g11-evalpoly",
+  "grade": 11,
+  "unit": "Polynomials",
+  "title": "Evaluate a polynomial",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Plug in, then simplify",
+    "text": "f(x) = 2x² − 3x + 1, f(−2)2 · 4 = 8, −3 · −2 = 6, so 8 + 6 + 1 = 15."
+   }
+  ]
+ },
+ {
+  "id": "g11-synth",
+  "grade": 11,
+  "unit": "Polynomials",
+  "title": "Synthetic division",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply, add, repeat",
+    "text": "(x² + x − 6) ÷ (x − 2)Bring down 1. 1 × 2 = 2; 1 + 2 = 3. 3 × 2 = 6; −6 + 6 = 0.Bottom row 1, 3, 0 means x + 3, remainder 0."
+   }
+  ]
+ },
+ {
+  "id": "g11-inverse",
+  "grade": 11,
+  "unit": "Functions",
+  "title": "Inverse functions",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Run it backwards",
+    "text": "f(x) = 3x + 2, f⁻¹(14)f adds 2 last, so undo it first: 14 − 2 = 12.Then undo × 3: 12 ÷ 3 = 4. Check: f(4) = 14."
+   }
+  ]
+ },
+ {
+  "id": "g11-compose",
+  "grade": 11,
+  "unit": "Functions",
+  "title": "Composing functions",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Inside out",
+    "text": "f(x) = x + 1, g(x) = 2x, f(g(3))g(3) = 6, then f(6) = 7."
+   }
+  ]
+ },
+ {
+  "id": "g11-vertex",
+  "grade": 11,
+  "unit": "Functions",
+  "title": "Vertex of a parabola",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "x = −b ÷ 2a",
+    "text": "y = x² − 6x + 5x = 6 ÷ 2 = 3. y = 9 − 18 + 5 = −4. Vertex (3, −4)."
+   }
+  ]
+ },
+ {
+  "id": "g11-radical",
+  "grade": 11,
+  "unit": "Functions",
+  "title": "Radical equations",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Square to undo the root",
+    "text": "√(x + 3) = 5x + 3 = 25, so x = 22. Check: √25 = 5."
+   }
+  ]
+ },
+ {
+  "id": "g11-complex",
+  "grade": 11,
+  "unit": "Complex numbers",
+  "title": "Multiplying complex numbers",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "FOIL, then i² = −1",
+    "text": "(2 + 3i)(1 + 4i)2 + 8i + 3i + 12i². 12i² = −12.So 2 − 12 + 11i = −10 + 11i."
+   }
+  ]
+ },
+ {
+  "id": "g11-comb",
+  "grade": 11,
+  "unit": "Probability",
+  "title": "Combinations",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Count, then remove repeats",
+    "text": "C(5, 2)5 × 4 = 20 ordered pairs. Each pair shows up 2 ways.20 ÷ 2 = 10."
+   }
+  ]
+ },
+ {
+  "id": "g12-rad",
+  "grade": 12,
+  "unit": "Trigonometry",
+  "title": "Degrees to radians",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply by π/180",
+    "text": "120°120/180 = 2/3, so 120° = 2π/3."
+   }
+  ]
+ },
+ {
+  "id": "g12-deg",
+  "grade": 12,
+  "unit": "Trigonometry",
+  "title": "Radians to degrees",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "π = 180°",
+    "text": "5π/6180 ÷ 6 = 30, and 5 × 30 = 150°."
+   }
+  ]
+ },
+ {
+  "id": "g12-unit",
+  "grade": 12,
+  "unit": "Trigonometry",
+  "title": "Unit circle values",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Reference angle, then sign",
+    "text": "sin 210°Quadrant III, reference 30°. sin 30° = 1/2.Below the x-axis, sine is negative: −1/2."
+   }
+  ]
+ },
+ {
+  "id": "g12-limit",
+  "grade": 12,
+  "unit": "Limits",
+  "title": "Limits by factoring",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "0 ÷ 0 means factor",
+    "text": "lim x→2 of (x² − 4) ÷ (x − 2)(x − 2)(x + 2) ÷ (x − 2) = x + 2.Now plug in: 2 + 2 = 4."
+   }
+  ]
+ },
+ {
+  "id": "g12-power",
+  "grade": 12,
+  "unit": "Derivatives",
+  "title": "Power rule",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "The power rule",
+    "text": "f(x) = 3x^(4)Bring the exponent down and multiply: 4 × 3 = 12. Then lower the exponent by 1: 4 − 1 = 3.f′(x) = 12x^(3)."
+   }
+  ]
+ },
+ {
+  "id": "g12-polyd",
+  "grade": 12,
+  "unit": "Derivatives",
+  "title": "Derivative of a polynomial",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "One term at a time",
+    "text": "f(x) = 2x³ − x² + 5x + 7f′(x) = 6x² − 2x + 5. The 7 drops out."
+   }
+  ]
+ },
+ {
+  "id": "g12-chain",
+  "grade": 12,
+  "unit": "Derivatives",
+  "title": "Chain rule",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Outside, then times inside",
+    "text": "(3x + 1)⁴4(3x + 1)³ × 3 = 12(3x + 1)³."
+   }
+  ]
+ },
+ {
+  "id": "g12-tangent",
+  "grade": 12,
+  "unit": "Derivatives",
+  "title": "Slope of a tangent line",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Slope = f′(x)",
+    "text": "f(x) = x² + 3x at x = 2f′(x) = 2x + 3, so the slope is 7."
+   }
+  ]
+ },
+ {
+  "id": "g12-anti",
+  "grade": 12,
+  "unit": "Integrals",
+  "title": "Antiderivatives",
+  "pre": null,
+  "story": false,
+  "final": [
+   -2,
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Up one, divide by the new power",
+    "text": "∫ 6x² dxx² → x³, and 6 ÷ 3 = 2.So the answer is 2x³ + C."
+   }
+  ]
+ },
+ {
+  "id": "g12-defint",
+  "grade": 12,
+  "unit": "Integrals",
+  "title": "Definite integrals",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "F(top) − F(bottom)",
+    "text": "∫₀² 3x² dxAntiderivative x³. 2³ − 0³ = 8."
+   }
+  ]
+ },
+ {
+  "id": "g12-series",
+  "grade": 12,
+  "unit": "Vectors and series",
+  "title": "Arithmetic series",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Pair them up",
+    "text": "1 + 2 + … + 1001 + 100 = 101, and there are 50 pairs.101 × 100 ÷ 2 = 5,050."
+   }
+  ]
+ },
+ {
+  "id": "g12-vecmag",
+  "grade": 12,
+  "unit": "Vectors and series",
+  "title": "Vector length",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "√(x² + y²)",
+    "text": "⟨3, −4⟩9 + 16 = 25, and √25 = 5."
+   }
+  ]
+ },
+ {
+  "id": "g12-dot",
+  "grade": 12,
+  "unit": "Vectors and series",
+  "title": "Dot product",
+  "pre": null,
+  "story": false,
+  "final": [
+   -1
+  ],
+  "learn": [
+   {
+    "h": "Multiply matching parts, then add",
+    "text": "⟨2, 3⟩ · ⟨4, −1⟩8 + (−3) = 5."
+   }
+  ]
+ }
+]

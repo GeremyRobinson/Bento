@@ -1,0 +1,67 @@
+/* Area model. The renderer sets data-* attributes from the animation state; CSS only animates the change. */
+.am{width:min(100%, calc(var(--w) * 1px), calc(min(56vh, 460px) * var(--w) / var(--h)));height:auto;overflow:visible;display:block;margin:0 auto}
+.am text{font-family:var(--num);font-size:20px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:600}
+.am .outline{fill:none;stroke:var(--faint);stroke-width:2}
+.am .axis-label{fill:var(--muted)}
+.am .whole{transition:opacity .4s ease}
+.am .region rect{fill:var(--card);stroke:var(--rule);stroke-width:2;transition:fill .5s var(--ease),stroke .5s var(--ease),opacity .5s ease}
+.am .region[data-shown="true"].r0 rect{fill:color-mix(in srgb,var(--c0) 18%,var(--card));stroke:var(--c0)}
+.am .region[data-shown="true"].r1 rect{fill:color-mix(in srgb,var(--c1) 18%,var(--card));stroke:var(--c1)}
+.am .region[data-shown="true"].r2 rect{fill:color-mix(in srgb,var(--c2) 18%,var(--card));stroke:var(--c2)}
+.am .region[data-active="true"] rect{stroke-width:3.5}
+.am .region .product{opacity:0;transition:opacity .4s ease .15s}
+.am .region[data-shown="true"] .product{opacity:1}
+.am .region.r0 .product,.am .region.r0 .product text,.am .region.r0 .part{fill:var(--c0)}
+.am .region.r1 .product,.am .region.r1 .product text,.am .region.r1 .part{fill:var(--c1)}
+.am .region.r2 .product,.am .region.r2 .product text,.am .region.r2 .part{fill:var(--c2)}
+.am .part{opacity:0;transition:opacity .4s ease}
+.am[data-split="true"] .part{opacity:1}
+.am[data-split="true"] .whole{opacity:0}
+.am .split-line{stroke:var(--text);stroke-width:2;stroke-dasharray:6 6;opacity:0;transition:opacity .4s ease}
+.am[data-split="true"] .split-line{opacity:.55}
+.am .total{fill:var(--tint);opacity:0;transition:opacity .4s ease}
+.am[data-sum="true"] .total{opacity:1}
+.am .leader{stroke:var(--faint);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){.am *{transition:none!important}}
+
+/* the explanation beats under the picture */
+.beats{display:grid;gap:var(--s);margin:0;padding:0;list-style:none}
+.beat{display:flex;align-items:center;gap:var(--u);padding:10px var(--u);border-radius:var(--r-box);background:var(--well);color:var(--muted);transition:background .3s,color .3s,opacity .3s}
+.beat .badge{background:var(--card);color:var(--muted);flex:none}
+.beat[data-state="done"]{color:var(--text)}
+.beat[data-state="now"]{background:var(--tint-soft);color:var(--text)}
+.beat[data-state="now"] .badge{background:var(--tint);color:var(--on-tint)}
+.beat[data-state="later"]{opacity:.55}
+.beat .say{display:grid;gap:2px;min-width:0}
+.beat .say .mline{font-size:var(--work);justify-content:flex-start}
+
+/* math lines built from MathText */
+/* pieces sit tight (8x, x², 3√2); operators carry their own space, text keeps the spaces written into it */
+.mline{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0;font-variant-numeric:tabular-nums}
+.mline .t{white-space:pre}
+.mline .o{margin:0 .3em}
+.mline .fr{margin:0 .15em}
+.mline>.muted,.mline-in>.muted{margin-left:.3em}
+.mline .br{flex-basis:100%;height:.15em}
+.math>.mline:has(.br){flex-wrap:wrap}
+.math>.mline{flex-wrap:nowrap;font-size:min(1em, 8.5vw)}
+.mline .ans{font-weight:700}
+.slot .caret{width:2px;height:.9em;background:var(--tint);margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.slot .caret{animation:none}}
+
+.foot{display:flex;flex-wrap:wrap;gap:var(--s);justify-content:center;color:var(--muted);font-size:var(--small);margin-top:var(--u)}
+.foot button{color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-weight:var(--w-mid)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mline-in{display:contents}
+/* in a flex line vertical-align does nothing, so raise and lower by hand */
+.mline sup{font-size:.6em;line-height:1;align-self:flex-start;margin-top:-.1em}
+.mline sub{font-size:.6em;line-height:1;align-self:flex-end;margin-bottom:-.1em}
+.mline mark{background:color-mix(in srgb,var(--acc) 26%,transparent);color:inherit;border-radius:6px;padding:0 .12em}
+.label.formula{text-transform:none!important}
+.learn .math>.mline{flex-wrap:wrap;row-gap:.1em}
+/* each step of the walk-through is a button that jumps the picture to it */
+.beat{padding:0}
+.beat>button{display:flex;align-items:center;gap:var(--u);width:100%;padding:10px var(--u);border-radius:inherit;text-align:left;color:inherit;font:inherit}
+.beat>button:not([disabled]):hover{background:color-mix(in srgb,var(--tint) 8%,transparent)}
+.beat>button[disabled]{cursor:default;opacity:1}
