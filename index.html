@@ -453,6 +453,7 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .lesson.review .name{display:flex;flex-direction:column;line-height:1.2}
 .lesson.review small{font-size:var(--small);font-weight:var(--w-mid)}
 /* ---- badges: pixel badges for passing tests, kept in a badge book for each grade ---- */
+.bchip svg{width:18px;height:18px}
 .bchip{cursor:pointer;transition:background .15s,transform .2s var(--spring)} .bchip:active{transform:scale(.95)}
 .bdg{position:relative;display:grid;justify-items:center;gap:6px;text-align:center;min-width:0}
 .bdg .art{width:100%;max-width:112px;aspect-ratio:1;display:grid;place-items:center}
@@ -461,7 +462,7 @@ button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .bdg .sub{font-size:12px;line-height:16px;color:var(--muted);font-weight:var(--w-mid)}
 .bdg.none svg{filter:none;opacity:.5}
 .bdg.none .nm{color:var(--muted)}
-.bdg.gold .art{position:relative;overflow:hidden;border-radius:12px}
+.bdg.gold .art{position:relative;overflow:hidden;border-radius:50%;padding:9%;background:radial-gradient(circle,#ffd96a 0 60%,#ffe9a8 66%,transparent 71%)}
 .bdg.gold .art::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.7) 48%,transparent 60%);background-size:250% 100%;animation:shine 3s ease-in-out infinite;pointer-events:none}
 @keyframes shine{0%{background-position:150% 0}60%,100%{background-position:-60% 0}}
 .bdg .ctl{height:36px;font-size:var(--small);padding:0 12px}
@@ -3432,6 +3433,152 @@ function parentHTML(){
 
 
 
+// ---- badge art from the art thread (grade 5 so far); badges without art fall back to the placeholder below ----
+/* Bento badges: original pixel badges earned by passing unit tests, one badge book per grade.
+   BADGES = [{id, grade, unit, name, svg, svgLocked}]
+     unit is the unit name used in the app (e.g. "Fractions"); the grade check-up badge uses unit "Check-up".
+   svg / svgLocked: self-contained strings, viewBox 0 0 120 120, transparent background, white
+   die-cut edge baked in, no ids, gradients or filters. svgLocked is the grey silhouette for empty slots.
+   Style: simple shapes, negative-space cut-outs, one colour per badge + one shade + a glint.
+   Add a badge by adding a row to GRADES (and a SHAPES entry if it needs a new shape). */
+const BADGES = (function () {
+  'use strict';
+  var N = 24, S = 5; // 24x24 grid, 5px per cell = 120
+
+  function Layer() { this.c = []; for (var y = 0; y < N; y++) this.c.push(new Array(N).fill('')); }
+  var Lp = Layer.prototype;
+  Lp.px = function (x, y, v) { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < N && y < N) this.c[y][x] = v; return this; };
+  Lp.get = function (x, y) { return (this.c[y] || [])[x] || ''; };
+  Lp.each = function (fn, v) { for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) if (fn(x + 0.5, y + 0.5)) this.c[y][x] = v; return this; };
+  Lp.ell = function (cx, cy, rx, ry, v) { return this.each(function (x, y) { var a = (x - cx) / rx, b = (y - cy) / ry; return a * a + b * b <= 1; }, v); };
+  Lp.poly = function (pts, v) {
+    return this.each(function (x, y) {
+      var inside = false;
+      for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        var xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
+        if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+      }
+      return inside;
+    }, v);
+  };
+  Lp.rect = function (x0, y0, w, h, v) { for (var y = y0; y < y0 + h; y++) for (var x = x0; x < x0 + w; x++) this.px(x, y, v); return this; };
+  Lp.sprite = function (rows, ox, oy, v) {
+    for (var y = 0; y < rows.length; y++) for (var x = 0; x < rows[y].length; x++) if (rows[y][x] !== '.') this.px(ox + x, oy + y, v === undefined ? rows[y][x] : v);
+    return this;
+  };
+  // regular polygon / star helpers
+  function ngon(cx, cy, r, n, rot) { var p = []; for (var i = 0; i < n; i++) { var a = rot + i * 2 * Math.PI / n; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return p; }
+  function star(cx, cy, r1, r2, n) { var p = []; for (var i = 0; i < n * 2; i++) { var a = -Math.PI / 2 + i * Math.PI / n, r = i % 2 ? r2 : r1; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return p; }
+  var DIGITS = {
+    '0': ['111', '101', '101', '101', '111'], '1': ['.1.', '11.', '.1.', '.1.', '111'], '2': ['111', '..1', '111', '1..', '111'],
+    '3': ['111', '..1', '.11', '..1', '111'], '4': ['1.1', '1.1', '111', '..1', '..1'], '5': ['111', '1..', '111', '..1', '111'],
+    '6': ['111', '1..', '111', '1.1', '111'], '7': ['111', '..1', '.1.', '.1.', '.1.'], '8': ['111', '1.1', '111', '1.1', '111'], '9': ['111', '1.1', '111', '..1', '111']
+  };
+  function number(L, n, cx, y, v) { var s = String(n), w = s.length * 4 - 1, x = Math.round(cx - w / 2); for (var i = 0; i < s.length; i++) L.sprite(DIGITS[s[i]], x + i * 4, y, v); }
+
+  /* ---------- the badge shapes (fill 'f', cut-outs '' or 'w') ---------- */
+  var SHAPES = {
+    // Whole numbers: a hexagon with a times sign cut out.
+    hexTimes: function (L) {
+      L.poly(ngon(12, 12, 10.5, 6, Math.PI / 6), 'f');
+      for (var i = -3; i <= 3; i++) { L.rect(11 + i, 11 + i, 2, 2, '').rect(11 + i, 11 - i, 2, 2, ''); }
+    },
+    // Decimals: a round coin with a decimal point cut out.
+    coinPoint: function (L) {
+      L.ell(12, 12, 10.5, 10.5, 'f');
+      L.ell(12, 12, 7.2, 7.2, 'w').ell(12, 12, 6, 6, 'f');
+      L.rect(14, 14, 3, 3, '');
+    },
+    // Fractions: a pie with one slice pulled out.
+    pieSlice: function (L) {
+      L.ell(11, 13, 9.5, 9.5, 'f');
+      L.poly([[11, 13], [11, 2], [22, 2], [22, 13]], '');
+      L.each(function (x, y) { var a = (x - 13) / 9.5, b = (y - 11) / 9.5; return a * a + b * b <= 1 && x > 13 && y < 11; }, 'f');
+    },
+    // Measurement: a set square with a triangle cut out and ruler notches.
+    setSquare: function (L) {
+      L.poly([[2, 22], [2, 2], [22, 22]], 'f');
+      L.poly([[6, 18.5], [6, 10], [14.5, 18.5]], '');
+      for (var y = 4; y < 20; y += 3) L.px(2, y, 'w');
+    },
+    // Grade check-up: a big star with the grade number cut out.
+    gradeStar: function (L, grade) {
+      L.poly(star(12, 12.6, 11.6, 6.2, 5), 'f');
+      number(L, grade, 12, 10, '');
+    }
+  };
+
+  // Each grade's badges: unit name in the app -> shape, badge name, colour.
+  var GRADES = {
+    5: [
+      { unit: 'Whole numbers', name: 'Builder Badge', shape: 'hexTimes', col: '#3b82f6', glint: [[6, 7], [6, 8], [7, 6]] },
+      { unit: 'Decimals', name: 'Point Badge', shape: 'coinPoint', col: '#f2683c', glint: [[5, 8], [5, 9], [6, 7]] },
+      { unit: 'Fractions', name: 'Slice Badge', shape: 'pieSlice', col: '#f59e0b', glint: [[4, 10], [4, 11], [5, 9]] },
+      { unit: 'Measurement', name: 'Ruler Badge', shape: 'setSquare', col: '#8b5cf6', glint: [[4, 9], [4, 10], [4, 11]] },
+      { unit: 'Check-up', name: 'Grade 5 Star', shape: 'gradeStar', col: '#f5c542', check: true, glint: [[11, 5], [11, 6]] }
+    ]
+  };
+
+  function shade(hex, amt) {
+    var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    function f(c) { return Math.max(0, Math.min(255, Math.round(c + (amt < 0 ? c : 255 - c) * amt))); }
+    return '#' + ((1 << 24) + (f(r) << 16) + (f(g) << 8) + f(b)).toString(16).slice(1);
+  }
+
+  function render(def, grade, locked) {
+    var L = new Layer();
+    SHAPES[def.shape](L, grade);
+    var g = L.c, out = g.map(function (r) { return r.slice(); }), x, y;
+    // outline (also traces every cut-out, which is what makes the negative space read)
+    for (y = 0; y < N; y++) for (x = 0; x < N; x++) {
+      if (g[y][x]) continue;
+      if (L.get(x + 1, y) || L.get(x - 1, y) || L.get(x, y + 1) || L.get(x, y - 1)) out[y][x] = 'o';
+    }
+    // outer empty area (flood from the edges), so shade only follows the outside edge, not the cut-outs
+    var outer = g.map(function (r) { return r.map(function () { return false; }); }), stack = [];
+    for (var i = 0; i < N; i++) stack.push([i, 0], [i, N - 1], [0, i], [N - 1, i]);
+    while (stack.length) {
+      var q = stack.pop(), qx = q[0], qy = q[1];
+      if (qx < 0 || qy < 0 || qx >= N || qy >= N || outer[qy][qx] || g[qy][qx]) continue;
+      outer[qy][qx] = true; stack.push([qx + 1, qy], [qx - 1, qy], [qx, qy + 1], [qx, qy - 1]);
+    }
+    function edge(x, y) { return y >= 0 && y < N && x >= 0 && x < N && out[y][x] === 'o' && outer[y][x]; }
+    var sh = out.map(function (r) { return r.slice(); });
+    for (y = 0; y < N; y++) for (x = 0; x < N; x++) {
+      if (out[y][x] !== 'f') continue;
+      if (edge(x, y + 1) || edge(x + 1, y)) sh[y][x] = 'F';
+    }
+    out = sh;
+    // one small glint, placed per shape
+    if (!locked && def.glint) def.glint.forEach(function (p) { if (out[p[1]][p[0]] === 'f') out[p[1]][p[0]] = 'g'; });
+    // white die-cut halo
+    var halo = out.map(function (r) { return r.slice(); });
+    for (y = 0; y < N; y++) for (x = 0; x < N; x++) {
+      if (out[y][x]) continue;
+      for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) { var rr = out[y + dy]; if (rr && rr[x + dx] && rr[x + dx] !== 'x') halo[y][x] = 'x'; }
+    }
+    var col = locked
+      ? { o: '#c3c0c9', f: '#ecebef', F: '#e0dee5', g: '#ecebef', w: '#ffffff', r: '#e0dee5', x: '#ffffff' }
+      : { o: '#1d1a20', f: def.col, F: shade(def.col, -0.18), g: '#ffffff', w: '#ffffff', r: '#f2683c', x: '#ffffff' };
+    var body = '';
+    for (y = 0; y < N; y++) {
+      x = 0;
+      while (x < N) { var v = halo[y][x]; if (!v) { x++; continue; } var x0 = x; while (x < N && halo[y][x] === v) x++; body += '<rect x="' + x0 + '" y="' + y + '" width="' + (x - x0) + '" height="1" fill="' + col[v] + '"/>'; }
+    }
+    var label = def.name + (locked ? ' (not earned yet)' : '');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" shape-rendering="crispEdges" role="img" aria-label="' + label + '"><g transform="scale(' + S + ')">' + body + '</g></svg>';
+  }
+
+  var out = [];
+  Object.keys(GRADES).forEach(function (gr) {
+    GRADES[gr].forEach(function (d) {
+      var slug = d.unit.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      out.push({ id: 'g' + gr + '-' + slug, grade: +gr, unit: d.unit, name: d.name, svg: render(d, +gr, false), svgLocked: render(d, +gr, true) });
+    });
+  });
+  return out;
+})();
+if (typeof window !== 'undefined') window.BentoBadges = BADGES;
 // ---- badges. Placeholder pixel art until the drawn set arrives as BADGES = [{id, grade, unit, name, svg}] (id is the test key). ----
 const BADGE_HUES = ["#3b82f6","#f2683c","#8b5cf6","#16a34a","#db2777","#0891b2","#f59e0b","#4f46e5","#0d9488","#e11d48"];
 const mixHex = (a, b, t) => "#" + [0,1,2].map(i => Math.round(parseInt(a.substr(1+2*i,2),16)*(1-t) + parseInt(b.substr(1+2*i,2),16)*t).toString(16).padStart(2,"0")).join("");
@@ -3444,9 +3591,10 @@ const SHAPES = [
 ];
 const STAR = ["................", ".......oo.......", "......offo......", ".....offffo.....", "ooooooffffoooooo", "offffffllffffffo", ".offfffllfffffo.", "..offffffffffo..", "...offffffffo...", "...offffffffo...", "..offfo..offfo..", "..offo....offo..", ".offo......offo.", ".oo..........oo.", "................", "................"];
 function badgeSVG(key, have, size, gold){
-  const art = typeof BADGES !== "undefined" && BADGES.find(b => b.id === key);
-  if (art && have) return art.svg;
-  const [kind, g, unit] = key.split(":"), units = unitsOf(Number(g)).map(u => u.name), k = Math.max(0, units.indexOf(unit));
+  const [kind, g, unit] = key.split(":");
+  const art = BADGES.find(b => b.grade === Number(g) && b.unit === (kind === "grade" ? "Check-up" : unit));
+  if (art) return have ? art.svg : art.svgLocked;
+  const units = unitsOf(Number(g)).map(u => u.name), k = Math.max(0, units.indexOf(unit));
   const hue = !have ? "#b9bdc7" : gold ? "#f2b630" : kind === "grade" ? "#f59e0b" : BADGE_HUES[(Number(g) * 3 + k) % BADGE_HUES.length];
   const C = {o: mixHex(hue, "#000000", .45), f: hue, l: mixHex(hue, "#ffffff", .45), s: "#ffffff", r: gold ? "#fff3b0" : mixHex(hue, "#ffffff", .25)};
   let px = "";
