@@ -2,7 +2,7 @@
 
 A Duolingo-style math app for kindergarten through 12th grade, built around solving problems one step at a time instead of on paper. Her starting point is 5th grade; a grade picker on the home screen switches grades.
 
-**Live app:** https://geremyrobinson.github.io/Bento/ (repo: https://github.com/GeremyRobinson/Bento)
+**Live app:** https://geremyrobinson.github.io/bento/ (repo: https://github.com/GeremyRobinson/bento)
 
 The app is called **Bento** (renamed from Mathbook on 2026-10-02). Its screens use a bento grid: tiles of different sizes that fill the whole iPad screen instead of one narrow column.
 
