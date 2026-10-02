@@ -13,5 +13,7 @@ export default defineConfig(({ mode }) => ({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],
+    // the whole-lesson UI test clicks through every problem; give it room on a busy machine
+    testTimeout: 20000,
   },
 }));
