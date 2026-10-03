@@ -1,6 +1,6 @@
 // Every flow of the app through the UI, written against whichever lessons are rebuilt (g5-mult2 is always there).
 import { fireEvent, screen, within } from "@testing-library/react";
-import { CATALOG, COMING_SOON } from "../../curriculum/catalog";
+import { CATALOG } from "../../curriculum/catalog";
 import { lessonById, lessonsInGrade } from "../../curriculum/registry";
 import type { Progress } from "../../engine/mastery/progress";
 import type { SessionReport } from "../../engine/session/types";
@@ -69,7 +69,7 @@ describe("home", () => {
     expect(screen.queryByText("Today's review")).toBeNull();
   });
 
-  it("shows coming soon for kindergarten to 4th grade, and switches grades from the sheet", () => {
+  it("shows the whole year for 2nd grade, and switches grades from the sheet", () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
     const sheet = screen.getByRole("dialog", { name: "Choose your grade" });
@@ -77,9 +77,9 @@ describe("home", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByRole("heading", { level: 1, name: "2nd grade" })).toBeInTheDocument();
     expect(document.querySelector("main")!.dataset.band).toBe("little");
-    expect(screen.getByRole("heading", { level: 3, name: "Coming soon" })).toBeInTheDocument();
-    for (const t of COMING_SOON[2]!) expect(screen.getByText(t)).toBeInTheDocument();
-    // 9th grade has no coming-soon list and takes the plain look
+    expect(screen.queryByText("Coming soon")).toBeNull();
+    for (const c of CATALOG.filter(c => c.grade === 2)) expect(screen.getAllByText(c.title).length).toBeGreaterThan(0);
+    // 9th grade takes the plain look
     fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /9th/ }));
     expect(screen.queryByText("Coming soon")).toBeNull();

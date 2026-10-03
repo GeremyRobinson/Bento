@@ -1,6 +1,5 @@
 import { useApp } from "../app/AppState";
 import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
-import { COMING_SOON } from "../curriculum/catalog";
 import { gradeOf } from "../curriculum/grades";
 import { todayPlan, upNext, type TodayItem } from "../app/today";
 import { placeKey } from "../engine/session/practice";
@@ -16,7 +15,7 @@ const KIND = { lesson: "Up next", review: "Review", test: "Unit test" } as const
 
 /**
  * Home is the grade's book: its cover (what this year is about), today's short plan (one tap starts it) with how the
- * year is going beside it, then every chapter with a moving picture and its pages. Lessons still being rebuilt show as "soon".
+ * year is going beside it, then every chapter with a moving picture and its pages.
  */
 export function Home() {
   const { progress, go, openSheet, startLesson, startTest, startReview, canReview, deps } = useApp();
@@ -102,11 +101,6 @@ export function Home() {
             </section>
           );
         })}
-        {g < 5 && COMING_SOON[g] && (
-          <section className="panel"><div className="unit"><h3>Coming soon</h3></div>
-            <div className="facts">{COMING_SOON[g]!.map(t => <div key={t}><span>{t}</span><span className="k">soon</span></div>)}</div>
-          </section>
-        )}
       </div>
     </>
   );

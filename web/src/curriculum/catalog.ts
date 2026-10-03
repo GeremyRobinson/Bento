@@ -184,12 +184,3 @@ export const CATALOG: CatalogEntry[] = [
   { id: "g12-vecmag", grade: 12, unit: "Vectors and series", title: "Vector length", pre: null, final: [-1] },
   { id: "g12-dot", grade: 12, unit: "Vectors and series", title: "Dot product", pre: null, final: [-1] },
 ];
-
-/** Shown on the home screen of grades K–4 under "Coming soon", as in the current app. */
-export const COMING_SOON: string[][] = [
-  ["Counting to 100", "Comparing numbers", "Subtracting within 10", "Shapes"],
-  ["Place value: tens and ones", "Subtracting within 20", "Telling time", "Measuring length"],
-  ["Subtracting with regrouping", "Skip counting", "Money", "Telling time to 5 minutes"],
-  ["Division facts", "Fractions on a number line", "Area", "Rounding"],
-  ["Comparing fractions", "Factors and multiples", "Line plots", "Converting measurements"],
-];
