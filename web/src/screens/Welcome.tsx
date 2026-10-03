@@ -75,6 +75,7 @@ export const HERO_POOLS = [
   ["g9-solvefactor", "g11-log", "g12-tangent", "g8-roots", "g10-pyramid", "g9-factor", "g11-complex"],
 ];
 /** The big tile starts first, the others a beat later each; a change waits until no other tile changed for this long. */
+const HOLD = 1200;
 const STAGGER = 600, GAP = 1200;
 
 type Shot = { id: string; grade: number; ex: Pictured };
@@ -92,19 +93,19 @@ function nextShot(pool: string[], from: number, avoid: number[], rng: Rng): [Sho
 
 /** One hero tile: a lesson's moving picture with its grade and title. Tap to skip to the next one. */
 function HeroTile({ shot, n, big, start, next }: { shot: Shot; n: number; big: boolean; start: number; next: () => void }) {
-  const [on, setOn] = useState(start === 0 || reduceMotion());
-  useEffect(() => { if (on) return; const t = setTimeout(() => setOn(true), start); return () => clearTimeout(t); }, [on, start]);
+  // every tile opens on its finished picture, holds it, then plays; the stagger keeps the three out of step
+  const hold = HOLD + start;
   useEffect(() => {
-    if (reduceMotion() || !on) return;
-    const t = setTimeout(next, 2400 + shot.ex.timeline.length * 750);
+    if (reduceMotion()) return;
+    const t = setTimeout(next, hold + 2400 + shot.ex.timeline.length * 750);
     return () => clearTimeout(t);
-  }, [shot, on, next]);
+  }, [shot, hold, next]);
   const g = gradeOf(shot.grade), entry = entryById(shot.id);
   return (
     // the card stays put; only what's inside it fades over to the next picture
     <figure className={`lhpic${big ? "" : " sm"}`} style={tintStyle(g) as CSSProperties} onClick={next}>
       <figcaption key={`c${n}`}><GradeNum grade={shot.grade} /><span><small>See it first</small><b>{entry?.title ?? shot.id}</b></span></figcaption>
-      <div className="lhd" key={`d${n}`}>{on && <PlayingDiagram ex={shot.ex} />}</div>
+      <div className="lhd" key={`d${n}`}><PlayingDiagram ex={shot.ex} hold={hold} /></div>
     </figure>
   );
 }
