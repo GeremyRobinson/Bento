@@ -194,3 +194,5 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
    (a full pill on iPad, a softer rounded row on phones where cards are less round) */
 .units>.panel{padding-bottom:var(--nest)}
 .units .lesson{height:56px;border-radius:calc(var(--r-panel) - var(--nest));margin:0 calc(var(--nest) - var(--u) * 1.25);width:calc(100% + (var(--u) * 1.25 - var(--nest)) * 2);padding:0 calc(var(--u) * 1.25 - var(--nest) + 14px)}
+/* the Me button stands as far from the place pill as the Bento word does */
+.island .ime{margin-left:14px}
