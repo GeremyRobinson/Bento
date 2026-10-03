@@ -15,11 +15,13 @@ describe("first launch: landing → grade → home", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Math that finally clicks." })).toBeInTheDocument();
     expect(screen.getByText("Counting to calculus, with unit tests and a check-up for every grade.")).toBeInTheDocument();
 
-    // the hero box plays a real lesson picture with its grade, beside the two step demos
-    const hero = document.querySelector(".lhbox .lhpic")!;
-    expect(hero.querySelector(".gnum")).not.toBeNull();
-    expect(hero.querySelector(".viz")).not.toBeNull();
-    expect(document.querySelectorAll(".lhbox .ldemo")).toHaveLength(2);
+    // the hero box plays three real lesson pictures, one big and two small, each with its grade, from early, middle and high school
+    const pics = [...document.querySelectorAll(".lhbox .lhpic")];
+    expect(pics).toHaveLength(3);
+    expect(pics.filter(p => p.classList.contains("sm"))).toHaveLength(2);
+    for (const p of pics) { expect(p.querySelector(".gnum")).not.toBeNull(); expect(p.querySelector(".viz")).not.toBeNull(); }
+    const picGrades = pics.map(p => Number(p.querySelector(".gnum")!.textContent!.replace(/\D/g, "") || 0)).sort((a, b) => a - b);
+    expect(picGrades[0]).toBeLessThanOrEqual(4); expect(picGrades[1]).toBeGreaterThanOrEqual(5); expect(picGrades[1]).toBeLessThanOrEqual(8); expect(picGrades[2]).toBeGreaterThanOrEqual(9);
     // the feature box: nine working tiles
     expect(document.querySelectorAll(".lbox .ltile")).toHaveLength(9);
 

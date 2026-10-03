@@ -8,7 +8,6 @@ import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { reduceMotion } from "../app/transition";
 import { FeatureBox } from "../components/LandingTiles";
 import { GradeNum, Shelf } from "../components/Shelf";
-import { SlipTile, SolveTile } from "../components/StepDemos";
 import { Advanced } from "../components/Advanced";
 import type { Explanation } from "../explanations/schema";
 
@@ -66,30 +65,52 @@ export function showcasePicture(id: string, rng: Rng): Pictured | null {
   try { return tryOne(lesson.reference); } catch { return null; }
 }
 
-/** The hero's big picture: a lesson's moving picture from a random grade, moving on to another after it plays. */
-function HeroPicture({ rng }: { rng: Rng }) {
+/**
+ * The landing's moving pictures come from the lessons with the boldest, most colorful diagrams: blocks, clocks,
+ * coins, graphs, shapes and solids. Thin number lines and balances teach well but look plain at this size.
+ */
+export const SHOWY = [
+  "k-tens", "k-teens", "k-make10", "g1-tensones", "g1-time", "g1-halves", "g2-hundreds", "g2-regroup", "g2-money", "g2-bargraph", "g2-arrays",
+  "g3-split", "g3-fraccompare", "g3-area", "g4-partial", "g4-likefrac", "g4-dec",
+  "add", "g5-improper", "g5-multfrac", "g5-volume", "g6-gcf", "g6-mean", "g6-tri", "g7-circarea", "g7-prob",
+  "g8-system", "g8-pyth", "g8-cyl", "g8-cone", "g8-tri",
+  "g9-foil", "g9-quadform", "g10-polygon", "g10-similar", "g10-trig", "g10-sector", "g10-surface",
+  "g11-geo", "g11-vertex", "g12-unit", "g12-tangent", "g12-dot",
+];
+/** Three bands so the three pictures always span the school years: one early, one middle, one high. */
+const BANDS = [[0, 4], [5, 8], [9, 12]] as const;
+
+/** A moving lesson picture that plays, then moves on to another from its band. Tap for the next one. */
+function LandingPicture({ rng, band, big, delay }: { rng: Rng; band: readonly [number, number]; big?: boolean; delay: number }) {
   const [n, setN] = useState(0);
+  const pool = useMemo(() => rng.shuffle(SHOWY.filter(id => { const g = lessonById(id)?.grade; return g != null && g >= band[0] && g <= band[1]; })), [rng, band]);
   const shot = useMemo(() => {
-    for (let tries = 0; tries < 20; tries++) {
-      const g = rng.pick(GRADES).grade, l = rng.pick(lessonsInGrade(g));
-      const ex = l && showcasePicture(l.id, rng);
-      if (l && ex) return { id: l.id, grade: g, ex };
+    for (let k = 0; k < pool.length; k++) {
+      const id = pool[(n + k) % pool.length]!, ex = showcasePicture(id, rng);
+      if (ex) return { id, grade: lessonById(id)!.grade, ex };
     }
     return null;
-  }, [n, rng]);
+  }, [n, pool, rng]);
   useEffect(() => {
     if (reduceMotion() || !shot) return;
-    const t = setTimeout(() => setN(k => k + 1), 2400 + shot.ex.timeline.length * 750);
+    const t = setTimeout(() => setN(k => k + 1), 2400 + shot.ex.timeline.length * 750 + (n ? 0 : delay));
     return () => clearTimeout(t);
-  }, [shot]);
+  }, [shot, n, delay]);
   if (!shot) return null;
   const g = gradeOf(shot.grade), entry = entryById(shot.id);
   return (
-    <figure className="lhpic" key={n} style={tintStyle(g) as CSSProperties} onClick={() => setN(k => k + 1)}>
-      <figcaption><GradeNum grade={shot.grade} /><span><small>See it first</small><b>{entry?.title ?? shot.id}</b></span></figcaption>
-      <PlayingDiagram ex={shot.ex} />
+    // the card stays put; only what's inside it fades over to the next picture
+    <figure className={`lhpic${big ? "" : " sm"}`} style={tintStyle(g) as CSSProperties} onClick={() => setN(k => k + 1)}>
+      <figcaption key={`c${n}`}><GradeNum grade={shot.grade} /><span>{big && <small>See it first</small>}<b>{entry?.title ?? shot.id}</b></span></figcaption>
+      <div className="lhd" key={`d${n}`}><PlayingDiagram ex={shot.ex} /></div>
     </figure>
   );
+}
+
+/** The hero box: one big moving picture and two smaller ones, each from a different part of school. */
+function HeroPictures({ rng }: { rng: Rng }) {
+  const bands = useMemo(() => rng.shuffle([...BANDS]), [rng]);
+  return <>{bands.map((b, i) => <LandingPicture key={b[0]} rng={rng} band={b} big={i === 0} delay={i * 1600} />)}</>;
 }
 
 /** The first screen on a new device: what Bento is, the real thing working, and the grade shelf to start from. */
@@ -105,9 +126,7 @@ export function Welcome() {
         <div className="lcta"><button className="ctl go" onClick={toShelf}>Choose your grade</button><span>Free. No account.</span></div>
       </section>
       <section className="lhbox">
-        <HeroPicture rng={rng} />
-        <SolveTile rng={rng} />
-        <SlipTile rng={rng} />
+        <HeroPictures rng={rng} />
       </section>
       <section className="lsec" id="lshelf"><h2>Pick your grade.</h2><p>Every grade is a book of chapters, Kindergarten to 12th. Start anywhere, and change any time.</p></section>
       <div className="lshelf"><Shelf current={null} onPick={chooseGrade} soon={false} /></div>

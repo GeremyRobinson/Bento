@@ -42,3 +42,11 @@ describe.each(LESSONS.map(l => [l.id, l] as const))("%s lesson page", (_id, less
     expect(pics.size).toBeGreaterThan(1);
   });
 });
+
+describe("the landing page's pictures", () => {
+  it("every showy lesson exists and draws a picture that fits a tile", async () => {
+    const { SHOWY, showcasePicture } = await import("../../screens/Welcome");
+    const { createRng } = await import("../../curriculum/generators/rng");
+    for (const id of SHOWY) expect(showcasePicture(id, createRng(7)), id).not.toBeNull();
+  });
+});
