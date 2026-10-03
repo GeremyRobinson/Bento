@@ -1,6 +1,7 @@
 import { defaultSettings, type Settings } from "../../app/settings";
 import type { Level } from "./levels";
 import type { PracticeSession } from "../session/types";
+import type { FactRecord, SprintRecord } from "../facts/mastery";
 
 export interface ScoreRecord {
   last: Level;
@@ -54,11 +55,16 @@ export interface Progress {
   intros: number[];
   /** accessibility and comfort settings for this device */
   settings: Settings;
+  /** facts known by heart: `${table}:${fact}` → level and when it comes back */
+  facts: Record<string, FactRecord>;
+  /** finished fact sprints, newest last (kept to the last 200) */
+  sprints: SprintRecord[];
 }
 
 export const emptyProgress = (): Progress => ({
   version: 1, grade: null, chosen: false, xp: 0, gxp: {}, streak: 0, last: "", done: 0,
   lessons: {}, scores: {}, tests: {}, log: [], seen: {}, reviews: {}, run: null, intros: [], settings: defaultSettings(),
+  facts: {}, sprints: [],
 });
 
 export const lastScore = (p: Progress, id: string) => p.scores[id]?.last ?? null;

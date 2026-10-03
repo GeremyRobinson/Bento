@@ -11,7 +11,7 @@ import { ChapterPic } from "../components/Contents";
 import { useMemo } from "react";
 
 
-const KIND = { lesson: "Up next", review: "Review", test: "Unit test" } as const;
+const KIND = { lesson: "Up next", review: "Review", test: "Unit test", facts: "Fact sprint" } as const;
 
 /**
  * Home is the grade's book: its cover (what this year is about), today's short plan (one tap starts it) with how the
@@ -30,9 +30,9 @@ export function Home() {
   const gt = progress.tests[testKey(g)];
   const open = (c: Entry) => go({ name: "learn", lessonId: c.id });
   const run = (i: TodayItem) => i.kind === "lesson" ? (i.done ? startLesson(i.id) : go({ name: "learn", lessonId: i.id }))
-    : i.kind === "review" ? startReview() : startTest(i.key);
+    : i.kind === "review" ? startReview() : i.kind === "facts" ? go({ name: "facts", table: i.table, start: true }, "fwd") : startTest(i.key);
   const doneScore = (i: TodayItem) => i.kind === "review" ? progress.reviews[new Date(deps().now).toDateString()]
-    : i.kind === "lesson" ? lastScore(progress, i.id) : progress.tests[i.key]?.last;
+    : i.kind === "lesson" ? lastScore(progress, i.id) : i.kind === "facts" ? undefined : progress.tests[i.key]?.last;
   const minutes = plan.filter(i => !i.done).reduce((m, i) => m + i.minutes, 0);
 
   let k = 0;
@@ -52,7 +52,7 @@ export function Home() {
             <ol className="plan">{plan.map(i => (
               <li key={i.kind}>
                 <button className={`pitem${i.done ? " done" : ""}${i === first ? " now" : ""}`} onClick={() => run(i)}
-                  aria-label={i.kind === "review" ? (i.done ? "Today's review: done" : "Today's review") : i.kind === "lesson" && !i.done ? `${i.again ? "Practice" : "Up next"}: ${i.title}` : undefined}>
+                  aria-label={i.kind === "facts" ? `Fact sprint: ${i.title}${i.done ? ", done" : ""}` : i.kind === "review" ? (i.done ? "Today's review: done" : "Today's review") : i.kind === "lesson" && !i.done ? `${i.again ? "Practice" : "Up next"}: ${i.title}` : undefined}>
                   <span className="pmark" aria-hidden>{i.done ? <Check /> : null}</span>
                   <span className="ptext"><small>{i.kind === "lesson" && i.again ? "Practice" : KIND[i.kind]}</small><b>{i.title}</b></span>
                   {i === first ? <span className="ctl go">Start</span> : i.done ? <ScoreChip n={doneScore(i)} /> : <span className="pmin">{i.minutes} min</span>}
@@ -60,7 +60,10 @@ export function Home() {
               </li>
             ))}</ol>
           )}
-          {!progress.log.length && <button className="tlink" onClick={() => startTest(placeKey(g))}>Not sure this is your grade? Find my level ›</button>}
+          <div className="tlinks">
+            {!progress.log.length && <button className="tlink" onClick={() => startTest(placeKey(g))}>Not sure this is your grade? Find my level ›</button>}
+            <button className="tlink" onClick={() => go({ name: "facts" }, "fwd")}>All facts ›</button>
+          </div>
         </section>
         <section className="tile b-stats battery">
           <Fill frac={list.length ? done / list.length : 0} />

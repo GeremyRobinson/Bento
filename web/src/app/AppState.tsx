@@ -1,3 +1,4 @@
+import { finishSprint, type SprintAnswer } from "../engine/facts/mastery";
 import { applySettings, readSettings, type Settings } from "./settings";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createRng, randomSeed, type Rng } from "../curriculum/generators/rng";
@@ -36,6 +37,8 @@ interface AppState extends AppData {
   finish(): void;
   /** ends a test, check-up or review without scoring it, and goes home */
   quit(): void;
+  /** save a finished fact sprint */
+  saveSprint(table: string, answers: SprintAnswer[]): void;
   /** change accessibility and comfort settings */
   setSettings(patch: Partial<Settings>): void;
   exportBackup(): string;
@@ -177,6 +180,7 @@ export function AppProvider(props: {
           show({ name: "results" });
         });
       },
+      saveSprint: (table, answers) => { if (answers.length) setProgress(p => finishSprint(p, table, p.grade ?? 5, answers, now())); },
       setSettings: patch => setProgress(p => ({ ...p, settings: { ...readSettings(p.settings), ...patch } })),
       exportBackup: () => JSON.stringify(makeBackup(data.progress, data.reports, now())),
       importBackup: async json => {

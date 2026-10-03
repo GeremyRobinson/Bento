@@ -1,3 +1,4 @@
+import { Facts } from "../screens/Facts";
 import { useEffect } from "react";
 import { bandOf, lineOf } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
@@ -58,10 +59,11 @@ export function App() {
     case "report": screen = <ReportScreen rep={reports[route.key]} />; break;
     case "parent": screen = <Parent />; break;
     case "me": screen = <Me />; break;
+    case "facts": screen = <Facts table={route.table} start={!!route.start} />; break;
     default: screen = <Home />;
   }
   // a new screen (or a new grade on a top-level screen) re-enters; with view transitions the browser cross-fades instead
-  const viewKey = [route.name, route.name === "learn" ? route.lessonId : route.name === "report" ? route.key : "", top ? chosenGrade : ""].join("|");
+  const viewKey = [route.name, route.name === "learn" ? route.lessonId : route.name === "report" ? route.key : route.name === "facts" ? route.table ?? "" : "", top ? chosenGrade : ""].join("|");
   return (
     <main id="app" className={`wrap t${tint}${canCrossFade() ? "" : " fresh"}`} data-band={bandOf(grade)} data-grade={grade} key={viewKey}>
       <Island grade={grade} />

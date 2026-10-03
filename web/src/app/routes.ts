@@ -8,7 +8,9 @@ export type Route =
   | { name: "report"; key: string }
   | { name: "parent" }
   /** the personal hub: grades, progress, the grown-up page, accessibility and backups */
-  | { name: "me" };
+  | { name: "me" }
+  /** the facts tables: all of them for the grade, or one table */
+  | { name: "facts"; table?: string; start?: boolean };
 
 const decode = (s: string) => { try { return decodeURIComponent(s); } catch { return s; } };
 
@@ -23,6 +25,7 @@ export function parseRoute(hash: string): Route {
     case "report": return parts[1] ? { name: "report", key: parts[1] } : { name: "home" };
     case "grown-up": return { name: "parent" };
     case "me": return { name: "me" };
+    case "facts": return parts[1] ? { name: "facts", table: parts[1], ...(parts[2] === "go" ? { start: true } : {}) } : { name: "facts" };
     default: return { name: "home" };
   }
 }
@@ -37,6 +40,7 @@ export function routeHash(r: Route): string {
     case "report": return `#/report/${encodeURIComponent(r.key)}`;
     case "parent": return "#/grown-up";
     case "me": return "#/me";
+    case "facts": return r.table ? `#/facts/${encodeURIComponent(r.table)}${r.start ? "/go" : ""}` : "#/facts";
   }
 }
 

@@ -5,11 +5,14 @@ import type { Progress } from "../engine/mastery/progress";
 import { lastScore, timesDone } from "../engine/mastery/progress";
 import { lessonById } from "../curriculum/registry";
 import { entriesInGrade, isReady, testKey, unitsInGrade, type Entry } from "./curriculum";
+import { tablesForGrade } from "../engine/facts/tables";
+import { sprintDoneToday, sprintTableFor } from "../engine/facts/mastery";
 
 export type TodayItem =
   | { kind: "lesson"; id: string; title: string; again: boolean; done: boolean; minutes: number }
   | { kind: "review"; title: string; done: boolean; minutes: number }
-  | { kind: "test"; key: string; unit: string; title: string; done: boolean; minutes: number };
+  | { kind: "test"; key: string; unit: string; title: string; done: boolean; minutes: number }
+  | { kind: "facts"; table: string; title: string; done: boolean; minutes: number };
 
 const sameDay = (a: number, b: number) => new Date(a).toDateString() === new Date(b).toDateString();
 
@@ -34,6 +37,14 @@ export function todayPlan(progress: Progress, g: number, now: number, reviewRead
 
   // a few problems from what's already been learned
   if (reviewReady) items.push({ kind: "review", title: "Today's review", done: progress.reviews[new Date(now).toDateString()] != null, minutes: 5 });
+
+  // a two-minute fact sprint, on the table that most needs it
+  const ft = sprintTableFor(progress.facts ?? {}, tablesForGrade(g), now);
+  if (ft) {
+    const doneToday = sprintDoneToday(progress.sprints ?? [], now);
+    const last = doneToday ? [...(progress.sprints ?? [])].reverse().find(s => new Date(s.date).toDateString() === new Date(now).toDateString()) : undefined;
+    items.push({ kind: "facts", table: last?.table ?? ft.id, title: (last ? tablesForGrade(g).find(t => t.id === last.table) ?? ft : ft).name, done: doneToday, minutes: 2 });
+  }
 
   // a unit test, once every lesson of a unit is done and its test hasn't been passed
   const units = unitsInGrade(g);

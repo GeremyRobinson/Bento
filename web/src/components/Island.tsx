@@ -6,6 +6,7 @@ import { gradeOf, inkOf } from "../curriculum/grades";
 import { lessonById } from "../curriculum/registry";
 import { currentItem, lessonOfItem } from "../engine/session/practice";
 import { Contents, type Level } from "./Contents";
+import { tableById } from "../engine/facts/tables";
 import { Chevron } from "./primitives/icons";
 
 /** A simple person: a head and shoulders. */
@@ -56,6 +57,10 @@ function placeOf(route: Route, app: ReturnType<typeof useApp>, grade: number): P
     }
     case "parent": return { kicker: "Me", title: "For the grown-up", back: { label: "Me", to: { name: "me" } } };
     case "me": return { kicker: "Me", title: "Your Bento", back: contents };
+    case "facts": {
+      const t = route.table ? tableById(route.table) : undefined;
+      return t ? { kicker: "Facts", title: t.name, back: { label: "facts", to: { name: "facts" } } } : { kicker: gradeOf(grade).name, title: "Facts", back: contents };
+    }
     default: return { kicker: "Contents", title: gradeOf(grade).name };
   }
 }

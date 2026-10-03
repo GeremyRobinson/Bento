@@ -10,7 +10,7 @@ describe("today's plan", () => {
   it("starts with the first lesson not done yet", () => {
     const plan = todayPlan(base(), 5, now, false);
     const first = entriesInGrade(5).find(c => isReady(c.id))!;
-    expect(plan).toEqual([expect.objectContaining({ kind: "lesson", id: first.id, done: false })]);
+    expect(plan).toEqual([expect.objectContaining({ kind: "lesson", id: first.id, done: false }), expect.objectContaining({ kind: "facts", done: false, minutes: 2 })]);
   });
   it("marks today's lesson done and adds review when there's enough to review", () => {
     const first = entriesInGrade(5).find(c => isReady(c.id))!;
