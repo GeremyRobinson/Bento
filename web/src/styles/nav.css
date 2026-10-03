@@ -182,3 +182,8 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
 .pitem{border-radius:999px;padding:10px 10px 10px 14px;margin:0 -14px;width:calc(100% + 28px)}
 .pitem .ctl.go{height:40px}
 .bhome .today:has(.plan:last-child){padding-bottom:calc(var(--u) * 1.75 - 14px)}
+
+/* anything that sticks while you scroll stops below the island, not under it */
+.wrap{--below-island:calc(max(10px,env(safe-area-inset-top)) + 52px + var(--u))}
+@media (min-width:900px) and (orientation:landscape){.lside,.bdone>.panel{top:var(--below-island)}}
+.panel.split>.col:last-child{top:var(--below-island)}
