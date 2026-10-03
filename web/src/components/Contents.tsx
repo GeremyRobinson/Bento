@@ -135,15 +135,15 @@ export function Contents({ grade, lessonId, level: first, close }: { grade: numb
               {line.grades.length ? line.grades.map(n => {
                 const d = GRADES[n]!, list = entriesInGrade(n), done = doneCount(progress, list);
                 return (
-                  <button key={n} className={`zbook${n === grade ? " on" : ""}`} style={{ "--tint": d.color } as CSSProperties}
+                  <button key={n} className={`zbook${n === grade ? " on" : ""}`} style={{ "--tint": d.color, "--p": list.length ? done / list.length : 0 } as CSSProperties}
                     onClick={() => { close(); chooseGrade(n); }} aria-label={`${d.name}: ${done} of ${list.length} lessons done`}>
-                    <span className="spine">{d.short}</span>
-                    <b>{d.name.split(" · ")[0]}</b>
-                    <span className="muted">{d.subtitle}</span>
-                    <span className="zbar"><i style={{ width: `${list.length ? (done / list.length) * 100 : 0}%` }} /></span>
+                    <span className="znum" aria-hidden>{d.short}{n > 0 && <small>{["", "st", "nd", "rd"][n] ?? "th"}</small>}</span>
+                    <b>{d.subtitle}</b>
+                    <span className="zfill" aria-hidden />
+                    <span className="zcount">{done === 0 ? `${list.length} lesson${list.length === 1 ? "" : "s"}` : done === list.length ? "Finished" : `${done} of ${list.length} done`}</span>
                   </button>
                 );
-              }) : line.soon?.map(c => <span key={c} className="zbook soon"><span className="spine">AP</span><b>{c.replace("AP ", "")}</b><span className="muted">Coming soon</span></span>)}
+              }) : line.soon?.map(c => <span key={c} className="zbook soon"><span className="znum">AP</span><b>{c.replace("AP ", "")}</b><span className="zsoon">Coming soon</span></span>)}
             </div>
           </div>
         ))}

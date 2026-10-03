@@ -98,16 +98,22 @@ html[data-zoomed] body{overflow:hidden}
 .zline{display:grid;gap:var(--s);align-content:start}
 .zline>.k{padding-left:4px}
 @media (min-width:900px){.zshelf{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:calc(var(--u) * 1.5)}.zshelf>.tlink{grid-column:1 / -1}}
-.zbooks{display:grid;gap:var(--s);grid-template-columns:repeat(auto-fit,minmax(140px,1fr));align-items:start}
-.zbook{display:grid;gap:4px;align-content:start;text-align:left;padding:var(--u);border-radius:calc(var(--r-panel) - 4px);background:var(--card);box-shadow:0 0 0 1px var(--rule);transition:transform .25s var(--spring),box-shadow .2s}
+.zbooks{display:grid;gap:var(--s);grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.zbook{position:relative;overflow:hidden;isolation:isolate;display:flex;flex-direction:column;gap:6px;height:156px;text-align:left;padding:14px 18px 18px;border-radius:calc(var(--r-panel) - 4px);background:var(--card);box-shadow:0 0 0 1px var(--rule);transition:transform .25s var(--spring),box-shadow .2s}
 button.zbook:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 14px 30px -18px rgba(15,20,30,.3)}
 .zbook.on{box-shadow:0 0 0 2px var(--tint)}
-.zbook .spine{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--tint);color:#fff;font:650 14px/1 var(--sans);margin-bottom:6px}
-.zbook b{font-weight:650}
-.zbook .muted{font-size:13px;line-height:1.3}
-.zbar{height:4px;border-radius:2px;background:var(--rule);margin-top:8px;overflow:hidden}
+.zbook .znum{font:650 44px/1 var(--sans);letter-spacing:-.04em;color:var(--tint);font-variant-numeric:tabular-nums}
+.zbook .znum small{font-size:17px;font-weight:600;letter-spacing:0;margin-left:2px;vertical-align:top;position:relative;top:4px}
+.zbook b{font-weight:600;font-size:15px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* progress fills the card from the bottom in the grade's colour, like a battery charging */
+.zbook .zfill{position:absolute;inset:auto 0 0;height:calc(var(--p) * 100%);z-index:-1;background:linear-gradient(to top,color-mix(in srgb,var(--tint) 30%,transparent),color-mix(in srgb,var(--tint) 16%,transparent));
+  box-shadow:inset 0 1.5px 0 color-mix(in srgb,var(--tint) 55%,transparent);transform-origin:bottom;animation:zcharge .9s var(--ease) .15s both}
+@keyframes zcharge{from{transform:scaleY(0)}}
+.zbook .zcount{margin-top:auto;font-size:13px;font-weight:550;color:var(--muted);font-variant-numeric:tabular-nums}
+.zbook .zsoon{margin-top:auto;font-size:13px;color:var(--muted)}
+.zbar{height:4px;border-radius:2px;background:var(--rule);margin-top:auto;overflow:hidden;flex:none}
 .zbar i{display:block;height:100%;background:var(--tint);border-radius:2px}
-.zbook.soon{--tint:#111827;opacity:.7}
+.zbook.soon{--tint:var(--muted);opacity:.75}
 .zshelf>.tlink{justify-self:center}
 
 /* ---- home is the book's cover: the grade, what the year is about, then today and every chapter ---- */
