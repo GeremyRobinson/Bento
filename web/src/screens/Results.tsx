@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { mins, when } from "../app/format";
 import { reduceMotion } from "../app/transition";
-import { bandOf, gradeOf } from "../curriculum/grades";
+import { bandOf, gradeOf, tintStyle } from "../curriculum/grades";
 import { placementResult } from "../engine/session/practice";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { LEVELS } from "../engine/mastery/levels";
@@ -42,7 +42,7 @@ function Placed({ rep }: { rep: SessionReport }) {
   const { grade, rows } = placementResult(rep.probs), gd = gradeOf(grade);
   const from = Number(rep.key.split(":")[1]), same = grade === from && progress.grade === from;
   return (
-    <section className="placed" style={{ "--tint": gd.color } as CSSProperties}>
+    <section className="placed" style={tintStyle(gd) as CSSProperties}>
       <span className="k">Your level</span>
       <h1>Start in {gd.name}.</h1>
       <p className="muted">{grade > from ? "You're ahead. The work here will stretch you." : grade < from ? "A few things to firm up first. You'll move fast." : "Right where you should be."}</p>

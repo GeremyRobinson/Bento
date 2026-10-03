@@ -2,7 +2,7 @@
 /* Bento. One layout, one spacing grid, one motion language; each grade brings its own colours and pattern.
    Grid: every size is a multiple of 4px. Nested corners are concentric: inner radius = outer radius − the padding between them. */
 :root{
-  --text:#1b1d22; --muted:#717786; --faint:#c9ccd4; --rule:#e4e6eb; --page:#fbfbfd; --well:#f1f2f6; --card:#fff; --hover:#e8eaf0;
+  --text:#1b1d22; --muted:#626879; --faint:#c9ccd4; --rule:#e4e6eb; --page:#fbfbfd; --well:#f1f2f6; --card:#fff; --hover:#e8eaf0;
   --ok:#1fbf5f; --busy:#f5a524; --err:#ef4444; --on-tint:#fff;
   /* one typeface for words and numbers. Inter with its friendlier cuts: a single-storey a, an l with a tail and an I with bars,
      so letters and digits never get mixed up. Numbers use even-width figures so columns line up. */

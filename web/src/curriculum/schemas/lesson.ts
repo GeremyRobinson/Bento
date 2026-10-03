@@ -88,6 +88,8 @@ export interface LessonDefinition<P = unknown> {
   display(problem: P): MathText;
   /** an optional line under the problem, e.g. "Factor it." */
   displayNote?(problem: P): RichText;
+  /** word problems: the whole question at reading size, shown in place of the short math line */
+  lead?(problem: P): RichText;
   /** counters under the problem in practice, built from its numbers (the current app's dots, ten frames and base-ten blocks) */
   displayCounters?(problem: P): Counters;
   /** an optional picture shown with the problem, e.g. the dots to count (the current app's dots and ten frames) */

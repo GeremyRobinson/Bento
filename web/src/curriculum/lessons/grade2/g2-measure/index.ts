@@ -12,7 +12,7 @@ export interface MeasureProblem { unit: number; start: number; end: number; thin
 
 const UNITS = [
   { abbr: "in" as const, one: "inch", many: "inches", max: 10, min: 2 },
-  { abbr: "cm" as const, one: "centimetre", many: "centimetres", max: 15, min: 3 },
+  { abbr: "cm" as const, one: "centimeter", many: "centimeters", max: 15, min: 3 },
 ];
 
 export function createMeasure(unit: number, start: number, end: number, thing: number): MeasureProblem {
@@ -102,7 +102,7 @@ export const lesson: LessonDefinition<MeasureProblem> = {
   id: "g2-measure",
   grade: 2,
   unit: "Measurement and data",
-  title: "Inches and centimetres",
+  title: "Inches and centimeters",
   pre: "g1-measure",
   reference: createMeasure(1, 2, 9, 0),
   generate,

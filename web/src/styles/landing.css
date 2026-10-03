@@ -24,7 +24,7 @@
 .lshot .viz-svg{max-height:220px;width:100%}
 .lshot.big .viz-svg{max-height:440px}
 .lshot figcaption{display:flex;align-items:center;gap:10px;font-weight:var(--w-bold);font-size:calc(var(--fs) * .95);min-width:0}
-.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--tint);font-weight:var(--w-bold)}
+.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--ink);font-weight:var(--w-bold)}
 .lpair{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
 @media (min-width:700px){.lpair{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule)}
@@ -34,7 +34,7 @@
 .lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
 .lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
 .lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
-.lsteps b{color:var(--tint);font-weight:600}
+.lsteps b{color:var(--ink);font-weight:600}
 .lsteps .sum{background:var(--tint-soft)}
 .lmiss .bad{background:color-mix(in srgb,#ef4444 12%,var(--card))} .lmiss .bad b{color:#dc2626;font-weight:600;text-decoration:line-through 2px}
 .lmiss p{font-family:var(--sans);margin-top:6px;color:var(--text);line-height:1.5}

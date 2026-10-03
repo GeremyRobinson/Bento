@@ -105,6 +105,7 @@ export const lesson: LessonDefinition<MeasureProblem> = {
   restore: raw => restoreVia(raw, ["x", "y", "a", "b"] as const, v => createMeasure(v.x, v.y, v.a, v.b)),
   display: p => [text(`${THINGS[p.x]} and ${THINGS[p.y]}`)],
   displayNote: () => "Count the cubes under each one.",
+  lead: p => `How long are the ${THINGS[p.x]} and the ${THINGS[p.y]}? Count the cubes under each one.`,
   picture: p => buildMeasure({ things: [{ name: THINGS[p.x]!, length: p.a }, { name: THINGS[p.y]!, length: p.b }], alt: `A ${THINGS[p.x]} and a ${THINGS[p.y]}, each with cubes under it` }),
   answers,
   explain,

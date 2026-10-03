@@ -72,7 +72,7 @@ export const lesson: LessonDefinition<CountProblem> = {
   generate: (rng, index) => createCount(rng.int(TEN + 1, index < 3 ? TEN + 5 : 2 * TEN)),
   restore: raw => restoreVia(raw, ["n"] as const, v => createCount(v.n)),
   display: () => words("How many dots?"),
-  picture: p => countStrip(p.n, `${p.n} dots in rows of ${TEN}`),
+  picture: p => countStrip(p.n, `A full row of ${TEN} dots, and more dots in the row below to count.`),
   answers,
   explain,
 };

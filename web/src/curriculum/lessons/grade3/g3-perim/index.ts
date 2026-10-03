@@ -130,7 +130,10 @@ export function perimPicture(p: PerimProblem, P: number, withBeats = true) {
   return buildPerimeter({
     corners, sides,
     lines: withBeats ? [{ text: `${all.join(" + ")} = ${P} cm`, from: 2 }] : [],
-    alt: `A ${kind === 0 ? "rectangle" : kind === 1 ? "square" : "triangle"} with sides ${all.map(cm).join(", ")}. All the way around is ${P} cm.`,
+    // the practice picture says only what it shows: the labeled sides, never the total
+    alt: withBeats
+      ? `A ${kind === 0 ? "rectangle" : kind === 1 ? "square" : "triangle"} with sides ${all.map(cm).join(", ")}. All the way around is ${P} cm.`
+      : `A ${kind === 0 ? "rectangle" : kind === 1 ? "square" : "triangle"} with ${sides.filter(s => s.text).map(s => s.text).join(" and ")} labeled.`,
   });
 }
 

@@ -28,7 +28,7 @@ function answers({ n, d, W }: FractionTimesWholeProblem): AnswerModel {
     steps: [
       ns({ id: "top", l: "Multiply the top", a: s => [num(W), op("×"), num(n), op("="), ...s], ans: W * n, h: `${W} groups of ${n} pieces.`,
         w: [[W * d, "Multiplied the bottom", "The pieces stay the same size. Only the number of pieces changes."]] }),
-      simplifyStep(W * n, d, "Simplify"),
+      simplifyStep(W * n, d, "Write as a mixed number"),
     ],
     finalParts: [-1],
   };

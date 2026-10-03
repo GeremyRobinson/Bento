@@ -136,6 +136,7 @@ export const lesson: LessonDefinition<BarGraphProblem> = {
     v => createBarGraph(v.theme, v.v0, v.v1, v.v2, v.v3, v.x, v.y, v.kind)),
   display: p => { const th = THEMES[p.theme]!; return [text(`${th.names[p.x]} ${p.kind ? "and" : "or"} ${th.names[p.y]}?`)]; },
   displayNote: questionOf,
+  lead: questionOf,
   picture: p => {
     const th = THEMES[p.theme]!;
     return buildBarGraph({

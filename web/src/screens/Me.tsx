@@ -1,7 +1,7 @@
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import { useApp } from "../app/AppState";
-import { readSettings, speak, playTone, type Settings } from "../app/settings";
-import { gradeOf } from "../curriculum/grades";
+import { readAloudOn, readSettings, speak, playTone, type Settings } from "../app/settings";
+import { gradeOf, tintStyle } from "../curriculum/grades";
 import { LEVEL_XP } from "../engine/mastery/levels";
 import { GradeLineup } from "../components/GradeLineup";
 import { placeKey } from "../engine/session/practice";
@@ -53,7 +53,7 @@ export function Me() {
   return (
     <>
       <div className="bme">
-        <section className="tile mhero battery" style={{ "--tint": grade.color } as CSSProperties}>
+        <section className="tile mhero battery" style={tintStyle(grade) as CSSProperties}>
           <Fill frac={into / LEVEL_XP} />
           <span className="bbig" aria-hidden>{lvl}</span>
           <div className="mh-text">
@@ -84,10 +84,10 @@ export function Me() {
             </span>
           </div>
           <Toggle label="High contrast" note="Darker text and stronger lines" on={st.contrast} set={v => set({ contrast: v })} />
-          <Toggle label="Colour-blind friendly" note="Blue and orange for right and wrong" on={st.colorSafe} set={v => set({ colorSafe: v })} />
+          <Toggle label="Color-blind friendly" note="Blue and orange for right and wrong" on={st.colorSafe} set={v => set({ colorSafe: v })} />
           <Toggle label="Easy-to-read letters" note="Plainer, wider letters" on={st.readable} set={v => set({ readable: v })} />
           <Toggle label="Less motion" note="No sliding or bouncing; pictures show finished" on={st.motion === "reduce"} set={v => set({ motion: v ? "reduce" : "system" })} />
-          <Toggle label="Read aloud" note="Reads each step and problem out loud" on={st.readAloud} set={v => { set({ readAloud: v }); if (v) speak("Read aloud is on."); }} />
+          <Toggle label="Read aloud" note="Reads each step and problem out loud" on={readAloudOn(st, progress.grade)} set={v => { set({ readAloud: v }); if (v) speak("Read aloud is on."); }} />
           <Toggle label="Sounds" note="A soft tone for right and wrong answers" on={st.sounds} set={v => { set({ sounds: v }); if (v) playTone("right"); }} />
         </Tile>
 

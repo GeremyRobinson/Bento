@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import type { Route } from "../app/routes";
 import { entriesInGrade, entryById, unitsInGrade } from "../app/curriculum";
-import { gradeOf } from "../curriculum/grades";
+import { gradeOf, inkOf } from "../curriculum/grades";
 import { lessonById } from "../curriculum/registry";
 import { currentItem, lessonOfItem } from "../engine/session/practice";
 import { Contents, type Level } from "./Contents";
@@ -110,7 +110,7 @@ export function Island({ grade }: { grade: number }) {
   return (
     <>
     <div className="itop">
-      <header className="island" style={{ "--itint": gradeOf(grade).color } as CSSProperties}>
+      <header className="island" style={{ "--itint": inkOf(gradeOf(grade).color) } as CSSProperties}>
         {place.back
           ? <button className="iside" onClick={() => go(place.back!.to, "back")} aria-label={`Back to ${place.back.label}`}><Chevron dir="left" /></button>
           : <button className="iside iword" onClick={() => go({ name: "welcome" }, "back")} aria-label="Bento home page">Bento</button>}
@@ -124,9 +124,9 @@ export function Island({ grade }: { grade: number }) {
         </button>
       </header>
       {showResume && (
-        <button className="iresume" style={{ "--rtint": runGrade!.color } as CSSProperties} onClick={() => go({ name: "practice" }, "fwd")}
+        <button className="iresume" style={{ "--rtint": inkOf(runGrade!.color) } as CSSProperties} onClick={() => go({ name: "practice" }, "fwd")}
           aria-label={`Resume ${run!.title}, ${runGrade!.name}, problem ${run!.i + 1} of ${run!.items.length}`}>
-          <span className="rdot" style={{ background: runGrade!.color }}>{runGrade!.short}</span>
+          <span className="rdot" style={{ background: inkOf(runGrade!.color) }}>{runGrade!.short}</span>
           <span className="rtext"><small>Resume</small><b>{run!.title}</b></span>
           <span className="rcount">{run!.i + 1}/{run!.items.length}</span>
         </button>

@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { entryById } from "../app/curriculum";
 import { CATALOG } from "../curriculum/catalog";
-import { GRADES, LINES, gradeOf } from "../curriculum/grades";
+import { GRADES, LINES, gradeOf, tintStyle } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
@@ -92,7 +92,7 @@ export function Welcome() {
             <div key={line.id} className={`lgroup lgroup-${line.id}`}>
               <span className="lgname">{line.name.replace("Bento ", "")}</span>
               <div className="lgbtns">{line.grades.length ? line.grades.map(n => { const g = gradeOf(n); return (
-                <button key={g.grade} className="lg" style={{ "--tint": g.color, "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
+                <button key={g.grade} className="lg" style={{ ...tintStyle(g), "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
                   <GradeBadge grade={g.grade} gxp={progress.gxp[g.grade] ?? 0} />
                 </button>
               ); }) : null}</div>

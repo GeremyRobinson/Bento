@@ -53,7 +53,9 @@ function answers({ hour, minute }: TimeProblem): AnswerModel {
           [longAt, "Wrote the number, not the minutes", half
             ? `The long hand at ${longAt} is halfway around the clock. Halfway is ${HALF} minutes.`
             : `The long hand at 12 means a new hour is just starting: 0 minutes.`],
-          [60, "Counted a whole hour", "The long hand at the top means the hour is just starting: 0 minutes."],
+          [60, "Counted a whole hour", half
+            ? `A whole hour is 60 minutes, but the long hand has only gone halfway around: ${HALF} minutes.`
+            : "The long hand at the top means the hour is just starting: 0 minutes."],
           [hour, "Read the short hand", "That's the short hand. The **long** hand tells the minutes."],
         ]),
         hint: half ? "The long hand has gone halfway around. Half an hour is 30 minutes." : "Long hand at the top, on 12, means 0 minutes: o'clock.",

@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { doneCount, entriesInGrade } from "../app/curriculum";
-import { GRADES, LINES } from "../curriculum/grades";
+import { GRADES, LINES, tintStyle } from "../curriculum/grades";
 
 /** Progress as a fill: the box fills from the bottom in its colour, like a battery charging. frac is 0–1. */
 export const Fill = ({ frac }: { frac: number }) => <span className="fill" aria-hidden style={{ "--p": Math.max(0, Math.min(1, frac)) } as CSSProperties} />;
@@ -27,7 +27,7 @@ export function Shelf({ current, onPick }: { current: number | null; onPick: (gr
             {line.grades.length ? line.grades.map(n => {
               const d = GRADES[n]!, list = entriesInGrade(n), done = doneCount(progress, list);
               return (
-                <button key={n} className={`book gcell battery${n === current ? " on" : ""}`} style={{ "--tint": d.color } as CSSProperties}
+                <button key={n} className={`book gcell battery${n === current ? " on" : ""}`} style={tintStyle(d) as CSSProperties}
                   onClick={() => onPick(n)} aria-label={`${d.name}: ${done} of ${list.length} lessons done`}>
                   <GradeNum grade={n} />
                   <b>{d.subtitle}</b>

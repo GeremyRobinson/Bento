@@ -1,9 +1,10 @@
 import type { AnyLesson } from "./schemas/lesson";
 import { CATALOG } from "./catalog";
+import { withSingulars } from "./plural";
 
 // Every lesson module registers itself by living at lessons/<grade>/<id>/index.ts and exporting `lesson`.
 const modules = import.meta.glob<{ lesson: AnyLesson }>("./lessons/*/*/index.ts", { eager: true });
-const BY_ID = new Map(Object.values(modules).map(m => [m.lesson.id, m.lesson]));
+const BY_ID = new Map(Object.values(modules).map(m => [m.lesson.id, withSingulars(m.lesson)]));
 
 /** Lessons rebuilt so far, in curriculum order (the catalog's). */
 export const LESSONS: AnyLesson[] = CATALOG.flatMap(c => {

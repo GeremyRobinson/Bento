@@ -9,7 +9,7 @@
 @keyframes glow{0%{background:color-mix(in srgb,var(--ok) 30%,transparent)}100%{background:transparent}}
 .rise{animation:rise .5s var(--ease) both}
 .pop{display:inline-block;animation:pop .45s var(--spring) both}
-.pop.big{font-size:44px;line-height:1}
+.pop{vertical-align:-4px;color:var(--ok)} .pop.big{vertical-align:-6px}
 .shake{animation:shake .4s ease}
 .enter{animation:enter .45s var(--ease) both}
 .workline.enter{animation:enter .45s var(--ease) both, glow 1.2s ease .2s}

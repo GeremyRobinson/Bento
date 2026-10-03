@@ -25,14 +25,14 @@ function answers(p: RemainderProblem): AnswerModel {
   return {
     steps: [
       oneBox({
-        id: "tens", label: "Tens first", question: `How many tens of ${dv} fit into ${n}? Write it like 20.`,
+        id: "tens", label: "Tens first", question: `What is the biggest tens number (10, 20, 30, …) where ${dv} × it is still ${n} or less?`,
         prompt: s => [num(dv), op("×"), s, op("≤"), num(n)], ans: T,
         hint: `Try ${dv} × 10, ${dv} × 20, … and stop before you go past ${n}.`,
-        wrong: [[T / 10, "Forgot it's tens", `${T / 10} tens is written ${T}.`], [T + 10, "Too many tens", `${dv} × ${T + 10} = ${dv * (T + 10)}, which is more than ${n}.`]],
+        wrong: [[T - 10, "Not the most tens", `${dv} × ${T} still fits, so you can use more tens.`], [T / 10, "Forgot it's tens", `${T / 10} tens is written ${T}.`], [T + 10, "Too many tens", `${dv} × ${T + 10} = ${dv * (T + 10)}, which is more than ${n}.`]],
       }),
       oneBox({ id: "subtract", label: "Subtract", prompt: s => [num(n), op("−"), num(dv * T), op("="), s], ans: left, hint: `${dv} × ${T} = ${dv * T}. Take that away from ${n}.` }),
       oneBox({
-        id: "ones", label: "Divide what's left", question: `How many whole ${dv}s fit into ${left}?`,
+        id: "ones", label: "Divide what's left", question: `What is the most whole ${dv}s that fit into ${left}?`,
         prompt: s => [num(dv), op("×"), s, op("≤"), num(left)], ans: O, hint: `Count by ${dv}s and stop before you pass ${left}.`,
       }),
       oneBox({ id: "answer", label: "The answer", prompt: s => [num(T), op("+"), num(O), op("="), s], ans: q, hint: "Add the tens and the ones." }),

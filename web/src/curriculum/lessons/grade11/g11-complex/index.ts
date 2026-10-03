@@ -19,7 +19,9 @@ export const generateComplex = (rng: Rng): ComplexProblem => ({ a: nonZero(rng, 
 const i = text("i");
 const factor = (re: number, im: number): MathText => [text("("), num(re), op(im < 0 ? "−" : "+"), num(Math.abs(im)), i, text(")")];
 const show = ({ a, b, c, d }: ComplexProblem): MathText => [...factor(a, b), ...factor(c, d)];
-const complexText = (re: number, im: number) => `${f(re)} ${im < 0 ? "−" : "+"} ${Math.abs(im)}i`;
+/** "1i" is written "i", and "−1i" is "−i". */
+const oneI = (t: string) => t.replace(/(^|[^\d.])1i(?![\d])/g, (_m, pre: string) => `${pre}i`);
+const complexText = (re: number, im: number) => oneI(`${f(re)} ${im < 0 ? "−" : "+"} ${Math.abs(im)}i`);
 const signed = (v: number, unit: string) => `${v < 0 ? "−" : "+"}${Math.abs(v)}${unit}`;
 
 export function complexAnswers({ a, b, c, d }: ComplexProblem): AnswerModel {
@@ -44,15 +46,15 @@ export function explainComplex(p: ComplexProblem, answers: AnswerModel): Explana
     idea: ["Multiply every part by every part, like two binomials. Then turn i² into −1 and gather the plain numbers and the i terms."],
     statement: show(p),
     diagram: buildAreaGrid({
-      cols: [{ label: f(c), size: Math.abs(c) }, { label: signed(d, "i"), size: Math.abs(d) }],
-      rows: [{ label: f(a), size: Math.abs(a) }, { label: signed(b, "i"), size: Math.abs(b) }],
+      cols: [{ label: f(c), size: Math.abs(c) }, { label: oneI(signed(d, "i")), size: Math.abs(d) }],
+      rows: [{ label: f(a), size: Math.abs(a) }, { label: oneI(signed(b, "i")), size: Math.abs(b) }],
       cells: [
-        [{ text: f(ac), from: 1, focus: [1, 3] }, { text: `${f(a * d)}i`, from: 4, focus: [4] }],
-        [{ text: `${f(b * c)}i`, from: 4, focus: [4] }, { text: `${f(b * d)}i² = ${f(last)}`, from: 2, focus: [2, 3] }],
+        [{ text: f(ac), from: 1, focus: [1, 3] }, { text: oneI(`${f(a * d)}i`), from: 4, focus: [4] }],
+        [{ text: oneI(`${f(b * c)}i`), from: 4, focus: [4] }, { text: oneI(`${f(b * d)}i² = ${f(last)}`), from: 2, focus: [2, 3] }],
       ],
       lines: [
         { text: `real: ${f(ac)} + ${f(last)} = ${f(re)}`.replace("+ −", "− "), from: 3, until: 3 },
-        { text: `i terms: ${f(a * d)}i + ${f(b * c)}i = ${f(im)}i`.replace("+ −", "− "), from: 4, until: 4, cls: "lbl" },
+        { text: oneI(`i terms: ${f(a * d)}i + ${f(b * c)}i = ${f(im)}i`.replace("+ −", "− ")), from: 4, until: 4, cls: "lbl" },
         { text: `= ${complexText(re, im)}`, from: 4 },
       ],
       alt: `(${complexText(a, b)}) times (${complexText(c, d)}) as an area: ${f(ac)}, ${f(a * d)}i, ${f(b * c)}i and ${f(b * d)}i² = ${f(last)}. The product is ${complexText(re, im)}.`,

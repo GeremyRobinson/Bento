@@ -75,7 +75,7 @@ html[data-zoomed] body{overflow:hidden}
 .zpages button:disabled{color:var(--muted)}
 .zpages button.on{background:var(--tint-soft)}
 .zpages .pn{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--well);font:650 13px/1 var(--sans);color:var(--muted)}
-.zpages button.on .pn{background:var(--tint);color:var(--on-tint)}
+.zpages button.on .pn{background:var(--ink);color:var(--on-tint)}
 .zpages .name{flex:1;min-width:0}
 .zpages .muted{font-size:var(--small)}
 
@@ -99,7 +99,7 @@ html[data-zoomed] body{overflow:hidden}
 .cover{display:grid;justify-items:center;text-align:center;gap:6px;padding:calc(var(--u) * 2) var(--u) var(--s);animation:rise .6s var(--ease) both}
 .cover .gpick{border-radius:50%;margin-bottom:6px;transition:transform .2s var(--spring)}
 .cover .gpick:hover{transform:scale(1.06)}
-.cover h1{font:650 clamp(40px,7vw,64px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--tint,var(--text))}
+.cover h1{font:650 clamp(40px,7vw,64px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--display,var(--text))}
 .cover .ysub{font:600 clamp(19px,2.6vw,24px)/1.25 var(--sans);letter-spacing:-.02em}
 .cover .muted{max-width:520px;line-height:1.5;text-wrap:pretty}
 .today h2{font:650 clamp(32px,4.4vw,44px)/1 var(--sans);letter-spacing:-.03em}
@@ -120,11 +120,11 @@ html[data-motion="reduce"] .wrap>:not(.itop):not(.zoom){transition:none}
   background:linear-gradient(to top,color-mix(in srgb,var(--tint) 30%,transparent),color-mix(in srgb,var(--tint) 14%,transparent));box-shadow:inset 0 1.5px 0 color-mix(in srgb,var(--tint) 55%,transparent)}
 @keyframes charge{from{transform:scaleY(0)}}
 .bcount{margin-top:auto;font-size:13px;font-weight:550;color:var(--muted);font-variant-numeric:tabular-nums}
-.bbig{font:650 56px/1 var(--sans);letter-spacing:-.04em;color:var(--tint);font-variant-numeric:tabular-nums}
+.bbig{font:650 56px/1 var(--sans);letter-spacing:-.04em;color:var(--display);font-variant-numeric:tabular-nums}
 html[data-motion="reduce"] .battery>.fill{animation:none}
 
 /* ---- a grade is its number, in its colour ---- */
-.gnum{font:650 44px/1 var(--sans);letter-spacing:-.04em;color:var(--tint);font-variant-numeric:tabular-nums}
+.gnum{font:650 44px/1 var(--sans);letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums}
 .gnum small{font-size:17px;font-weight:600;letter-spacing:0;margin-left:2px;vertical-align:top;position:relative;top:4px}
 
 /* ---- the shelf: every grade by line, one card size ---- */
@@ -173,7 +173,8 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
 @keyframes slideOutR{to{opacity:0;transform:translateX(14%)}}
 @keyframes slideInL{from{opacity:0;transform:translateX(-14%)}}
 /* the dots in the lesson bar are buttons: tap one to jump to that lesson */
-.lbar .dots-nav button.dot{padding:0;border:0;cursor:pointer}
+.lbar .dots-nav button.dot{padding:0;border:0;cursor:pointer;position:relative}
+.lbar .dots-nav button.dot::before{content:"";position:absolute;inset:-17px -4px}
 .lbar .dots-nav button.dot:disabled{cursor:default}
 .lbar .dots-nav button.dot:not(:disabled):hover{background:var(--muted)}
 

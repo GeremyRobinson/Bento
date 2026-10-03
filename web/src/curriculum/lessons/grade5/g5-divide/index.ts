@@ -20,7 +20,7 @@ function answers({ dv, qt, n }: LongDivisionProblem): AnswerModel {
   return {
     steps: [
       oneBox({
-        id: "tens", label: "Tens first", question: `How many tens of ${dv} fit into ${n}? Write it like 30.`,
+        id: "tens", label: "Tens first", question: `What is the biggest tens number (10, 20, 30, …) where ${dv} × it is still ${n} or less?`,
         prompt: s => [num(dv), op("×"), s, op("≤"), num(n)], ans: T,
         hint: `Try ${dv} × 10, ${dv} × 20, … and stop before you go past ${n}.`,
         wrong: [

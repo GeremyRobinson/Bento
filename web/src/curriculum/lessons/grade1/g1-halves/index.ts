@@ -1,4 +1,4 @@
-// Halves and quarters: count the equal parts, name them, then count the shaded ones.
+// Halves and fourths: count the equal parts, name them, then count the shaded ones.
 import { answer, num, text } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
@@ -17,9 +17,9 @@ export function createHalves(shape: number, parts: number, cut: number, shaded: 
   return { shape, parts, cut, shaded };
 }
 
-const CHOICES = ["wholes", "halves", "quarters"];
-const nameOf = (parts: number) => (parts === 2 ? "halves" : "quarters");
-const oneName = (parts: number) => (parts === 2 ? "half" : "quarter");
+const CHOICES = ["wholes", "halves", "fourths"];
+const nameOf = (parts: number) => (parts === 2 ? "halves" : "fourths");
+const oneName = (parts: number) => (parts === 2 ? "half" : "fourth");
 const partWord = (n: number, parts: number) => (n === 1 ? oneName(parts) : nameOf(parts));
 const picture = (p: HalvesProblem) => ({ shape: p.shape as ShapeKind, parts: p.parts as 2 | 4, cut: p.cut });
 
@@ -44,9 +44,9 @@ function answers(p: HalvesProblem): AnswerModel {
         choices: CHOICES, ans: right,
         wrong: [
           [0, "Picked wholes", `The whole is the full ${shape}. Each part is a smaller piece of it.`],
-          [parts === 2 ? 2 : 1, "Mixed up halves and quarters", parts === 2 ? "Quarters means **4** equal parts. Here there are 2." : "Halves means **2** equal parts. Here there are 4."],
+          [parts === 2 ? 2 : 1, "Mixed up halves and fourths", parts === 2 ? "Fourths means **4** equal parts. Here there are 2." : "Halves means **2** equal parts. Here there are 4."],
         ],
-        hint: "2 equal parts are halves. 4 equal parts are quarters.",
+        hint: "2 equal parts are halves. 4 equal parts are fourths.",
         explain: `${parts} equal parts are ${name}. Each part is one ${oneName(parts)}.`,
         work: [text(`The parts are ${name}`)],
       }),
@@ -69,9 +69,9 @@ function answers(p: HalvesProblem): AnswerModel {
 function explain(p: HalvesProblem, model: AnswerModel): Explanation {
   const parts = expectedOf(model, "parts"), shaded = expectedOf(model, "shaded"), shape = SHAPE_NAMES[p.shape]!, name = nameOf(parts);
   return {
-    heading: "Halves and quarters",
-    idea: ["Cut a shape into 2 equal parts and each part is a half. Cut it into 4 equal parts and each part is a quarter."],
-    statement: [text("Halves or quarters?")],
+    heading: "Halves and fourths",
+    idea: ["Cut a shape into 2 equal parts and each part is a half. Cut it into 4 equal parts and each part is a fourth."],
+    statement: [text("Halves or fourths?")],
     diagram: buildParts({
       ...picture(p), shaded,
       beats: { count: 0, one: 1, shaded: 2 },
@@ -92,7 +92,7 @@ export const lesson: LessonDefinition<HalvesProblem> = {
   id: "g1-halves",
   grade: 1,
   unit: "Measurement and shapes",
-  title: "Halves and quarters",
+  title: "Halves and fourths",
   pre: "k-shapes",
   reference: createHalves(0, 4, 0, 3),
   generate: (rng, index) => {
@@ -100,7 +100,7 @@ export const lesson: LessonDefinition<HalvesProblem> = {
     return createHalves(shape, parts, rng.pick(cutsAllowed(shape as ShapeKind)), rng.int(1, parts - 1));
   },
   restore: raw => restoreVia(raw, ["shape", "parts", "cut", "shaded"] as const, v => createHalves(v.shape, v.parts, v.cut, v.shaded)),
-  display: () => [text("Halves or quarters?")],
+  display: () => [text("Halves or fourths?")],
   displayNote: p => `The ${SHAPE_NAMES[p.shape]} is cut into equal parts.`,
   picture: p => buildParts({ ...picture(p), shaded: p.shaded, alt: `A ${SHAPE_NAMES[p.shape]} cut into equal parts, some shaded` }),
   answers,

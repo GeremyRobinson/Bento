@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { reduceMotion } from "../app/transition";
 import type { Rng } from "../curriculum/generators/rng";
-import { gradeOf } from "../curriculum/grades";
+import { gradeOf, tintStyle } from "../curriculum/grades";
 import { frac, num, op, sup, text, type MathText } from "../curriculum/schemas/math-text";
 import { MathLine } from "./primitives/MathLine";
 
@@ -127,7 +127,7 @@ function useDemo<T extends { kind: string }>(make: ((rng: Rng) => T)[], rng: Rng
 
 function Chip({ grade }: { grade: number }) {
   const g = gradeOf(grade);
-  return <span className="lchip" style={{ "--tint": g.color } as CSSProperties}>{g.name.split(" · ")[0]}</span>;
+  return <span className="lchip" style={tintStyle(g) as CSSProperties}>{g.name.split(" · ")[0]}</span>;
 }
 
 /** The landing page's "Solve it" tile: a random worked problem whose steps fill in one at a time. */

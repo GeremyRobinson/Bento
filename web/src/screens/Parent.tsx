@@ -3,14 +3,13 @@ import { gradeAverage, isReady, testKey } from "../app/curriculum";
 import { plural, when } from "../app/format";
 import { CATALOG } from "../curriculum/catalog";
 import { GRADES } from "../curriculum/grades";
-import { CATEGORIES } from "../engine/diagnosis/diagnose";
 import { LEVELS, type Level } from "../engine/mastery/levels";
 import { lastScore } from "../engine/mastery/progress";
 import type { Mistake } from "../engine/session/types";
 import { ScoreChip } from "../components/primitives/Score";
+import { Rich } from "../components/primitives/MathLine";
+import { explainMistake } from "../components/reports/SessionReportView";
 
-const explain = (m: Pick<Mistake, "cat" | "label" | "msg">) =>
-  m.cat === "concept" ? `${m.label}: ${m.msg}` : CATEGORIES[m.cat] ? `${CATEGORIES[m.cat][1]} Tip: ${CATEGORIES[m.cat][2]}` : m.msg;
 
 /** "For the grown-up": scores by grade, mistake patterns across sessions, what needs practice, and every recent session. */
 export function Parent() {
@@ -47,7 +46,7 @@ export function Parent() {
           {top.length ? (
             <div className="facts" style={{ background: "var(--card)" }}>
               {top.map(([k, n]) => { const m = first[k]; return (
-                <div className="pattern" key={k}><span><b>{k}</b>{m && <span className="k">{explain(m)}</span>}</span><span className="v">×{n}</span></div>
+                <div className="pattern" key={k}><span><b>{k}</b>{m && <span className="k"><Rich text={explainMistake(m)} /></span>}</span><span className="v">×{n}</span></div>
               ); })}
             </div>
           ) : <p style={{ padding: "0 5px" }}>No mistakes recorded yet.</p>}

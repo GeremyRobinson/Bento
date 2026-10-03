@@ -28,6 +28,27 @@
 .wrap{--l0:#3b82f6;--l1:#f2683c;--l2:#8b5cf6;--la:#f59e0b;--c0:var(--l0);--c1:var(--l1);--c2:var(--l2);--acc:var(--la)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wrap{--c0:color-mix(in srgb,var(--l0) 75%,white);--c1:color-mix(in srgb,var(--l1) 75%,white);--c2:color-mix(in srgb,var(--l2) 75%,white);--acc:color-mix(in srgb,var(--la) 80%,white)}}
 .t0{--tint:var(--c0)} .t1{--tint:var(--c1)} .t2{--tint:var(--c2)} .t3{--tint:var(--muted)}
+
+/* ---- ink: each colour darkened just enough for text, and for fills behind white text (4.5:1 on white). Drawings keep the bright colour. ---- */
+.wrap{--k0:#2e6bd0;--k1:#bf5230;--k2:#7a51d8}
+.wrap[data-grade="0"]{--k0:#a26807;--k1:#cb3e84;--k2:#178640}
+.wrap[data-grade="1"]{--k0:#12873d;--k1:#0a7caf;--k2:#bd5711}
+.wrap[data-grade="2"]{--k0:#077e9b;--k1:#6164ec;--k2:#bd5711}
+.wrap[data-grade="3"]{--k0:#d92776;--k1:#9333ea;--k2:#a26807}
+.wrap[data-grade="4"]{--k0:#2563eb;--k1:#0b8278;--k2:#e11d48}
+.wrap[data-grade="5"]{--k0:#3472d8;--k1:#bf522f;--k2:#8457ea}
+.wrap[data-grade="6"]{--k0:#0f766e;--k1:#51820a;--k2:#c94c0a}
+.wrap[data-grade="7"]{--k0:#4f46e5;--k1:#077e9b;--k2:#e11d48}
+.wrap[data-grade="8"]{--k0:#c94c0a;--k1:#dc2626;--k2:#7c3aed}
+.wrap[data-grade="9"]{--k0:#2563eb;--k1:#7c3aed;--k2:#0b8278}
+.wrap[data-grade="10"]{--k0:#0369a1;--k1:#b45309;--k2:#475569}
+.wrap[data-grade="11"]{--k0:#7c3aed;--k1:#c026d3;--k2:#2563eb}
+.wrap[data-grade="12"]{--k0:var(--text);--k1:var(--text);--k2:var(--text)}
+.t0{--ink:var(--k0)} .t1{--ink:var(--k1)} .t2{--ink:var(--k2)} .t3{--ink:var(--muted)}
+/* big display type (a grade's name, a big count) only needs 3:1, so it keeps more of the bright colour */
+.wrap,.wrap *{--display:color-mix(in srgb,var(--tint) 78%,black)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wrap,:root:not([data-theme="light"]) .wrap *{--ink:var(--tint) !important;--display:var(--tint);--on-tint:#14161b}}
+:root[data-theme="dark"] .wrap,:root[data-theme="dark"] .wrap *{--ink:var(--tint) !important;--display:var(--tint);--on-tint:#14161b}
 .wrap,.wrap *{--tint-soft:color-mix(in srgb,var(--tint) 13%,var(--card))}
 .wrap[data-grade="12"]{--on-tint:var(--page)}
 

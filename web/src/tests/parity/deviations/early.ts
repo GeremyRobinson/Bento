@@ -3,5 +3,8 @@ export const deviations: Record<string, Partial<Record<string, string>>> = {
   "k-add": { unit: "kindergarten has units now; this lesson lives in Adding and subtracting" },
   "g1-ten": { unit: "1st grade has units now; this lesson lives in Adding and subtracting" },
   "g2-regroup": { unit: "2nd grade has units now; this lesson lives in Adding and subtracting" },
+  "g4-divide": { prompt: "the tens step asks for the biggest tens number, so only one answer fits (reviewer, 2026-10-03)", checks: "a new slip for too few tens" },
+  "g5-divide": { prompt: "the tens step asks for the biggest tens number, so only one answer fits (reviewer, 2026-10-03)" },
+  "g4-fracwhole": { steps: "the last step is named \"Write as a mixed number\", not \"Simplify\" (reviewer, 2026-10-03)", checks: "step names appear in slip messages" },
   "g3-split": { unit: "3rd grade has units now; this lesson lives in Multiplication and division" },
 };

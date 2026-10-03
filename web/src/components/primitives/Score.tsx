@@ -1,5 +1,5 @@
 import { LEVEL_XP, LEVELS, type Level } from "../../engine/mastery/levels";
-import { gradeOf } from "../../curriculum/grades";
+import { gradeOf, tintStyle } from "../../curriculum/grades";
 import type { CSSProperties } from "react";
 
 export function ScoreChip({ n, words = false }: { n: Level | null | undefined; words?: boolean }) {
@@ -34,5 +34,5 @@ export const gradeLevel = (gxp: number) => ({ lvl: Math.floor(gxp / LEVEL_XP) + 
 
 export function GradeBadge({ grade, gxp }: { grade: number; gxp: number }) {
   const g = gradeOf(grade), { into } = gradeLevel(gxp);
-  return <span className="gbadge" style={{ "--tint": g.color } as CSSProperties}><RingSvg frac={into / LEVEL_XP} /><b>{g.short}</b></span>;
+  return <span className="gbadge" style={tintStyle(g) as CSSProperties}><RingSvg frac={into / LEVEL_XP} /><b>{g.short}</b></span>;
 }

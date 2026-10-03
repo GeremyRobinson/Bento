@@ -79,7 +79,7 @@ export function unitFracPicture({ b, k }: UnitFracProblem, beatsOn = true) {
     }],
     maxRowHeight: 64,
     width: 540,
-    alt: `A bar cut into ${b} equal parts with ${k} shaded. Each part is 1/${b}, so the shaded part is ${k}/${b}.`,
+    alt: beatsOn ? `A bar cut into ${b} equal parts with ${k} shaded. Each part is 1/${b}, so the shaded part is ${k}/${b}.` : `A bar cut into ${b} equal parts with ${k} shaded.`,
   });
 }
 

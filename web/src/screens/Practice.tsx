@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { playTone, readSettings, speak } from "../app/settings";
+import { playTone, readAloudOn, readSettings, speak } from "../app/settings";
 import { useApp } from "../app/AppState";
 import { withTransition } from "../app/transition";
 import { MathLine, Rich } from "../components/primitives/MathLine";
@@ -11,11 +11,15 @@ import {
   pickPlan, pressKey, problemOf, showMe, showMeAvailable, skipAvailable, toggleSkip,
 } from "../engine/session/practice";
 
+const SpeakerIcon = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></svg>
+);
+
 /** One problem at a time: the problem and the finished lines on one side, the step, feedback and keypad on the other. */
 export function Practice() {
   const { progress, go, act, finish, quit } = useApp();
   const s = progress.run;
-  const prefs = readSettings(progress.settings);
+  const prefs = readSettings(progress.settings), aloud = readAloudOn(prefs, progress.grade);
 
   // sounds: a soft tone when a step comes out right or a try is wrong
   const counts = useRef({ work: s?.work.length ?? 0, miss: s?.mistakes.length ?? 0, key: `${s?.i}` });
@@ -31,10 +35,14 @@ export function Practice() {
 
   // read aloud: each new problem is read out, as on screen
   useEffect(() => {
-    if (!s || !prefs.readAloud) return;
+    if (!s || !aloud) return;
     const t = setTimeout(() => speak(document.querySelector("#app .card")?.textContent ?? ""), 350);
     return () => clearTimeout(t);
-  }, [s?.i, prefs.readAloud]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [s?.i, aloud]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // read aloud: what the feedback says, as it appears
+  const said = s?.feedback ? `${s.feedback.strong ?? ""} ${s.feedback.text ?? ""}`.replace(/\*\*/g, "").trim() : "";
+  useEffect(() => { if (aloud && said) speak(said); }, [said, aloud]);
 
   // a physical keyboard works too: digits, minus, point, Backspace, Tab for the next box, Enter to check
   useEffect(() => {
@@ -100,20 +108,16 @@ export function Practice() {
           {step && (
             <div key={`${s.i}-${s.step}-${s.collapsed}-${s.mistakes.length}`} className={`card${s.fx === "shake" ? " shake" : ""}${s.fx === "line" ? " enter" : ""}`}>
               {s.pick ? (
-                <>
-                  <div className="label">Step {s.step + 1} · What comes next?</div>
-                  <div className="choices">{s.pick.options.map((o, i) => <button key={o} className="choice" onClick={() => act(st => pickPlan(st, i))}>{o}</button>)}</div>
-                </>
+                <div className="label">Step {s.step + 1} · What comes next?</div>
               ) : (
                 <>
-                  <div className="label">{step.label}</div>
+                  <div className="label lspeak">{step.label}
+                    <button className="speak" aria-label="Read it to me" onClick={() => speak([step.question, document.querySelector("#app .card")?.textContent].filter(Boolean).join(". ").replace(/\*\*/g, ""))}><SpeakerIcon /></button>
+                  </div>
                   <div className="ask">
                     {step.question && <span className="q"><Rich text={step.question} /></span>}
                     <MathLine math={step.prompt} values={s.values} active={s.active} onSlot={id => act(st => focusSlot(st, id))} />
                   </div>
-                  {step.choices && (
-                    <div className="choices">{step.choices.map((o, i) => <button key={o} className="choice" onClick={() => act((st, p, d) => choose(st, i, p, d))}>{o}</button>)}</div>
-                  )}
                   {step.note && <div className="note"><Rich text={step.note} /></div>}
                 </>
               )}
@@ -121,8 +125,17 @@ export function Practice() {
           )}
         </div>
         <div className="col">
-          {fb && <FeedbackBox key={`${s.i}-${s.step}-${s.mistakes.length}-${s.hints}-${fb.strong}-${fb.text}`} fb={fb} enter={s.fx != null} />}
-          {step && tapOnly && <div className="tapnote muted">{s.pick ? "You plan this one: tap the step that comes next." : "Tap your answer."}</div>}
+          {/* feedback; on a wide screen it sits under the keypad, so the keys don't jump under a finger when a message appears */}
+          <div className="fbslot">{fb && <FeedbackBox key={`${s.i}-${s.step}-${s.mistakes.length}-${s.hints}-${fb.strong}-${fb.text}`} fb={fb} enter={s.fx != null} />}</div>
+          {step && tapOnly && (
+            // tap answers sit where the keypad goes, so they never fall below the fold beside a long problem
+            <div className="tappad">
+              <div className="tapnote muted">{s.pick ? "You plan this one: tap the step that comes next." : "Tap your answer."}</div>
+              <div className="choices">{s.pick
+                ? s.pick.options.map((o, i) => <button key={`${i}-${o}`} className="choice" onClick={() => act(st => pickPlan(st, i))}>{o}</button>)
+                : step.choices!.map((o, i) => <button key={`${i}-${o}`} className="choice" onClick={() => act((st, p, d) => choose(st, i, p, d))}>{o}</button>)}</div>
+            </div>
+          )}
           {step && !tapOnly && <Keypad band={band} onKey={key => act(st => pressKey(st, key))} />}
           {step ? (
             <div className="actions">

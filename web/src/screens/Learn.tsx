@@ -20,7 +20,7 @@ const PLAY_MS = 1800;
 /** the last lesson page shown, so the next one can glide its pill over from there */
 let lastPage: { chapter: string; i: number } | null = null;
 import { reduceMotion } from "../app/transition";
-import { readSettings, speak } from "../app/settings";
+import { readAloudOn, readSettings, speak } from "../app/settings";
 import { toPlainText } from "../curriculum/schemas/math-text";
 
 /** A freshly generated problem for the lesson; the reference problem only if generating fails. */
@@ -55,7 +55,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
   const ex: Explanation = useMemo(() => lesson.explain(example, lesson.answers(example)), [lesson, example]);
   const last = ex.timeline.length - 1, finished = at >= last;
   // read aloud: the problem first, then each step as it plays
-  const readAloud = readSettings(progress.settings).readAloud;
+  const readAloud = readAloudOn(readSettings(progress.settings), lesson.grade);
   useEffect(() => {
     if (!readAloud) return;
     const beat = ex.steps.find(s => s.state === at);
@@ -124,7 +124,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
             <h2 className={`label${/[=²³√ⁿ₀-₉]/.test(ex.heading) ? " formula" : ""}`}>{ex.heading}</h2>
             {ex.idea?.map((t, i) => <p key={i} className="idea"><Rich text={t} /></p>)}
             <div className="math"><MathLine math={ex.statement} /></div>
-            {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && playing ? last : at} />}
+            {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && (playing || at === 0) ? last : at} />}
             {ex.caption && <p className="caption muted"><Rich text={ex.caption} /></p>}
             <ol className="beats" aria-live="polite">
               {ex.steps.map((s, i) => (

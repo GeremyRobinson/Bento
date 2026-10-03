@@ -115,17 +115,20 @@ export const placementGrades = (g: number) =>
   [g - 2, g - 1, g, g + 1].filter((x, i, a) => x >= 0 && x <= 12 && a.indexOf(x) === i && lessonsInGrade(x).length > 0);
 
 /**
- * Find my level: two problems from each grade around the one picked, easiest grade first, no hints and one try per
+ * Find my level: three problems from each grade around the one picked, easiest grade first, no hints and one try per
  * step, like a check-up. The results screen reads where the right answers stop.
  */
 function startPlacement(g: number, progress: Progress, deps: Deps): PracticeSession {
   const grades = placementGrades(g);
   if (!grades.length) throw new Error(`no lessons around grade ${g}`);
-  const items = grades.flatMap(x => deps.rng.shuffle(lessonsInGrade(x)).concat(lessonsInGrade(x)).slice(0, 2).map((l, k) => makeItem(l, 2 + k, deps.rng)));
+  const items = grades.flatMap(x => deps.rng.shuffle(lessonsInGrade(x)).concat(lessonsInGrade(x)).slice(0, 3).map((l, k) => makeItem(l, 2 + k, deps.rng)));
   return newRun({ mode: "test", key: placeKey(g), title: "Find my level", items, startTier: 0, hintsLeft: 0 }, progress, deps);
 }
 
-/** Where a placement lands: climb the grades while at least one of each grade's problems was right the first time. */
+/**
+ * Where a placement lands: climb the grades while at least one of each grade's problems was right. A problem counts as
+ * right with at most one slip and no "Show me", so one small mistake doesn't send anyone down a grade.
+ */
 export function placementResult(probs: { lessonId: string; wrong: number; shown: number }[]): { grade: number; rows: { grade: number; right: number; total: number }[] } {
   const rows: { grade: number; right: number; total: number }[] = [];
   for (const p of probs) {
@@ -134,7 +137,7 @@ export function placementResult(probs: { lessonId: string; wrong: number; shown:
     let r = rows.find(x => x.grade === g);
     if (!r) rows.push(r = { grade: g, right: 0, total: 0 });
     r.total++;
-    if (!p.wrong && !p.shown) r.right++;
+    if (p.wrong <= 1 && !p.shown) r.right++;
   }
   rows.sort((a, b) => a.grade - b.grade);
   let grade = rows[0]?.grade ?? 0;

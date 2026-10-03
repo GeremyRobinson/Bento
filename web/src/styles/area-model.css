@@ -4,7 +4,7 @@
 .am .outline{fill:none;stroke:var(--faint);stroke-width:2}
 .am .axis-label{fill:var(--muted)}
 .am .whole{transition:opacity .4s ease}
-.am .region rect{fill:var(--card);stroke:var(--rule);stroke-width:2;transition:fill .5s var(--ease),stroke .5s var(--ease),opacity .5s ease}
+.am .region rect{fill:var(--well);stroke:var(--faint);stroke-width:2;transition:fill .5s var(--ease),stroke .5s var(--ease),opacity .5s ease}
 .am .region[data-shown="true"].r0 rect{fill:color-mix(in srgb,var(--c0) 18%,var(--card));stroke:var(--c0)}
 .am .region[data-shown="true"].r1 rect{fill:color-mix(in srgb,var(--c1) 18%,var(--card));stroke:var(--c1)}
 .am .region[data-shown="true"].r2 rect{fill:color-mix(in srgb,var(--c2) 18%,var(--card));stroke:var(--c2)}
@@ -30,7 +30,7 @@
 .beat .badge{background:var(--card);color:var(--muted);flex:none}
 .beat[data-state="done"]{color:var(--text)}
 .beat[data-state="now"]{background:var(--tint-soft);color:var(--text)}
-.beat[data-state="now"] .badge{background:var(--tint);color:var(--on-tint)}
+.beat[data-state="now"] .badge{background:var(--ink);color:var(--on-tint)}
 .beat[data-state="later"]{opacity:.55}
 .beat .say{display:grid;gap:2px;min-width:0}
 .beat .say .mline{font-size:var(--work);justify-content:flex-start}

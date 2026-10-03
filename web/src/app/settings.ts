@@ -14,12 +14,12 @@ export interface Settings {
   readable: boolean;
   /** a soft tone for right and wrong answers */
   sounds: boolean;
-  /** reads each step of a lesson and each problem out loud */
-  readAloud: boolean;
+  /** reads each step of a lesson and each problem out loud; null until chosen, which means on for kindergarten and 1st grade */
+  readAloud: boolean | null;
 }
 
 export const defaultSettings = (): Settings => ({
-  text: "standard", contrast: false, motion: "system", colorSafe: false, readable: false, sounds: false, readAloud: false,
+  text: "standard", contrast: false, motion: "system", colorSafe: false, readable: false, sounds: false, readAloud: null,
 });
 
 /** Settings from a save, with anything missing or unknown back at its default. */
@@ -34,9 +34,12 @@ export function readSettings(raw: unknown): Settings {
     colorSafe: r.colorSafe === true,
     readable: r.readable === true,
     sounds: r.sounds === true,
-    readAloud: r.readAloud === true,
+    readAloud: typeof r.readAloud === "boolean" ? r.readAloud : null,
   };
 }
+
+/** Read aloud is on for early readers (kindergarten and 1st grade) until someone turns it off. */
+export const readAloudOn = (s: Settings, grade: number | null | undefined): boolean => s.readAloud ?? (grade != null && grade <= 1);
 
 /** Puts the settings on <html>, where the styles pick them up. */
 export function applySettings(s: Settings): void {

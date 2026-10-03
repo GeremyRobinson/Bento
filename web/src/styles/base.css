@@ -9,7 +9,7 @@ body{margin:0;background:var(--page);color:var(--text);font:400 18px/26px var(--
 h1,h2,h3,p{font-size:inherit;font-weight:var(--w-bold);margin:0}
 p{font-weight:400}
 b,strong{font-weight:var(--w-bold)}
-.label{color:var(--tint);border-bottom:1px solid var(--rule);padding-bottom:var(--s);font-weight:var(--w-bold);font-size:var(--small);line-height:20px}
+.label{color:var(--ink);border-bottom:1px solid var(--rule);padding-bottom:var(--s);font-weight:var(--w-bold);font-size:var(--small);line-height:20px}
 .muted{color:var(--muted)}
 .mono{font-family:var(--num);font-variant-numeric:tabular-nums}
 h1,h2,h3{letter-spacing:-.011em}

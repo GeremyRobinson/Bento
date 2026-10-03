@@ -4,12 +4,16 @@ import { CATEGORIES } from "../../engine/diagnosis/diagnose";
 import { LEVELS } from "../../engine/mastery/levels";
 import type { Mistake, SessionReport } from "../../engine/session/types";
 import { LEVEL_SENTENCES, plural, summaryLine, when } from "../../app/format";
-import { MathLine } from "../primitives/MathLine";
+import { MathLine, Rich } from "../primitives/MathLine";
 import { ProblemView } from "../practice/ProblemView";
 import { ScoreChip } from "../primitives/Score";
 
-const explainMistake = (m: { cat: Mistake["cat"]; label: string; msg: string }) =>
-  m.cat === "concept" || !CATEGORIES[m.cat] ? `${m.label}: ${m.msg}` : `${CATEGORIES[m.cat][1]} Tip: ${CATEGORIES[m.cat][2]}`;
+/** The step, then what went wrong; the step's name is left off when the message already starts with it. */
+export const explainMistake = (m: { cat: Mistake["cat"]; label: string; msg: string }) => {
+  if (m.cat !== "concept" && CATEGORIES[m.cat]) return `${CATEGORIES[m.cat][1]} Tip: ${CATEGORIES[m.cat][2]}`;
+  const lead = m.label.toLowerCase().split(" ").slice(0, 2).join(" ");
+  return m.msg.toLowerCase().startsWith(lead) ? m.msg : `${m.label}: ${m.msg}`;
+};
 
 /** "What you did" and "For the grown-up": every problem with its worked lines, and every mistake grouped by kind. */
 export function SessionReportView({ rep }: { rep: SessionReport }) {
@@ -56,7 +60,7 @@ export function SessionReportView({ rep }: { rep: SessionReport }) {
           <>
             <h3 className="label" style={{ padding: "0 5px" }}>Mistake patterns, most common first</h3>
             <div className="facts" style={{ background: "var(--card)" }}>
-              {sorted.map(([k, g]) => <div className="pattern" key={k}><span><b>{k}</b><span className="k">{explainMistake(g.first)}</span></span><span className="v">×{g.n}</span></div>)}
+              {sorted.map(([k, g]) => <div className="pattern" key={k}><span><b>{k}</b><span className="k"><Rich text={explainMistake(g.first)} /></span></span><span className="v">×{g.n}</span></div>)}
             </div>
             <h3 className="label" style={{ padding: "0 5px" }}>Every mistake</h3>
             <div className="facts mlist" style={{ background: "var(--card)" }}>

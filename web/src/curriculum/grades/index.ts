@@ -31,6 +31,22 @@ export const GRADES: GradeDefinition[] = [
 export const bandOf = (g: number): Band => (g <= 2 ? "little" : g <= 5 ? "kid" : g <= 8 ? "middle" : "high");
 export const gradeOf = (g: number): GradeDefinition => GRADES[g] ?? GRADES[5]!;
 
+const lum = (hex: string) => {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+};
+/** A colour darkened just enough to carry text, or sit behind white text, at 4.5:1 or better on white. */
+export function inkOf(hex: string): string {
+  const ch = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  for (let p = 1; p > 0.3; p -= 0.01) {
+    const out = "#" + ch.map(c => Math.round(c * p).toString(16).padStart(2, "0")).join("");
+    if (1.05 / (lum(out) + 0.05) >= 4.6) return out;
+  }
+  return "#1b1d22";
+}
+/** Inline style for something drawn in another grade's colour: its bright tint and its ink. */
+export const tintStyle = (g: GradeDefinition) => ({ "--tint": g.color, "--ink": inkOf(g.color) });
+
 /** Bento's product lines: grades grouped the way people think about school, each with its own canvas. */
 export interface Line {
   id: "early" | "core" | "middle" | "high" | "ap";

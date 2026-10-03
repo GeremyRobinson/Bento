@@ -183,6 +183,7 @@ export const lesson: LessonDefinition<TwoStepProblem> = {
   restore: raw => restoreVia(raw, ["kind", "a", "b", "c", "who"] as const, v => createTwoStep(v.kind, v.a, v.b, v.c, v.who)),
   display: p => story(p).short,
   displayNote: p => `${story(p).text} ${story(p).ask}`,
+  lead: p => `${story(p).text} ${story(p).ask}`,
   answers,
   explain,
 };
