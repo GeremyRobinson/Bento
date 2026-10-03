@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
-import { doneCount, entriesInGrade, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
+import { doneCount, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
 import { upNext } from "../app/today";
-import { GRADES, LINES, gradeOf } from "../curriculum/grades";
+import { gradeOf } from "../curriculum/grades";
 import type { Rng } from "../curriculum/generators/rng";
-import { lastScore, timesDone } from "../engine/mastery/progress";
+import { lastScore } from "../engine/mastery/progress";
 import { showcasePicture } from "../screens/Welcome";
 import { PlayingDiagram } from "./diagrams/PlayingDiagram";
 import { ScoreChip } from "./primitives/Score";
+import { Fill, Shelf } from "./Shelf";
 
 /** How far out the contents are zoomed: one chapter's pages, the whole year, or every grade on the shelf. */
 export type Level = "chapter" | "year" | "shelf";
@@ -114,12 +115,11 @@ export function Contents({ grade, lessonId, level: first, close }: { grade: numb
         <div className="zch">{units.map((u, k) => {
           const done = doneCount(progress, u.entries), on = u.name === here?.name;
           return (
-            <button key={u.name} className={`zcard${on ? " on" : ""}`} style={{ "--i": k } as CSSProperties} onClick={() => { setChapter(u.name); to("chapter"); }}>
+            <button key={u.name} className={`zcard battery${on ? " on" : ""}`} style={{ "--i": k } as CSSProperties} onClick={() => { setChapter(u.name); to("chapter"); }}>
               <span className="k">{units.length > 1 ? `Chapter ${k + 1}` : "This year"}</span>
               <b>{u.name === "Skills" ? g.name : u.name}</b>
-              <span className="zdots" aria-label={`${done} of ${u.entries.length} done`}>
-                {u.entries.map(c => <i key={c.id} className={c.id === lessonId ? "here" : timesDone(progress, c.id) > 0 ? "done" : ""} />)}
-              </span>
+              <Fill frac={u.entries.length ? done / u.entries.length : 0} />
+              <span className="bcount">{done === 0 ? `${u.entries.length} lesson${u.entries.length === 1 ? "" : "s"}` : done === u.entries.length ? "Finished" : `${done} of ${u.entries.length} done`}</span>
             </button>
           );
         })}</div>
@@ -128,25 +128,7 @@ export function Contents({ grade, lessonId, level: first, close }: { grade: numb
   } else {
     body = (
       <section className="zshelf">
-        {LINES.map(line => (
-          <div key={line.id} className="zline">
-            <span className="k">{line.name}</span>
-            <div className="zbooks">
-              {line.grades.length ? line.grades.map(n => {
-                const d = GRADES[n]!, list = entriesInGrade(n), done = doneCount(progress, list);
-                return (
-                  <button key={n} className={`zbook${n === grade ? " on" : ""}`} style={{ "--tint": d.color, "--p": list.length ? done / list.length : 0 } as CSSProperties}
-                    onClick={() => { close(); chooseGrade(n); }} aria-label={`${d.name}: ${done} of ${list.length} lessons done`}>
-                    <span className="znum" aria-hidden>{d.short}{n > 0 && <small>{["", "st", "nd", "rd"][n] ?? "th"}</small>}</span>
-                    <b>{d.subtitle}</b>
-                    <span className="zfill" aria-hidden />
-                    <span className="zcount">{done === 0 ? `${list.length} lesson${list.length === 1 ? "" : "s"}` : done === list.length ? "Finished" : `${done} of ${list.length} done`}</span>
-                  </button>
-                );
-              }) : line.soon?.map(c => <span key={c} className="zbook soon"><span className="znum">AP</span><b>{c.replace("AP ", "")}</b><span className="zsoon">Coming soon</span></span>)}
-            </div>
-          </div>
-        ))}
+        <Shelf current={grade} onPick={n => { close(); chooseGrade(n); }} />
         <button className="tlink" onClick={() => { close(); go({ name: "welcome" }, "back"); }}>About Bento ›</button>
       </section>
     );

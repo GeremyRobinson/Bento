@@ -6,7 +6,8 @@ import { todayPlan, upNext, type TodayItem } from "../app/today";
 import { placeKey } from "../engine/session/practice";
 import { Check } from "../components/primitives/icons";
 import { lastScore, timesDone } from "../engine/mastery/progress";
-import { BigRing, GradeBadge, ScoreChip } from "../components/primitives/Score";
+import { ScoreChip } from "../components/primitives/Score";
+import { Fill } from "../components/Shelf";
 import { ChapterPic } from "../components/Contents";
 import { useMemo } from "react";
 
@@ -39,10 +40,10 @@ export function Home() {
   return (
     <>
       <header className="cover">
-        <button className="gpick" onClick={() => openSheet(true)} aria-label="Change grade"><GradeBadge grade={g} gxp={progress.gxp[g] ?? 0} /></button>
         <h1>{grade.name}</h1>
         <p className="ysub">This year: {grade.subtitle.toLowerCase()}.</p>
         <p className="muted">{list.length} lesson{list.length === 1 ? "" : "s"}{units.length > 1 ? ` in ${units.length} chapters` : ""}. Each starts with a picture that moves, then you solve it one step at a time.</p>
+        <button className="tlink" onClick={() => openSheet(true)} aria-label="Change grade">Change grade</button>
       </header>
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="tile today">
@@ -62,8 +63,9 @@ export function Home() {
           )}
           {!progress.log.length && <button className="tlink" onClick={() => startTest(placeKey(g))}>Not sure this is your grade? Find my level ›</button>}
         </section>
-        <section className="tile b-stats">
-          <BigRing frac={list.length ? done / list.length : 0} label={done} />
+        <section className="tile b-stats battery">
+          <Fill frac={list.length ? done / list.length : 0} />
+          <span className="bbig">{done}</span>
           <p><b>of {list.length}</b> lessons done{avg != null && <><br /><span className="muted">Average score {avg.toFixed(1)} of 4</span></>}</p>
           {gt && <p className="muted gtline">Grade check-up <ScoreChip n={gt.last} /></p>}
           {testReady(g) && <button className="ctl" onClick={() => startTest(testKey(g))}>Grade check-up</button>}

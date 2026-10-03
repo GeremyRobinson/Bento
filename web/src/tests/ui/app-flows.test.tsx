@@ -118,7 +118,7 @@ describe("home", () => {
     expect(within(book).getByRole("button", { name: "Chapter" })).toHaveAttribute("aria-pressed", "true");
     // every grade, then into another grade's book
     fireEvent.click(within(book).getByRole("button", { name: "All grades" }));
-    expect(book.querySelectorAll("button.zbook")).toHaveLength(13);
+    expect(book.querySelectorAll("button.book")).toHaveLength(13);
     fireEvent.click(within(book).getByRole("button", { name: /^7th grade:/ }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByRole("heading", { level: 1, name: "7th grade" })).toBeInTheDocument();

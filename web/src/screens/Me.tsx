@@ -5,7 +5,8 @@ import { gradeOf } from "../curriculum/grades";
 import { LEVEL_XP } from "../engine/mastery/levels";
 import { GradeLineup } from "../components/GradeLineup";
 import { placeKey } from "../engine/session/practice";
-import { BigRing, gradeLevel } from "../components/primitives/Score";
+import { gradeLevel } from "../components/primitives/Score";
+import { Fill } from "../components/Shelf";
 
 function Toggle({ label, note, on, set }: { label: string; note: string; on: boolean; set: (v: boolean) => void }) {
   return (
@@ -52,8 +53,9 @@ export function Me() {
   return (
     <>
       <div className="bme">
-        <section className="tile mhero" style={{ "--tint": grade.color } as CSSProperties}>
-          <BigRing frac={into / LEVEL_XP} label={lvl} />
+        <section className="tile mhero battery" style={{ "--tint": grade.color } as CSSProperties}>
+          <Fill frac={into / LEVEL_XP} />
+          <span className="bbig" aria-hidden>{lvl}</span>
           <div className="mh-text">
             <span className="k">{grade.name} · level {lvl}</span>
             <h1>Your Bento</h1>

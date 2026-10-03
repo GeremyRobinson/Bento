@@ -41,6 +41,8 @@ Each grade is a book. Home is its cover: what the year is about, today's plan, t
 
 The island is the only navigation: a small floating capsule, the same on every screen. It says which chapter and page you're on, steps back one page, and holds you. Tap it, or pinch the page closed, and the book zooms out: the chapter, then the year, then every grade on the shelf. Pinch open or tap to go back in. You always know where you are because you watch the page shrink back into its place.
 
+A grade is always its number in its own colour (K, 1st, 12th), never a badge plus its name. Progress is always a fill: a card fills from the bottom in its colour, like a battery charging. In a row of steps, the one you're on stretches into a pill and glides along.
+
 ## 8. Respect people
 No account is needed, there are no ads, and nothing leaves the device. Accessibility settings sit in the hub, not hidden away.
 
