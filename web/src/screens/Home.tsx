@@ -6,17 +6,20 @@ import { todayPlan, upNext, type TodayItem } from "../app/today";
 import { placeKey } from "../engine/session/practice";
 import { Check } from "../components/primitives/icons";
 import { lastScore, timesDone } from "../engine/mastery/progress";
-import { BigRing, ScoreChip } from "../components/primitives/Score";
+import { BigRing, GradeBadge, ScoreChip } from "../components/primitives/Score";
+import { ChapterPic } from "../components/Contents";
+import { useMemo } from "react";
 
 
 const KIND = { lesson: "Up next", review: "Review", test: "Unit test" } as const;
 
 /**
- * Home: today's short plan first (one tap starts it), how the year is going beside it, then every unit of the grade.
- * Lessons still being rebuilt show as "soon".
+ * Home is the grade's book: its cover (what this year is about), today's short plan (one tap starts it) with how the
+ * year is going beside it, then every chapter with a moving picture and its pages. Lessons still being rebuilt show as "soon".
  */
 export function Home() {
-  const { progress, go, startLesson, startTest, startReview, canReview, deps } = useApp();
+  const { progress, go, openSheet, startLesson, startTest, startReview, canReview, deps } = useApp();
+  const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
   const g = progress.grade ?? 5, grade = gradeOf(g), list = entriesInGrade(g), units = unitsInGrade(g);
   const isDone = (id: string) => timesDone(progress, id) > 0;
   const next = upNext(progress, g);
@@ -35,10 +38,15 @@ export function Home() {
   let k = 0;
   return (
     <>
+      <header className="cover">
+        <button className="gpick" onClick={() => openSheet(true)} aria-label="Change grade"><GradeBadge grade={g} gxp={progress.gxp[g] ?? 0} /></button>
+        <h1>{grade.name}</h1>
+        <p className="ysub">This year: {grade.subtitle.toLowerCase()}.</p>
+        <p className="muted">{list.length} lesson{list.length === 1 ? "" : "s"}{units.length > 1 ? ` in ${units.length} chapters` : ""}. Each starts with a picture that moves, then you solve it one step at a time.</p>
+      </header>
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="tile today">
-          <button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} aria-label={`See the year: ${grade.name}`}>{grade.name}<span aria-hidden> ›</span></button>
-          <h1>Today</h1>
+          <h2>Today</h2>
           <p className="sub">{!plan.length ? "New lessons for this grade are almost ready." : first ? `About ${minutes} minutes.` : "All done for today. Nicely done."}</p>
           {plan.length > 0 && (
             <ol className="plan">{plan.map(i => (
@@ -69,12 +77,13 @@ export function Home() {
         )}
       </div>
       <div className="units">
-        {units.map(u => {
+        {units.map((u, ui) => {
           const tk = testKey(g, u.name), t = progress.tests[tk];
           return (
             <section className="panel" key={u.name}>
+              <ChapterPic entries={u.entries} rng={rng} />
               {(units.length > 1 || u.name !== "Skills") && (
-                <div className="unit"><h3>{u.name}</h3>
+                <div className="unit"><div><span className="k">Chapter {ui + 1}</span><h3>{u.name}</h3></div>
                   {testReady(g, u.name) && <button className={`ctl${t ? " badged" : ""}`} onClick={() => startTest(tk)}>{t && <ScoreChip n={t.last} />}Unit test</button>}
                 </div>
               )}

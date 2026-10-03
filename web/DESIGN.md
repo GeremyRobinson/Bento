@@ -36,14 +36,10 @@ Things move to show how the math works, like a box filling up, a carry sliding o
 ## 6. Fun is earned, not applied
 The delight is the moment it clicks: a picture that resolves, or a slip that's explained exactly. Confetti is saved for real wins.
 
-## 7. One way around
-The Bento bar is the only navigation, and it's the same on every screen. It holds:
+## 7. Bento is a book
+Each grade is a book. Home is its cover: what the year is about, today's plan, then every chapter (unit) with its moving picture. Lessons are pages.
 
-- The Bento name, which takes you to the front page.
-- Your grade.
-- The trail back.
-- Anything you left unfinished.
-- You.
+The island is the only navigation: a small floating capsule, the same on every screen. It says which chapter and page you're on, steps back one page, and holds you. Tap it, or pinch the page closed, and the book zooms out: the chapter, then the year, then every grade on the shelf. Pinch open or tap to go back in. You always know where you are because you watch the page shrink back into its place.
 
 ## 8. Respect people
 No account is needed, there are no ads, and nothing leaves the device. Accessibility settings sit in the hub, not hidden away.

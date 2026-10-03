@@ -139,12 +139,10 @@ export function AppProvider(props: {
     return {
       ...data, route, lastReport: latest, sheetOpen, go, openSheet, deps,
       chooseGrade: g => withTransition(() => {
-        // a grade opens on its own intro the first time; after that, straight to its lessons
-        const first = !(data.progress.intros ?? []).includes(g);
-        setProgress(p => ({ ...p, grade: g, chosen: true, intros: first ? [...(p.intros ?? []), g] : p.intros }));
+        // a grade opens on its book: the year's cover, today's plan and every chapter
+        setProgress(p => ({ ...p, grade: g, chosen: true }));
         openSheet(false);
-        if (first) show({ name: "intro" });
-        else if (route.name === "welcome" || route.name === "intro") show({ name: "home" });
+        if (route.name !== "home") show({ name: "home" });
       }),
       startLesson: id => withTransition(() => {
         setProgress(p => ({ ...p, run: startPractice(id, p, deps()) }));

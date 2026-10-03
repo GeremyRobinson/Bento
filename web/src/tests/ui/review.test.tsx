@@ -33,7 +33,7 @@ describe("today's review", () => {
     expect(document.querySelector(".split .card .label")!.textContent).toMatch(/Multiply two-digit numbers|Twin of two-digit multiplying/);
     expect(screen.getByRole("button", { name: /Hints?$/ })).toHaveTextContent("4");
     expect(solveRun()).toBe(8);
-    expect(screen.getByRole("navigation", { name: "You are here" })).toHaveTextContent("LessonsToday's reviewDone");
+    expect(document.querySelector(".island")).toHaveTextContent("Today's review");
     expect(screen.queryByRole("button", { name: "Practice again" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Take it again" })).toBeNull();
     tap("All lessons");

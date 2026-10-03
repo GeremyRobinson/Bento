@@ -4,7 +4,6 @@ import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { currentItem } from "../engine/session/practice";
 import { GradeSheet } from "../components/GradeSheet";
 import { Home } from "../screens/Home";
-import { Intro } from "../screens/Intro";
 import { Me } from "../screens/Me";
 import { Learn } from "../screens/Learn";
 import { Parent } from "../screens/Parent";
@@ -13,7 +12,7 @@ import { ReportScreen, Results } from "../screens/Results";
 import { Welcome } from "../screens/Welcome";
 import { useApp } from "./AppState";
 import { isTopLevel } from "./routes";
-import { TopBar } from "../components/TopBar";
+import { Island } from "../components/Island";
 import { canCrossFade } from "./transition";
 
 /** Picks the screen for the route and sets the grade band and tint the styles key off. */
@@ -58,7 +57,6 @@ export function App() {
     case "results": screen = <Results />; break;
     case "report": screen = <ReportScreen rep={reports[route.key]} />; break;
     case "parent": screen = <Parent />; break;
-    case "intro": screen = <Intro />; break;
     case "me": screen = <Me />; break;
     default: screen = <Home />;
   }
@@ -66,7 +64,7 @@ export function App() {
   const viewKey = [route.name, route.name === "learn" ? route.lessonId : route.name === "report" ? route.key : "", top ? chosenGrade : ""].join("|");
   return (
     <main id="app" className={`wrap t${tint}${canCrossFade() ? "" : " fresh"}`} data-band={bandOf(grade)} data-grade={grade} key={viewKey}>
-      <TopBar grade={grade} />
+      <Island grade={grade} />
       {screen}
       {sheetOpen && <GradeSheet />}
     </main>

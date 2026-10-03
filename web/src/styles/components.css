@@ -30,13 +30,6 @@
 .head{display:flex;justify-content:space-between;align-items:center;gap:var(--u);flex-wrap:wrap;padding:0 var(--s);min-height:24px}
 .head h2{font-size:var(--fs)}
 
-/* ---- the main header: the same in every grade ---- */
-.top{--fs:16px;--h:44px;font:600 16px/22px var(--sans);display:flex;align-items:center;gap:8px;padding:6px;background:var(--well);border-radius:999px;min-width:0}
-.top .gpick{display:flex;align-items:center;gap:12px;flex:1;min-width:0;height:52px;padding:0 16px 0 0;border-radius:999px;text-align:left;transition:background .15s}
-.top .gpick:hover{background:var(--hover)}
-.top .brand{flex:none;height:52px;padding:0 16px 0 14px;border-radius:999px;font:700 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em;color:var(--text);transition:background .15s;position:relative}
-.top .brand:hover{background:var(--hover)}
-@media (max-width:430px){.top .gpick .gtext{display:none}.top .brand{padding:0 12px}}
 .gbadge{position:relative;width:52px;height:52px;flex:none;display:grid;place-items:center}
 .gbadge svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .gbadge circle{fill:none;stroke-width:4}
@@ -373,31 +366,9 @@
 .lesson.review .name{display:flex;flex-direction:column;line-height:1.2}
 .lesson.review small{font-size:var(--small);font-weight:var(--w-mid)}
 
-/* resume: an unfinished lesson waits in the top bar, apart from any grade's own "up next" */
-.top .resume{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:10px;height:52px;padding:0 14px 0 6px;border-radius:999px;background:var(--card);box-shadow:0 0 0 1px var(--rule);text-align:left;transition:transform .2s var(--spring),box-shadow .15s;animation:pop .4s var(--spring) both}
-.top .resume:hover{box-shadow:0 0 0 2px var(--accent)}
-.top .resume:active{transform:scale(.97)}
-.top .resume .rdot{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 15px/1 var(--num)}
-.top .resume .rtext{display:grid;min-width:0;line-height:1.15}
-.top .resume small{font-size:12px;color:var(--muted);font-weight:var(--w-bold);white-space:nowrap}
-.top .resume b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
-.top .resume .rcount{font-size:13px;color:var(--muted)}
-.top .resume .rshort{display:none}
-@media (max-width:760px){.top .resume .rtext,.top .resume .rcount,.top .resume .rdot{display:none}.top .resume .rshort{display:inline;font-size:15px;white-space:nowrap}.top.has-resume .mestat{display:none}.top .resume{flex:none;padding:0 14px;height:44px;box-shadow:0 0 0 2px var(--rtint,var(--rule))}}
-.yearlink{font:inherit;color:inherit;letter-spacing:inherit;border-radius:12px;margin:-2px -6px;padding:2px 6px;transition:background .15s}
-.yearlink:hover{background:color-mix(in srgb,var(--card) 60%,transparent)}
-.yearlink span{opacity:.45;font-weight:600}
 @media (min-width:900px) and (orientation:landscape){.bar .pbtn{visibility:hidden}}
 
-/* ---- Me: the button in the top bar, and the personal hub ---- */
-.top .mebtn{flex:none;margin-left:auto;display:flex;align-items:center;gap:6px;height:52px;padding:0 6px 0 14px;border-radius:999px;background:var(--card);box-shadow:0 0 0 1px var(--rule);transition:transform .2s var(--spring),box-shadow .15s}
-.top .resume + .mebtn{margin-left:0}
-.top .mebtn:hover{box-shadow:0 0 0 2px var(--tint,var(--rule))}
-.top .mebtn:active{transform:scale(.96)}
-.top .mestat{display:flex;align-items:center;gap:3px;font-size:15px;padding-right:6px}
-.top .mestat i{font-style:normal;font-size:14px}
-.top .meav{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--tint,#3b82f6);color:#fff}
-@media (max-width:430px){.top .mestat:nth-child(2){display:none}}
+/* ---- Me: the personal hub ---- */
 .bme{display:grid;gap:var(--u);grid-template-columns:minmax(0,1fr)}
 @media (min-width:760px){.bme{grid-template-columns:repeat(2,minmax(0,1fr))}.mhero,.mgrades{grid-column:1 / -1}.macc{grid-row:span 2}}
 @media (min-width:1100px){.bme{grid-template-columns:repeat(3,minmax(0,1fr))}.mhero{grid-column:span 2}.macc{grid-column:3;grid-row:1 / span 3}.mgrades{grid-column:1 / span 2}}
@@ -450,39 +421,12 @@
 .apsoon em{font-style:normal;color:#f5d08a;font-size:13px;font-weight:650;margin-left:4px}
 .hero .hline{display:block;font-size:var(--small);font-weight:var(--w-bold);color:var(--muted);letter-spacing:.01em;margin-bottom:-2px}
 
-/* ---- the one navigation bar: same place, same size, every screen ---- */
-.top{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:15;background:color-mix(in srgb,var(--well) 86%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);box-shadow:0 0 0 1px color-mix(in srgb,var(--rule) 70%,transparent)}
-.top .brand{display:flex;align-items:center;gap:8px;font:650 19px/1 var(--sans);letter-spacing:-.02em}
-.top .gpick.slim{flex:none;padding:0}
-.top .grow{flex:1}
-.trail{flex:1;min-width:0;display:flex;align-items:center;gap:4px}
-.trail ol{list-style:none;margin:0;padding:0;display:flex;align-items:center;min-width:0;gap:2px}
-.trail li{display:flex;align-items:center;min-width:0;white-space:nowrap}
-.trail li+li::before{content:"›";color:var(--faint);padding:0 6px;font-weight:500}
-.trail li:last-child{min-width:0;flex:1}
-.trail li>span,.trail li>button{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trail li>button{color:var(--muted);font-weight:550;padding:8px 10px;margin:0 -4px;border-radius:999px;transition:background .15s,color .15s}
-.trail li>button:hover{background:var(--hover);color:var(--text)}
-.trail li[aria-current]>span{font-weight:650;padding-left:4px}
-.trail .tback{display:none;flex:none;width:40px;height:40px;border-radius:50%;place-items:center;background:var(--card);color:var(--text)}
-@media (max-width:640px){
-  .trail .tback{display:grid}
-  .trail li:not(:last-child){display:none}
-  .trail li+li::before{content:none}
-  .top:has(.trail) .gpick.slim{display:none}
-}
-.top .tnote{color:var(--muted);font-size:var(--small);font-weight:550;padding-right:14px}
-.top.guest .lback{margin:0;padding:0 16px;height:44px;display:grid;place-items:center}
-.top .mebtn.on{box-shadow:0 0 0 2px var(--tint,var(--rule))}
 .phead{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);flex-wrap:wrap;padding:0 var(--s)}
 .phead h1{font-size:calc(var(--fs) * 1.6);letter-spacing:-.02em}
-.top.guest .resume{display:none}
 
 /* ---- home, stripped back: today's plan, the year's progress, the units. Space does the work, not boxes. ---- */
 .bhome .today,.bhome .b-stats,.bhome .b-weak{background:var(--card);box-shadow:0 0 0 1px var(--rule);padding:calc(var(--u) * 1.75)}
 .today{gap:0;align-content:start}
-.today .yearlink{justify-self:start;font-size:var(--small);font-weight:600;color:var(--tint);margin:0 -6px 6px}
-.today h1{font:650 clamp(40px,6vw,60px)/1 var(--sans);letter-spacing:-.035em}
 .today .sub{color:var(--muted);margin-top:10px;font-weight:450}
 .plan{list-style:none;margin:calc(var(--u) * 1.5) 0 0;padding:0;display:grid}
 .plan li+li{border-top:1px solid var(--rule)}
@@ -512,7 +456,6 @@
   .bhome.tall>.b-stats{grid-row:1}
   .bhome>.b-weak{grid-column:3}
 }
-.top .gtext b{font-size:16px}
 /* units: one quiet card each, lessons as hairline rows instead of pills inside a well */
 .units>.panel{background:var(--card);box-shadow:0 0 0 1px var(--rule);padding:calc(var(--u) * 1.25) calc(var(--u) * 1.25) var(--s);gap:var(--s)}
 .units .unit{padding:0;min-height:36px}
