@@ -551,3 +551,4 @@
 .pitem:hover .ptext b{color:inherit}
 .plan li+li{border-top:0}
 .plan{gap:2px}
+.bhome .b-stats{grid-template-rows:none}
