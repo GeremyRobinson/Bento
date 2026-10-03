@@ -3,6 +3,7 @@ import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, u
 import { COMING_SOON } from "../curriculum/catalog";
 import { gradeOf } from "../curriculum/grades";
 import { todayPlan, upNext, type TodayItem } from "../app/today";
+import { placeKey } from "../engine/session/practice";
 import { Check } from "../components/primitives/icons";
 import { lastScore, timesDone } from "../engine/mastery/progress";
 import { BigRing, ScoreChip } from "../components/primitives/Score";
@@ -51,6 +52,7 @@ export function Home() {
               </li>
             ))}</ol>
           )}
+          {!progress.log.length && <button className="tlink" onClick={() => startTest(placeKey(g))}>Not sure this is your grade? Find my level ›</button>}
         </section>
         <section className="tile b-stats">
           <BigRing frac={list.length ? done / list.length : 0} label={done} />

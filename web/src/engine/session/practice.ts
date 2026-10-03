@@ -98,6 +98,7 @@ export const testKey = (g: number, unit?: string) => (unit ? `unit:${g}:${unit}`
 /** A unit test (up to 10 problems) or a grade check-up (up to 12), mixed from the lessons, no hints, one try per step. */
 export function startTest(key: string, progress: Progress, deps: Deps): PracticeSession {
   const [kind, gs, unit] = key.split(":"), g = Number(gs);
+  if (kind === "place") return startPlacement(g, progress, deps);
   const list = kind === "unit" ? lessonsInGrade(g).filter(l => (l.unit || "Skills") === unit) : lessonsInGrade(g);
   if (!list.length) throw new Error(`no lessons for test ${key}`);
   const n = Math.min(kind === "unit" ? 10 : 12, Math.max(6, list.length * 2));
@@ -105,6 +106,45 @@ export function startTest(key: string, progress: Progress, deps: Deps): Practice
   const items = deps.rng.shuffle(Array.from({ length: n }, (_, k) => makeItem(order[k % order.length]!, k, deps.rng)));
   const title = kind === "unit" ? `${unit} test` : `${gradeOf(g).name} check-up`;
   return newRun({ mode: "test", key, title, items, startTier: 0, hintsLeft: 0 }, progress, deps);
+}
+
+export const placeKey = (g: number) => `place:${g}`;
+
+/** The grades a placement around grade g looks at: two below, g itself and one above, where lessons exist. */
+export const placementGrades = (g: number) =>
+  [g - 2, g - 1, g, g + 1].filter((x, i, a) => x >= 0 && x <= 12 && a.indexOf(x) === i && lessonsInGrade(x).length > 0);
+
+/**
+ * Find my level: two problems from each grade around the one picked, easiest grade first, no hints and one try per
+ * step, like a check-up. The results screen reads where the right answers stop.
+ */
+function startPlacement(g: number, progress: Progress, deps: Deps): PracticeSession {
+  const grades = placementGrades(g);
+  if (!grades.length) throw new Error(`no lessons around grade ${g}`);
+  const items = grades.flatMap(x => deps.rng.shuffle(lessonsInGrade(x)).concat(lessonsInGrade(x)).slice(0, 2).map((l, k) => makeItem(l, 2 + k, deps.rng)));
+  return newRun({ mode: "test", key: placeKey(g), title: "Find my level", items, startTier: 0, hintsLeft: 0 }, progress, deps);
+}
+
+/** Where a placement lands: climb the grades while at least one of each grade's problems was right the first time. */
+export function placementResult(probs: { lessonId: string; wrong: number; shown: number }[]): { grade: number; rows: { grade: number; right: number; total: number }[] } {
+  const rows: { grade: number; right: number; total: number }[] = [];
+  for (const p of probs) {
+    const g = lessonById(p.lessonId)?.grade;
+    if (g == null) continue;
+    let r = rows.find(x => x.grade === g);
+    if (!r) rows.push(r = { grade: g, right: 0, total: 0 });
+    r.total++;
+    if (!p.wrong && !p.shown) r.right++;
+  }
+  rows.sort((a, b) => a.grade - b.grade);
+  let grade = rows[0]?.grade ?? 0;
+  for (const r of rows) {
+    if (r.right === 0) break;
+    grade = r.grade;
+    // everything right at the top grade tested: ready for the one after
+    if (r === rows[rows.length - 1] && r.right === r.total && r.grade < 12) grade = r.grade + 1;
+  }
+  return { grade, rows };
 }
 
 /** Lessons already scored, weighted to low scores and long gaps since last practice. */

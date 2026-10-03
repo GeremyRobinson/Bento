@@ -4,6 +4,7 @@ import { readSettings, speak, playTone, type Settings } from "../app/settings";
 import { gradeOf } from "../curriculum/grades";
 import { LEVEL_XP } from "../engine/mastery/levels";
 import { GradeLineup } from "../components/GradeLineup";
+import { placeKey } from "../engine/session/practice";
 import { BigRing, gradeLevel } from "../components/primitives/Score";
 
 function Toggle({ label, note, on, set }: { label: string; note: string; on: boolean; set: (v: boolean) => void }) {
@@ -30,7 +31,7 @@ function Tile({ k, title, className = "", children }: { k?: string; title: strin
  * your grown-up, settings that make Bento easier to see and hear, and backups. Nothing leaves this device.
  */
 export function Me() {
-  const { progress, go, chooseGrade, setSettings, exportBackup, importBackup } = useApp();
+  const { progress, go, chooseGrade, setSettings, exportBackup, importBackup, startTest } = useApp();
   const st = readSettings(progress.settings);
   const set = (patch: Partial<Settings>) => setSettings(patch);
   const g = progress.grade ?? 5, grade = gradeOf(g), gxp = progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
@@ -66,6 +67,7 @@ export function Me() {
         </section>
 
         <Tile title="Your grades" className="mgrades">
+          <button className="tlink" onClick={() => startTest(placeKey(g))}>Find my level ›</button>
           <GradeLineup onPick={chooseGrade} />
         </Tile>
 

@@ -7,6 +7,7 @@ import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { GradeBadge } from "../components/primitives/Score";
 import { showcasePicture } from "./Welcome";
+import { placeKey } from "../engine/session/practice";
 
 /** One unit of the year: a moving picture from a fresh problem of its first lesson that has one, then its lessons. */
 function UnitTile({ name, entries, k, solo, soon = [], rng, open }: { name: string; entries: Entry[]; k: number; solo: boolean; soon?: string[]; rng: Rng; open: (c: Entry) => void }) {
@@ -30,7 +31,7 @@ function UnitTile({ name, entries, k, solo, soon = [], rng, open }: { name: stri
 
 /** A grade's own opening page: what this year is about, one moving picture per unit, and every lesson in order. */
 export function Intro() {
-  const { progress, go, deps } = useApp();
+  const { progress, go, deps, startTest } = useApp();
   const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
   const g = progress.grade ?? 5, grade = gradeOf(g), list = entriesInGrade(g), units = unitsInGrade(g);
   const started = doneCount(progress, list) > 0;
@@ -44,6 +45,7 @@ export function Intro() {
         <p className="ysub">This year: {grade.subtitle.toLowerCase()}.</p>
         <p>{list.length} lesson{list.length === 1 ? "" : "s"}{units.length > 1 ? ` in ${units.length} units` : ""}. Each one starts with a picture that moves, then you solve it one step at a time.</p>
         <button className="ctl go big" onClick={home}>{started ? "Back to my lessons ›" : "Start the year ›"}</button>
+        {!started && <button className="tlink" onClick={() => startTest(placeKey(g))}>Not sure this is your grade? Find my level ›</button>}
       </section>
       <section className="yunits">{units.map((u, k) => <UnitTile key={u.name} {...u} k={k} solo={units.length === 1} soon={units.length === 1 ? COMING_SOON[g] : undefined} rng={rng} open={open} />)}</section>
     </div>

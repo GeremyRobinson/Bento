@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { mins, when } from "../app/format";
 import { reduceMotion } from "../app/transition";
-import { bandOf } from "../curriculum/grades";
+import { bandOf, gradeOf } from "../curriculum/grades";
+import { placementResult } from "../engine/session/practice";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { LEVELS } from "../engine/mastery/levels";
 import { BuildUp } from "../components/BuildUp";
@@ -35,10 +36,35 @@ export function CountUp({ to, pre = "" }: { to: number; pre?: string }) {
   return <span aria-label={`${pre}${to}`}>{pre}{v}</span>;
 }
 
+/** After "Find my level": the grade to start in, and how each grade went. */
+function Placed({ rep }: { rep: SessionReport }) {
+  const { progress, chooseGrade, go } = useApp();
+  const { grade, rows } = placementResult(rep.probs), gd = gradeOf(grade);
+  const from = Number(rep.key.split(":")[1]), same = grade === from && progress.grade === from;
+  return (
+    <section className="placed" style={{ "--tint": gd.color } as CSSProperties}>
+      <span className="k">Your level</span>
+      <h1>Start in {gd.name}.</h1>
+      <p className="muted">{grade > from ? "You're ahead. The work here will stretch you." : grade < from ? "A few things to firm up first. You'll move fast." : "Right where you should be."}</p>
+      <ol className="prows">{rows.map(r => (
+        <li key={r.grade} className={r.grade <= grade ? "ok" : ""}>
+          <span>{gradeOf(r.grade).name}</span>
+          <span className="pdots" aria-label={`${r.right} of ${r.total} right`}>{Array.from({ length: r.total }, (_, i) => <i key={i} className={i < r.right ? "on" : ""} />)}</span>
+        </li>
+      ))}</ol>
+      <div className="actions">
+        <button className="ctl go" onClick={() => same ? go({ name: "home" }, "fwd") : chooseGrade(grade)}>Start {gd.name} ›</button>
+        {!same && progress.grade != null && <button className="ctl" onClick={() => go({ name: "home" }, "back")}>Stay in {gradeOf(progress.grade).name}</button>}
+      </div>
+    </section>
+  );
+}
+
 /** The screen after a run: score ring, XP, time, what to do next, then the full report. */
 export function Results() {
   const { lastReport: rep, progress, go, startLesson, startTest } = useApp();
   if (!rep) return <section className="panel"><p className="empty">Nothing finished yet.</p><div className="actions"><button className="ctl go" onClick={() => go({ name: "home" })}>All lessons</button></div></section>;
+  if (rep.key.startsWith("place:")) return <Placed rep={rep} />;
   const lesson = lessonById(rep.key), test = rep.mode === "test", review = rep.mode === "review";
   const grade = lesson ? lessonsInGrade(lesson.grade) : [], k = lesson ? grade.indexOf(lesson) : -1, next = grade[k + 1];
   const lastLesson = lessonById(rep.probs[rep.probs.length - 1]?.lessonId ?? "");

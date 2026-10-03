@@ -242,3 +242,13 @@ describe("the personal hub", () => {
     expect(document.documentElement.dataset.motion).toBe("reduce");
   });
 });
+
+describe("find my level", () => {
+  it("runs a short placement from a new grade's home and offers the grade to start in", () => {
+    renderApp({ grade: 5, chosen: true });
+    tap("Not sure this is your grade? Find my level ›");
+    solveRun();
+    expect(screen.getByRole("heading", { level: 1, name: /^Start in .+ grade\.$/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Start .+ grade ›$/ })).toBeInTheDocument();
+  });
+});
