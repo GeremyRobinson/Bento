@@ -42,3 +42,9 @@ export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** A term after an operator: term(−8, "x") → "(−8x)", term(1, "x") → "x", term(3, "x²") → "3x²". */
 export const term = (a: number, v: string) => (a < 0 ? `(${coef(a, v)})` : coef(a, v));
+
+/** "a" or "an" before a word ("an orange", "a cube"); capital for the start of a sentence. */
+export function aOrAnWord(word: string, capital = false): string {
+  const a = /^[aeiou]/i.test(word) ? "an" : "a";
+  return capital ? cap(a) : a;
+}

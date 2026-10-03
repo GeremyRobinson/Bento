@@ -3,7 +3,7 @@
 import type { SceneDiagram, SceneItem } from "../scene/schema";
 
 export type Pt = [number, number];
-export type Seg = { c: "M" | "L"; p: Pt } | { c: "A"; r: number; ry?: number; large: 0 | 1; sweep: 0 | 1; p: Pt; samples: Pt[] } | { c: "Q"; q: Pt; p: Pt } | { c: "Z" };
+export type Seg = { c: "M" | "L"; p: Pt } | { c: "A"; r: number; ry?: number; large: 0 | 1; sweep: 0 | 1; p: Pt; samples: Pt[] } | { c: "Q"; q: Pt; p: Pt } | { c: "C"; c1: Pt; c2: Pt; p: Pt } | { c: "Z" };
 
 type PathItem = Extract<SceneItem, { type: "path" }>;
 /** A scene item while a family builds it: paths are kept as segments until the picture is framed. */
@@ -63,7 +63,7 @@ function pointsOf(it: Draft): Pt[] {
     case "line": return [[it.x1, it.y1], [it.x2, it.y2]];
     case "circle": return [[it.cx - it.r, it.cy - it.r], [it.cx + it.r, it.cy + it.r]];
     case "polygon": return it.points;
-    case "path": return it.segs.flatMap(s => (s.c === "Z" ? [] : s.c === "A" ? [s.p, ...s.samples] : s.c === "Q" ? [s.p, s.q] : [s.p]));
+    case "path": return it.segs.flatMap(s => (s.c === "Z" ? [] : s.c === "A" ? [s.p, ...s.samples] : s.c === "Q" ? [s.p, s.q] : s.c === "C" ? [s.p, s.c1, s.c2] : [s.p]));
     case "text": { const b = textBox(it); return [[b.x0, b.y0], [b.x1, b.y1]]; }
   }
 }
@@ -75,6 +75,7 @@ function writePath(segs: Seg[], dx: number, dy: number): string {
     switch (s.c) {
       case "M": case "L": return `${s.c}${P(s.p)}`;
       case "Q": return `Q${P(s.q)} ${P(s.p)}`;
+      case "C": return `C${P(s.c1)} ${P(s.c2)} ${P(s.p)}`;
       case "Z": return "Z";
       case "A": return `A${ff(s.r)} ${ff(s.ry ?? s.r)} 0 ${s.large} ${s.sweep} ${P(s.p)}`;
     }

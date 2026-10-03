@@ -21,6 +21,8 @@ const ORACLES: Record<string, Oracle> = {
  "k-count20":p=>[p.n],"k-tens":p=>[p.rows*10],"k-teens":p=>[10+p.ones],
  "k-add":p=>[p.a+p.b],"k-sub":p=>[p.a-p.b],"k-make10":p=>[10-p.have],
  "k-story":p=>[p.take?p.a-p.b:p.a+p.b],
+ "k-write":p=>[String(p.n)],"k-bonds":p=>[p.whole-p.part],"k-solids":p=>[["Cube","Sphere","Cylinder","Cone"][p.shape]],
+ "k-sort":p=>{const v=p.ask?Math.min(...p.counts):Math.max(...p.counts);return [[["Buttons","Leaves","Blocks"],["Circles","Squares","Triangles"]][p.by]![(p.counts.indexOf(v)+p.theme)%3]]},
  "g1-tensones":p=>[p.n],"g1-tenmore":p=>[p.more?p.n+10:p.n-10],"g1-ten":p=>[p.a+p.b],"g1-add20":p=>[p.a+p.b],"g1-sub20":p=>[p.a-p.b],
  "g1-missing":p=>[p.c-p.a],"g1-addtens":p=>[p.n+p.k*10],"g1-time":p=>[p.hour,p.minute],
  "g2-hundreds":p=>[Math.floor(p.n/100)*100,Math.floor(p.n/10)%10*10,p.n%10],"g2-skip":p=>[p.start+5*p.by],

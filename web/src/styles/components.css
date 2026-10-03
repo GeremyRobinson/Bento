@@ -457,3 +457,17 @@
 .plan{gap:2px}
 .bhome .b-stats{grid-template-rows:none}
 .slegend{list-style:none;margin:0;padding:0 5px;display:grid;gap:6px}.slegend li{display:flex;align-items:center;gap:10px}
+/* wave 1 pictures (design/pictures-k4.md): numerals, solids */
+.viz-svg .numst{fill:none;stroke:var(--tint);stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+.viz-svg .numghost{fill:none;stroke:var(--rule);stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+.viz-svg .sol.f{fill:color-mix(in srgb,var(--tint) 18%,var(--card))} .viz-svg .sol.b{fill:color-mix(in srgb,var(--tint) 40%,var(--card))}
+.viz-svg .edge.thin{stroke-width:2}
+.viz-svg .hid{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 6}
+.viz-svg .lit{fill:color-mix(in srgb,var(--acc) 45%,transparent);stroke:none}
+.viz-svg .litedge{fill:none;stroke:var(--acc);stroke-width:4;stroke-linecap:round}
+.viz-svg .detail{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round} .viz-svg .detail.c1{stroke:var(--c1)} .viz-svg .detail.c2{stroke:var(--c2)}
+.viz-svg .detail.fillc.c1{fill:color-mix(in srgb,var(--c1) 40%,var(--card))}
+.viz-svg .floor{fill:none;stroke:var(--rule);stroke-width:2}
+.viz-svg .pin{fill:var(--card)} .viz-svg .pinline{stroke:var(--card);stroke-width:2;fill:none;stroke-linecap:round} .viz-svg .pinbox{fill:none;stroke:var(--card);stroke-width:2}
+.viz-svg .dotpath{fill:var(--tint);stroke:var(--tint);stroke-width:1;stroke-linejoin:round}
+.viz-svg .hlrow{fill:color-mix(in srgb,var(--acc) 20%,transparent)}
