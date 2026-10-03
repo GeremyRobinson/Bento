@@ -1,79 +1,100 @@
 import { useEffect, useRef } from "react";
 import { LINES } from "../curriculum/grades";
 
-/** A small moving picture for each Advanced course, drawn in thin light lines on the dark canvas. */
-function CoursePic({ id }: { id: string }) {
+/** Where Bento² is headed, each as a small moving picture in thin light lines on the dark canvas. */
+const HORIZON = [
+  { id: "ai", title: "The math of AI", math: "Linear algebra, gradients" },
+  { id: "orbit", title: "Orbits and space", math: "Vectors, differential equations" },
+  { id: "relativity", title: "Relativity", math: "Geometry of spacetime" },
+  { id: "quantum", title: "Quantum", math: "Waves and probability" },
+] as const;
+
+function HorizonPic({ id }: { id: (typeof HORIZON)[number]["id"] }) {
   switch (id) {
-    case "AP Precalculus": // a point travelling the unit circle, its height traced as a sine wave
+    case "ai": // a ball rolling down a loss curve: gradient descent, how a network learns
       return (
         <svg viewBox="0 0 200 110" aria-hidden="true">
-          <circle cx="50" cy="55" r="36" className="adv-faint" />
-          <line x1="8" y1="55" x2="192" y2="55" className="adv-faint" />
-          <path d="M100 55 C 112 19, 128 19, 140 55 S 168 91, 180 55" className="adv-line adv-draw" />
-          <g className="adv-spin" style={{ transformOrigin: "50px 55px" }}>
-            <line x1="50" y1="55" x2="86" y2="55" className="adv-line" />
-            <circle cx="86" cy="55" r="4" className="adv-dot" />
+          <line x1="14" y1="96" x2="186" y2="96" className="adv-faint" />
+          <path d="M16 18 C 50 18, 62 92, 104 92 S 160 40, 186 30" className="adv-line adv-draw" />
+          {[30, 52, 72, 92].map((x, i) => <circle key={x} cx={x + 6} cy={[24, 52, 78, 90][i]} r="2.5" className="adv-trail" style={{ animationDelay: `${0.6 + i * 0.35}s` }} />)}
+          <circle r="5" className="adv-dot">
+            <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;.7;1" calcMode="spline" keySplines=".5 0 .5 1;0 0 1 1" path="M16 18 C 50 18, 62 92, 104 92" />
+          </circle>
+        </svg>
+      );
+    case "orbit": // a planet on an ellipse, the sun at one focus
+      return (
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <ellipse cx="100" cy="55" rx="80" ry="38" className="adv-faint" />
+          <circle cx="62" cy="55" r="8" className="adv-fill" />
+          <circle cx="62" cy="55" r="3" className="adv-dot" />
+          <circle r="4.5" className="adv-dot">
+            <animateMotion dur="7s" repeatCount="indefinite" path="M180 55 A 80 38 0 1 1 20 55 A 80 38 0 1 1 180 55" />
+          </circle>
+        </svg>
+      );
+    case "relativity": // a grid of spacetime bending around a mass
+      return (
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map(i => <path key={`h${i}`} className="adv-faint adv-bend" style={{ animationDelay: `${i * 0.05}s` }}
+            d={`M14 ${20 + i * 18} Q 100 ${20 + i * 18 + (i === 2 ? 26 : i === 1 || i === 3 ? 16 : 8)}, 186 ${20 + i * 18}`} />)}
+          {[0, 1, 2, 3, 4, 5, 6].map(i => { const x = 22 + i * 26; return <path key={`v${i}`} className="adv-faint"
+            d={`M${x} 14 Q ${x + (100 - x) * 0.25} 55, ${x} 96`} />; })}
+          <circle cx="100" cy="62" r="9" className="adv-fill adv-mass" />
+          <circle cx="100" cy="62" r="4" className="adv-dot" />
+        </svg>
+      );
+    default: // a wave packet travelling: where a particle probably is
+      return (
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <line x1="10" y1="62" x2="190" y2="62" className="adv-faint" />
+          <g className="adv-drift">
+            <path d={wave()} className="adv-line" />
+            <path d="M40 62 C 70 62, 82 28, 100 28 S 130 62, 160 62" className="adv-faint adv-dash" />
           </g>
-        </svg>
-      );
-    case "AP Calculus AB": // the area under a curve filling in
-      return (
-        <svg viewBox="0 0 200 110" aria-hidden="true">
-          <defs><clipPath id="adv-under"><path d="M20 96 C 60 96, 70 20, 110 30 S 160 70, 184 40 L184 96 Z" /></clipPath></defs>
-          <rect x="20" y="10" width="164" height="86" className="adv-fill adv-sweep" clipPath="url(#adv-under)" />
-          <path d="M20 96 C 60 96, 70 20, 110 30 S 160 70, 184 40" className="adv-line adv-draw" />
-          <line x1="20" y1="96" x2="184" y2="96" className="adv-faint" />
-        </svg>
-      );
-    case "AP Calculus BC": // ½ + ¼ + ⅛ + … closing in on 1
-      return (
-        <svg viewBox="0 0 200 110" aria-hidden="true">
-          <line x1="20" y1="22" x2="184" y2="22" className="adv-faint adv-dash" />
-          {[0.5, 0.75, 0.875, 0.9375, 0.96875, 0.984].map((v, i) => (
-            <rect key={i} x={24 + i * 27} y={96 - v * 74} width="18" height={v * 74} rx="4" className="adv-fill adv-grow" style={{ animationDelay: `${i * 0.18}s` }} />
-          ))}
-        </svg>
-      );
-    default: // AP Statistics: a bell curve settling over its bars
-      return (
-        <svg viewBox="0 0 200 110" aria-hidden="true">
-          {[6, 14, 30, 52, 70, 52, 30, 14, 6].map((h, i) => (
-            <rect key={i} x={23 + i * 17.5} y={96 - h} width="13" height={h} rx="3" className="adv-fill adv-grow" style={{ animationDelay: `${Math.abs(i - 4) * 0.12}s` }} />
-          ))}
-          <path d="M14 94 C 60 94, 74 22, 100 22 S 140 94, 186 94" className="adv-line adv-draw" />
         </svg>
       );
   }
 }
 
-/** Bento Advanced on the landing page: the AP courses, introduced like a pro product line. Not in the grade picker. */
+/** A sine wave inside a bell-shaped envelope. */
+function wave() {
+  const pts: string[] = [];
+  for (let x = 20; x <= 180; x += 2) {
+    const env = Math.exp(-(((x - 100) / 34) ** 2));
+    pts.push(`${x},${(62 - Math.sin((x - 100) / 5.2) * 32 * env).toFixed(1)}`);
+  }
+  return `M${pts.join(" L")}`;
+}
+
+/** Bento² on the landing page: the pro side of Bento, introduced on its own dark canvas. */
 export function Advanced() {
   const line = LINES.find(l => l.id === "ap")!;
-  // the pictures wait until the section is on screen, then draw themselves once
+  // the pictures wait until the section is on screen, then play
   const box = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") { el.classList.add("in"); return; }
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { el.classList.add("in"); io.disconnect(); } }, { threshold: 0.25 });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { el.classList.add("in"); io.disconnect(); } }, { threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
   return (
     <section className="ladv" ref={box} aria-labelledby="adv-title">
-      <span className="adv-eyebrow">{line.name}</span>
-      <h2 id="adv-title">Go further.</h2>
-      <p>AP Precalculus, Calculus AB and BC, and Statistics. The same calm, step-by-step Bento, built for college-level math and the exam at the end of it.</p>
+      <h2 id="adv-title" aria-label="Bento squared">Bento²</h2>
+      <p className="adv-tag">Bento, maxed out.</p>
+      <p>The pro side of Bento. It picks up where 12th grade's calculus ends: {line.soon?.slice(0, -1).join(", ").toLowerCase()} and {line.soon?.at(-1)?.toLowerCase()}. Then it keeps going, to the math that shaped AI, space travel, relativity and quantum physics.</p>
       <div className="adv-courses">
-        {line.soon?.map((c, k) => (
-          <article key={c} className="adv-course" style={{ animationDelay: `${k * 0.08}s` }}>
-            <CoursePic id={c} />
-            <h3>{c.replace("AP ", "")}</h3>
-            <span>AP</span>
+        {HORIZON.map((h, k) => (
+          <article key={h.id} className="adv-course" style={{ animationDelay: `${k * 0.08}s` }}>
+            <HorizonPic id={h.id} />
+            <h3>{h.title}</h3>
+            <span>{h.math}</span>
           </article>
         ))}
       </div>
-      <span className="adv-soon">Coming soon</span>
+      <span className="adv-soon">Coming later</span>
     </section>
   );
 }

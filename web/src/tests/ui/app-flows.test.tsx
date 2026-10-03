@@ -13,19 +13,21 @@ describe("first launch: landing → grade → home", () => {
   it("shows the landing page, then the chosen grade's home", () => {
     renderApp({ grade: null, chosen: false });
     expect(screen.getByRole("heading", { level: 1, name: "Math that finally clicks." })).toBeInTheDocument();
-    expect(screen.getByText(`Counting to calculus. ${CATALOG.length} lessons, unit tests and a check-up for every grade.`)).toBeInTheDocument();
+    expect(screen.getByText("Counting to calculus, with unit tests and a check-up for every grade.")).toBeInTheDocument();
 
-    // a random bento: five or six tiles from different grades, each with a real picture and its grade on it
-    const tiles = [...document.querySelectorAll(".lshots figure")];
-    expect(tiles.length).toBeGreaterThanOrEqual(5);
-    const shown = tiles.map(t => t.querySelector(".lchip")!.textContent);
-    expect(new Set(shown).size).toBe(tiles.length);
-    for (const t of tiles) expect(t.firstElementChild!.tagName).not.toBe("FIGCAPTION");
+    // the hero box plays a real lesson picture with its grade, beside the two step demos
+    const hero = document.querySelector(".lhbox .lhpic")!;
+    expect(hero.querySelector(".gnum")).not.toBeNull();
+    expect(hero.querySelector(".viz")).not.toBeNull();
+    expect(document.querySelectorAll(".lhbox .ldemo")).toHaveLength(2);
+    // the feature box: nine working tiles
+    expect(document.querySelectorAll(".lbox .ltile")).toHaveLength(9);
 
-    // thirteen grade buttons; picking one goes home
-    const grades = within(document.querySelector(".lgrades") as HTMLElement).getAllByRole("button");
+    // the grade picker is the shelf: thirteen grade cards, nothing that isn't open yet
+    const grades = [...document.querySelectorAll(".lshelf button.book")];
     expect(grades).toHaveLength(13);
-    fireEvent.click(screen.getByRole("button", { name: "5th grade" }));
+    expect(document.querySelector(".lshelf .book.soon")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /^5th grade:/ }));
     // a grade opens on its book: the cover, today's plan, then every chapter with its pages
     expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
     expect(screen.getByText("This year: fractions and decimals.")).toBeInTheDocument();

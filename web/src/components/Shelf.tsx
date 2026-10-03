@@ -16,11 +16,11 @@ export function GradeNum({ grade }: { grade: number }) {
  * Every grade as a card, grouped by Bento's lines: the grade's number in its colour, what the year covers, and
  * how much is done as a fill. The same shelf in the contents, the grade picker and the personal hub.
  */
-export function Shelf({ current, onPick }: { current: number | null; onPick: (grade: number) => void }) {
+export function Shelf({ current, onPick, soon = true }: { current: number | null; onPick: (grade: number) => void; soon?: boolean }) {
   const { progress } = useApp();
   return (
     <div className="shelf">
-      {LINES.map(line => (
+      {LINES.filter(l => soon || l.grades.length).map(line => (
         <div key={line.id} className="sline">
           <span className="k">{line.name}</span>
           <div className="sbooks">
@@ -35,7 +35,7 @@ export function Shelf({ current, onPick }: { current: number | null; onPick: (gr
                   <span className="bcount">{done === 0 ? `${list.length} lesson${list.length === 1 ? "" : "s"}` : done === list.length ? "Finished" : `${done} of ${list.length} done`}</span>
                 </button>
               );
-            }) : line.soon?.map(c => <span key={c} className="book soon"><span className="gnum">AP</span><b>{c.replace("AP ", "")}</b><span className="bcount">Coming soon</span></span>)}
+            }) : line.soon?.map(c => <span key={c} className="book soon"><span className="gnum">²</span><b>{c}</b><span className="bcount">Coming soon</span></span>)}
           </div>
         </div>
       ))}

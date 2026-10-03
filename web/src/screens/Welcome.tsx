@@ -1,12 +1,13 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { entryById } from "../app/curriculum";
-import { CATALOG } from "../curriculum/catalog";
-import { GRADES, LINES, gradeOf, tintStyle } from "../curriculum/grades";
+import { GRADES, gradeOf, tintStyle } from "../curriculum/grades";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
-import { GradeBadge } from "../components/primitives/Score";
+import { reduceMotion } from "../app/transition";
+import { FeatureBox } from "../components/LandingTiles";
+import { GradeNum, Shelf } from "../components/Shelf";
 import { SlipTile, SolveTile } from "../components/StepDemos";
 import { Advanced } from "../components/Advanced";
 import type { Explanation } from "../explanations/schema";
@@ -65,52 +66,54 @@ export function showcasePicture(id: string, rng: Rng): Pictured | null {
   try { return tryOne(lesson.reference); } catch { return null; }
 }
 
-function Shot({ id, size, color, ex, k, tail }: Showcase & { ex: Pictured; k: number }) {
-  const entry = entryById(id), grade = gradeOf(entry?.grade ?? 5);
-  const [replay, setReplay] = useState(0);
-  const style = { "--tint": color, "--acc": "#f59e0b", "--i": k } as CSSProperties;
+/** The hero's big picture: a lesson's moving picture from a random grade, moving on to another after it plays. */
+function HeroPicture({ rng }: { rng: Rng }) {
+  const [n, setN] = useState(0);
+  const shot = useMemo(() => {
+    for (let tries = 0; tries < 20; tries++) {
+      const g = rng.pick(GRADES).grade, l = rng.pick(lessonsInGrade(g));
+      const ex = l && showcasePicture(l.id, rng);
+      if (l && ex) return { id: l.id, grade: g, ex };
+    }
+    return null;
+  }, [n, rng]);
+  useEffect(() => {
+    if (reduceMotion() || !shot) return;
+    const t = setTimeout(() => setN(k => k + 1), 2400 + shot.ex.timeline.length * 750);
+    return () => clearTimeout(t);
+  }, [shot]);
+  if (!shot) return null;
+  const g = gradeOf(shot.grade), entry = entryById(shot.id);
   return (
-    <figure className={`lshot ${size}${tail ? " tail" : ""}`} style={style} onClick={() => setReplay(r => r + 1)}>
-      <PlayingDiagram ex={ex} replay={replay} />
-      <figcaption><span className="lchip">{grade.name.split(" · ")[0]}</span>{entry?.title ?? id}</figcaption>
+    <figure className="lhpic" key={n} style={tintStyle(g) as CSSProperties} onClick={() => setN(k => k + 1)}>
+      <figcaption><GradeNum grade={shot.grade} /><span><small>See it first</small><b>{entry?.title ?? shot.id}</b></span></figcaption>
+      <PlayingDiagram ex={shot.ex} />
     </figure>
   );
 }
 
-/** The first screen on a new device: what Bento is, real lesson pictures, and the grade choice built in. */
+/** The first screen on a new device: what Bento is, the real thing working, and the grade shelf to start from. */
 export function Welcome() {
-  const { progress, chooseGrade, deps } = useApp();
-  const shots = useMemo(() => pickShowcase(deps().rng), []); // eslint-disable-line react-hooks/exhaustive-deps
-  const demoRng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const { chooseGrade, deps } = useApp();
+  const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const toShelf = () => document.getElementById("lshelf")?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
   return (
     <div className="land">
       <section className="lhero">
-        <h1>Math that finally clicks.</h1>
+        <h1>Math that <span>finally clicks.</span></h1>
         <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
-        <div className="lpick"><span>Pick your grade to start</span>
-          <div className="lgrades">{LINES.filter(l => l.grades.length).map(line => (
-            <div key={line.id} className={`lgroup lgroup-${line.id}`}>
-              <span className="lgname">{line.name.replace("Bento ", "")}</span>
-              <div className="lgbtns">{line.grades.length ? line.grades.map(n => { const g = gradeOf(n); return (
-                <button key={g.grade} className="lg" style={{ ...tintStyle(g), "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
-                  <GradeBadge grade={g.grade} gxp={progress.gxp[g.grade] ?? 0} />
-                </button>
-              ); }) : null}</div>
-            </div>
-          ))}</div>
-        </div>
+        <div className="lcta"><button className="ctl go" onClick={toShelf}>Choose your grade</button><span>Free. No account.</span></div>
       </section>
-      <section className="lsec"><h2>See it first.</h2><p>Every lesson opens with a picture that moves, so the idea makes sense before the numbers show up.</p></section>
-      <section className="lshots">{shots.map((s, k) => <Shot key={s.id} {...s} k={k} />)}</section>
-      <section className="lsec"><h2>One step at a time.</h2><p>Big problems get split into small moves. Each one is checked the moment you enter it.</p></section>
-      <section className="lpair"><SolveTile rng={demoRng} /><SlipTile rng={demoRng} /></section>
+      <section className="lhbox">
+        <HeroPicture rng={rng} />
+        <SolveTile rng={rng} />
+        <SlipTile rng={rng} />
+      </section>
+      <section className="lsec" id="lshelf"><h2>Pick your grade.</h2><p>Every grade is a book of chapters, Kindergarten to 12th. Start anywhere, and change any time.</p></section>
+      <div className="lshelf"><Shelf current={null} onPick={chooseGrade} soon={false} /></div>
+      <section className="lsec"><h2>Everything in one box.</h2><p>Bento is more than lessons. Here's the rest of it, working.</p></section>
+      <FeatureBox rng={rng} />
       <Advanced />
-      <section className="lfeats">
-        <article className="lf"><h3>Help that steps back.</h3><p>Hints and worked steps fade as you get stronger, until it's just you and the problem.</p></article>
-        <article className="lf"><h3>Review that sticks.</h3><p>A few old problems every day, picked from the skills you're shakiest on.</p></article>
-        <article className="lf"><h3>K through 12.</h3><p>Counting to calculus. {CATALOG.length} lessons, unit tests and a check-up for every grade.</p></article>
-        <article className="lf wide"><h3>A report for your grown-up.</h3><p>Scores, time spent and the exact mistakes made, so everyone knows what to work on next.</p></article>
-      </section>
       <footer className="lfoot">Bento · Free. Private. No account needed.</footer>
     </div>
   );

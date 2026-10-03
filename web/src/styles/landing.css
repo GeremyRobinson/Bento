@@ -1,36 +1,117 @@
-/* ---- welcome: a landing page that shows what Bento is, with the grade choice built in ---- */
-.land{max-width:1040px;margin:0 auto;display:grid;gap:calc(var(--u) * 2);padding:0 4px calc(var(--u) * 2)}
-.lnav{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);padding:6px 4px 0}
-.lnav b{font:650 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em}
-.lnav span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
-.lhero{display:grid;justify-items:center;gap:calc(var(--u) + 4px);text-align:center;padding:calc(var(--u) * 3) var(--u) var(--u);animation:rise .7s var(--ease) both}
-.lhero h1{font:650 clamp(38px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;text-wrap:balance}
-.lhero p{max-width:540px;font-size:calc(var(--fs) * 1.1);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
-.lpick{max-width:100%;margin-top:var(--s);display:grid;justify-items:center;gap:10px;background:var(--well);border-radius:var(--r-panel);padding:var(--u) calc(var(--u) - 4px) calc(var(--u) - 4px)}
-.lpick>span{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted);letter-spacing:.01em}
-.lgrades{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 2px;max-width:1000px}
-.lg{padding:4px;border-radius:999px;transition:transform .2s var(--spring),background .15s;animation:pop .45s var(--spring) both;animation-delay:calc(.2s + var(--j) * 30ms)}
-.lg:hover{background:var(--card);transform:translateY(-2px)}
-.lg:active{transform:scale(.94)}
-.lsec{display:grid;justify-items:center;gap:6px;text-align:center;padding:calc(var(--u) * 2) var(--u) 0}
-.lsec h2{font:650 clamp(28px,4.5vw,44px)/1.1 var(--sans);letter-spacing:-.03em}
-.lsec p{max-width:520px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.02)}
-.lshots{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr);grid-auto-flow:row dense}
-@media (min-width:700px){.lshots{grid-template-columns:repeat(2,minmax(0,1fr))}.lshot.big,.lshot.wide,.lshot.tail{grid-column:1 / -1}}
-@media (min-width:960px){.lshots{grid-template-columns:repeat(3,minmax(0,1fr))}.lshot.tail{grid-column:auto}.lshot.big{grid-column:span 2;grid-row:span 2}.lshot.wide{grid-column:span 2}}
-.lshot{margin:0;background:var(--card);border-radius:var(--r-panel);padding:var(--u);display:grid;grid-template-rows:1fr auto;gap:var(--s);cursor:pointer;box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) both;animation-delay:calc(var(--i) * 60ms)}
-.lshot .viz{align-self:center;align-content:center}
-.lshot .viz-cap,.lshot .replay{display:none}
-.lshot .viz-svg{max-height:220px;width:100%}
-.lshot.big .viz-svg{max-height:440px}
-.lshot figcaption{display:flex;align-items:center;gap:10px;font-weight:var(--w-bold);font-size:calc(var(--fs) * .95);min-width:0}
-.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--ink);font-weight:var(--w-bold)}
-.lpair{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
-@media (min-width:700px){.lpair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* ---- welcome: Bento's front door. The real thing working, in one box, then the shelf to start from ---- */
+.land{max-width:1120px;margin:0 auto;display:grid;gap:var(--s);padding:0 4px calc(var(--u) * 2)}
+.lhero{display:grid;justify-items:center;gap:calc(var(--u) + 4px);text-align:center;padding:calc(var(--u) * 3.5) var(--u) calc(var(--u) * 2);animation:rise .7s var(--ease) both}
+.lhero h1{font:650 clamp(46px,9vw,104px)/.96 var(--sans);letter-spacing:-.05em;text-wrap:balance}
+.lhero p{max-width:560px;font-size:calc(var(--fs) * 1.12);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
+.lcta{display:flex;align-items:center;gap:var(--u);flex-wrap:wrap;justify-content:center;margin-top:4px}
+.lcta .ctl.go{--tint:#1b1d22;--ink:#1b1d22;height:52px;padding:0 28px;font-size:17px;font-weight:600}
+.lcta>span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}}
+:root[data-theme="dark"] .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}
+
+/* the hero box: a lesson's picture playing, a problem solving itself, and a slip being explained */
+.lhbox{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.lhbox{grid-template-columns:repeat(2,minmax(0,1fr))}.lhpic{grid-column:1 / -1}}
+@media (min-width:960px){.lhbox{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(250px,auto))}.lhpic{grid-column:span 2;grid-row:span 2}.lhbox>.ldemo{grid-column:span 2}}
+.lhpic{margin:0;background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;grid-template-rows:auto 1fr;gap:var(--u);cursor:pointer;box-shadow:0 0 0 1px var(--rule);animation:fadeIn .7s var(--ease) both;min-height:340px}
+.lhpic figcaption{display:flex;align-items:center;gap:14px;min-width:0}
+.lhpic .gnum{font-size:40px;flex:none;white-space:nowrap}
+.lhero h1 span{display:block}
+.lhpic figcaption>span:not(.gnum){display:grid;gap:2px;min-width:0}
+.lhpic figcaption>span:not(.gnum) small{font-size:13px;font-weight:550;color:var(--muted)}
+.lhpic b{font-size:calc(var(--fs) * 1.05);font-weight:650;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lhpic .viz{align-self:center;min-height:0}
+.lhpic .viz-cap,.lhpic .replay{display:none}
+.lhpic .viz-svg,.lhpic .am{max-height:400px;width:100%}
+.lhbox>.ldemo{min-height:250px}
+
+/* section heads */
+.lsec{display:grid;justify-items:center;gap:8px;text-align:center;padding:calc(var(--u) * 4) var(--u) var(--u)}
+.lsec h2{font:650 clamp(32px,5vw,56px)/1.02 var(--sans);letter-spacing:-.04em}
+.lsec p{max-width:520px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.02);text-wrap:pretty}
+
+/* the grade picker is the same shelf as the book's contents */
+.lshelf .book{animation:rise .5s var(--ease) both}
+@media (min-width:900px){.lshelf .shelf{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:calc(var(--u) * 1.5)}}
+@media (max-width:699px){
+  .lshelf .sbooks{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .lshelf .book{height:128px;padding:12px 12px 14px;gap:4px}
+  .lshelf .book .gnum{font-size:34px}
+  .lshelf .book .gnum small{font-size:14px;top:2px}
+  .lshelf .book b{font-size:13px}
+  .lshelf .book .bcount{font-size:12px}
+}
+
+/* the feature box: every tile is a small working piece of the app */
+.lbox{display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(232px,auto);grid-auto-flow:row dense}
+@media (min-width:960px){.lbox{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(272px,auto)}}
+.ltile.wide{grid-column:span 2}
+.ltile.tall{grid-row:span 2}
+.ltile{min-width:0;background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;grid-template-rows:1fr auto;gap:var(--u);box-shadow:0 0 0 1px var(--rule);animation:rise .6s var(--ease) both;animation-delay:calc(var(--i) * 50ms)}
+.lvis{display:grid;place-items:center;min-height:0}
+.ltext{display:grid;gap:4px}
+.ltext h3{font-size:calc(var(--fs) * 1.05);font-weight:650;letter-spacing:-.01em}
+.ltext p{color:var(--muted);font-weight:var(--w-mid);line-height:1.45;font-size:calc(var(--fs) * .9);text-wrap:pretty}
+@media (max-width:699px){.ltile:not(.wide) .ltext p{font-size:14px}.ltile{padding:var(--u)}}
+
+.ltoday{list-style:none;margin:0;padding:0;display:grid;gap:6px;width:100%}
+.ltoday li{display:flex;align-items:center;gap:12px;padding:8px 16px 8px 10px;border-radius:999px;background:var(--well);transition:background .4s var(--ease)}
+.ltoday li.now{background:var(--tint-soft)}
+.ltoday li>span:last-child{display:grid;gap:1px;min-width:0}
+.ltoday small{font-size:12px;font-weight:550;color:var(--muted)}
+.ltoday b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmark{flex:none;width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--faint);display:grid;place-items:center;transition:background .3s,box-shadow .3s}
+.ltoday li.now .lmark{box-shadow:inset 0 0 0 2px var(--ink)}
+.ltoday li.done .lmark{background:var(--ok);box-shadow:none}
+.lmark svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:16;animation:tick .35s var(--ease) both}
+@keyframes tick{from{stroke-dashoffset:16}}
+
+.lfacts{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px;width:100%;max-width:300px}
+.lfacts span{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font:500 clamp(10px,1.3vw,14px)/1 var(--num);font-variant-numeric:tabular-nums;color:var(--muted);
+  background:color-mix(in srgb,var(--tint) calc(var(--lv) * 30%),var(--well));transition:background .5s var(--ease),color .5s}
+.lfacts span.k{color:var(--on-tint);font-weight:650}
+
+.lbatt{display:flex;flex-direction:column;gap:6px;width:min(100%,210px);height:150px;padding:14px 18px 16px;border-radius:calc(var(--r-panel) - 8px);background:var(--page);box-shadow:0 0 0 1px var(--rule);text-align:left}
+.lbatt b{font-size:14px;font-weight:600;line-height:1.3}
+.lbatt .gnum{font-size:40px}
+
+.lbook{display:grid;grid-template-columns:repeat(3,28px);grid-auto-rows:36px;gap:6px;padding:10px;border-radius:16px;transition:transform .8s var(--ease),background .8s}
+.lbook span{border-radius:7px;background:var(--well);transition:opacity .6s var(--ease),transform .8s var(--ease),background .6s}
+.lbook .page{background:var(--tint);position:relative;z-index:1}
+.lbook.z0 span:not(.page){opacity:0}
+.lbook.z0 .page{transform:scale(3.6);border-radius:3px}
+.lbook.z1 .page{transform:none}
+.lbook.z2{transform:scale(.72);background:var(--tint-soft)}
+.lbook.z2 span:not(.page){background:color-mix(in srgb,var(--tint) 30%,var(--card))}
+
+.lreport{display:grid;gap:12px;width:100%}
+.lreport>div{display:grid;grid-template-columns:minmax(0,9fr) minmax(0,8fr) 28px;align-items:center;gap:12px;font-size:14px;font-weight:550}
+.lreport span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lreport i{height:10px;border-radius:999px;background:var(--well);position:relative;overflow:hidden}
+.lreport i::after{content:"";position:absolute;inset:0 auto 0 0;width:calc(var(--w) * 100%);border-radius:inherit;background:var(--ink);transform-origin:left;animation:grow .9s var(--ease) both;animation-delay:calc(var(--d) * 140ms + 150ms)}
+@keyframes grow{from{transform:scaleX(0)}}
+.lreport b{font-weight:650;font-variant-numeric:tabular-nums;text-align:right}
+
+.lhelp{display:grid;gap:6px;justify-items:center}
+.lhelp span{padding:8px 18px;border-radius:999px;background:var(--well);font-size:15px;font-weight:600;color:var(--muted);transition:background .5s var(--ease),color .5s,opacity .5s,transform .5s var(--spring)}
+.lhelp span.on{background:var(--ink);color:var(--on-tint);transform:scale(1.06)}
+.lhelp span.gone{opacity:.3;transform:scale(.94)}
+
+.lreview{display:grid;place-items:center;width:100%}
+.lreview span{grid-area:1/1;padding:14px 22px;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--rule),0 10px 24px -14px rgba(15,20,30,.35);font:600 20px/1 var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;
+  transform:translateY(calc(var(--j) * 14px)) scale(calc(1 - var(--j) * .08));z-index:calc(3 - var(--j));opacity:calc(1 - var(--j) * .3);animation:rise .5s var(--ease) both}
+.lreview span.top{color:var(--ink)}
+
+.lcount{display:grid;justify-items:center;gap:2px}
+.lcount b{font:650 clamp(60px,8vw,92px)/1 var(--sans);letter-spacing:-.05em;color:var(--display,var(--ink));font-variant-numeric:tabular-nums}
+.lcount span{color:var(--muted);font-weight:550}
+.lprivate svg{width:72px;height:72px;fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.lprivate circle{fill:var(--ink);stroke:none}
+
+/* the step demos, as cards */
 .lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule)}
-.lf h3{font-size:calc(var(--fs) * 1.05);font-weight:var(--w-bold)}
-.lf p{color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * .95)}
-.lk{font-size:12px;font-weight:var(--w-bold);letter-spacing:.08em;color:var(--muted)}
+.lk{font-size:13px;font-weight:var(--w-bold);color:var(--muted)}
+.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--ink);font-weight:var(--w-bold)}
 .lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
 .lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
 .lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
@@ -39,34 +120,8 @@
 .lmiss .bad{background:color-mix(in srgb,#ef4444 12%,var(--card))} .lmiss .bad b{color:#dc2626;font-weight:600;text-decoration:line-through 2px}
 .lmiss p{font-family:var(--sans);margin-top:6px;color:var(--text);line-height:1.5}
 .lmiss p b{color:#dc2626}
-.lfeats{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
-@media (min-width:700px){.lfeats{grid-template-columns:repeat(3,minmax(0,1fr))}.lf.wide{grid-column:1 / -1}}
-.lfoot{text-align:center;color:var(--faint);font-size:var(--small);font-weight:var(--w-mid);padding-top:var(--u)}
-
-/* ---- additions for the rebuild ---- */
-/* the way back to your lessons once a grade is picked */
-.lback{color:var(--muted);font-size:var(--small);font-weight:var(--w-bold);padding:6px 12px;margin:-6px -8px 0 0;border-radius:999px;transition:background .15s,color .15s}
-.lback:hover{background:var(--well);color:var(--text)}
-/* the area model inside a tile: as big as the tile allows */
-.lshot .am{max-height:220px;width:100%}
-.lshot.big .am{max-height:440px}
-.lshot .viz{min-height:0}
-/* a lesson whose picture isn't rebuilt yet: its grade's pattern and a flat circle, so the grid keeps its shape */
-.lshot.pending{cursor:default}
-.lpend{position:relative;display:grid;place-items:center;min-height:180px;border-radius:var(--r-card);background-color:var(--tint-soft);background-repeat:repeat;overflow:hidden}
-.lshot.big .lpend{min-height:360px}
-.lpend::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--card) 55%,transparent))}
-.lpend-mark{position:relative;z-index:1;width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--tint);color:#fff;font:600 30px/1 var(--num);text-box:trim-both cap alphabetic;animation:popIn .5s var(--spring) calc(var(--i) * 60ms + .2s) both}
-.lshot.big .lpend-mark{width:104px;height:104px;font-size:44px}
-
-/* ---- a grade's opening page: the year at a glance ---- */
-/* the landing grade picker, grouped by product line */
-.lgrades{gap:6px 18px;align-items:flex-start}
-.lgroup{display:grid;justify-items:center;gap:2px}
-.lgname{font-size:12px;font-weight:650;color:var(--muted);letter-spacing:.02em}
-.lgbtns{display:flex;gap:2px}
-.lgsoon{width:54px;height:54px;margin:4px;border-radius:50%;display:grid;place-items:center;align-content:center;background:linear-gradient(135deg,#0b0d12,#2a2140);color:#f5d08a;font:650 16px/1 var(--num)}
-.lgsoon small{font:650 9px/1 var(--sans);color:#b9bdc9;letter-spacing:.06em;margin-top:2px}
+.lfoot{text-align:center;color:var(--muted);font-size:var(--small);font-weight:var(--w-mid);padding-top:calc(var(--u) * 2)}
+@media (prefers-reduced-motion:reduce){.ltile,.lhpic,.lbook,.lbook span,.lreview span,.lreport i::after,.lmark svg{animation:none;transition:none}}
 
 /* the two step tiles play: rows fill in, a slip shakes, the fix lands; a tap brings another problem */
 .ldemo{cursor:pointer;grid-template-rows:auto 1fr auto;-webkit-user-select:none;user-select:none}
@@ -118,3 +173,16 @@
 .adv-spin{animation:advSpin 6s linear infinite}
 @keyframes advSpin{to{transform:rotate(-360deg)}}
 .ladv:not(.in),.ladv:not(.in) *{animation-play-state:paused}
+
+/* Bento²: the name is the headline */
+.ladv h2{font-size:clamp(64px,13vw,148px);letter-spacing:-.06em;line-height:.95}
+.adv-tag{font:600 clamp(22px,3vw,30px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--adv-ink);margin-top:-4px}
+.adv-trail{fill:var(--adv-glow);opacity:0;animation:advTrail 4s linear infinite}
+@keyframes advTrail{0%,8%{opacity:0}20%,70%{opacity:.5}100%{opacity:0}}
+.adv-bend{animation:advBend 5s var(--ease) infinite alternate}
+@keyframes advBend{from{transform:translateY(0)}to{transform:translateY(3px)}}
+.adv-mass{transform-box:fill-box;transform-origin:center;animation:advPulse 2.6s ease-in-out infinite alternate}
+@keyframes advPulse{to{transform:scale(1.35)}}
+.adv-drift{animation:advDrift 5s ease-in-out infinite alternate}
+@keyframes advDrift{from{transform:translateX(-26px)}to{transform:translateX(26px)}}
+@media (prefers-reduced-motion:reduce){.adv-trail,.adv-bend,.adv-mass,.adv-drift{animation:none}.adv-trail{opacity:.5}}
