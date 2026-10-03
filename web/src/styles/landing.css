@@ -10,7 +10,7 @@
 :root[data-theme="dark"] .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}
 
 /* the hero box: a lesson's picture playing, a problem solving itself, and a slip being explained */
-/* the hero box: one big moving picture and two smaller ones beside it (below it, side by side, on narrower screens) */
+/* the hero box: one big moving picture and two smaller ones beside it (below it on narrower screens, stacked on phones) */
 .lhbox{display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr))}
 .lhpic:not(.sm){grid-column:1 / -1}
 @media (min-width:960px){.lhbox{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(250px,auto))}.lhpic:not(.sm){grid-column:span 2;grid-row:span 2}.lhpic.sm{grid-column:span 2}}
@@ -29,7 +29,7 @@
 .lhpic.sm{min-height:250px;padding:var(--u)}
 .lhpic.sm .gnum{font-size:30px}
 .lhpic.sm .viz-svg,.lhpic.sm .am{max-height:220px}
-@media (max-width:699px){.lhpic{min-height:300px}.lhpic.sm{min-height:200px;padding:12px;gap:8px}.lhpic.sm .gnum{font-size:24px}.lhpic.sm b{font-size:14px;white-space:normal;line-height:1.2}.lhpic.sm .viz-svg,.lhpic.sm .am{max-height:160px}}
+@media (max-width:699px){.lhbox{grid-template-columns:minmax(0,1fr)}.lhpic{min-height:300px}.lhpic.sm{min-height:260px}}
 
 /* section heads */
 .lsec{display:grid;justify-items:center;gap:8px;text-align:center;padding:calc(var(--u) * 4) var(--u) var(--u)}
@@ -115,6 +115,33 @@
 .lprivate circle{fill:var(--ink);stroke:none}
 .lfoot{text-align:center;color:var(--muted);font-size:var(--small);font-weight:var(--w-mid);padding-top:calc(var(--u) * 2)}
 @media (prefers-reduced-motion:reduce){.ltile,.lhpic,.lhpic figcaption,.lhpic .lhd,.lbook,.lbook span,.lreview span,.lreport i::after,.lmark svg{animation:none;transition:none}}
+
+/* "One step at a time" and "Slips, explained": wide feature tiles whose steps stack from the top and play in turn; a tap brings another */
+.ldemo{cursor:pointer;-webkit-user-select:none;user-select:none}
+.ldemo .lvis{place-items:stretch;align-content:start;gap:8px}
+.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--ink);font-weight:var(--w-bold);font-family:var(--sans)}
+.lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num);align-content:start}
+.lsteps .q,.lmiss .q{display:flex;align-items:center;justify-content:space-between;gap:var(--u);font-size:calc(var(--fs) * 1.45);margin:0 0 2px}
+.lsteps>div:not(.q),.lmiss .bad,.lmiss .good{display:flex;align-items:center;justify-content:space-between;gap:var(--u);padding:7px 14px;border-radius:999px;background:var(--well);font-size:var(--fs)}
+.lsteps b{color:var(--ink);font-weight:650}
+.lsteps .sum{background:var(--tint-soft)}
+.lsteps>div:not(.q)>span{color:var(--muted);font-family:var(--sans);font-weight:var(--w-mid);font-size:calc(var(--fs) * .92)}
+.lmiss .bad{background:color-mix(in srgb,var(--err) 12%,var(--card))}
+.lmiss .bad b{color:var(--err-ink);font-weight:650;position:relative}
+.lmiss .bad b::after{content:"";position:absolute;left:-3px;right:-3px;top:52%;height:2px;border-radius:2px;background:currentColor;transform-origin:left;transform:scaleX(0);transition:transform .35s var(--ease) .15s}
+.lmiss .bad.shook b::after{transform:scaleX(1)}
+.lmiss p{font-family:var(--sans);color:var(--text);line-height:1.45;font-size:calc(var(--fs) * .92)}
+.lmiss p b{color:var(--err-ink)}
+.lmiss .good{background:color-mix(in srgb,var(--ok) 14%,var(--card))}
+.lmiss .good b{color:var(--ok-ink);font-weight:650}
+.ldemo .lsteps>div,.ldemo .lmiss>div,.ldemo .lmiss p{transition:opacity .45s var(--ease),transform .45s var(--ease)}
+/* rows still to come wait as faint pills with their answers hidden, so the tile is never an empty band */
+.ldemo .off{opacity:.4}
+.ldemo .off b{opacity:0}
+.ldemo .lmiss p.off{opacity:0;transform:translateY(6px)}
+.ldemo .lsteps>div.on b,.lmiss .good.on b{animation:popIn .4s var(--ease) .25s both;display:inline-block}
+.ldemo .shook{animation:shake .5s ease .2s both}
+.lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--muted)}
 
 /* ---- Bento Advanced: the AP line, introduced like a pro product. Always on its own dark canvas, in light hairlines. ---- */
 .ladv{--adv-ink:#f5f5f7;--adv-dim:#86868b;--adv-glow:#a78bfa;margin-top:calc(var(--u) * 2);background:radial-gradient(120% 80% at 50% 0%,#1d1b2e 0%,#0a0a0c 62%);color:var(--adv-ink);

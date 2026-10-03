@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useApp } from "../app/AppState";
 import { entryById } from "../app/curriculum";
 import { GRADES, gradeOf, tintStyle } from "../curriculum/grades";
@@ -66,51 +66,72 @@ export function showcasePicture(id: string, rng: Rng): Pictured | null {
 }
 
 /**
- * The landing's moving pictures come from the lessons with the boldest, most colorful diagrams: blocks, clocks,
- * coins, graphs, shapes and solids. Thin number lines and balances teach well but look plain at this size.
+ * The hero's three pictures, each from its own pool of lessons with rich, full-tile diagrams (Design, handoff 2):
+ * the big tile, then early and core grades, then middle and high school. Sparse pictures and equation ladders stay out.
  */
-export const SHOWY = [
-  "k-tens", "k-teens", "k-make10", "g1-tensones", "g1-time", "g1-halves", "g2-hundreds", "g2-regroup", "g2-money", "g2-bargraph", "g2-arrays",
-  "g3-split", "g3-fraccompare", "g3-area", "g4-partial", "g4-likefrac", "g4-dec",
-  "add", "g5-improper", "g5-multfrac", "g5-volume", "g6-gcf", "g6-mean", "g6-tri", "g7-circarea", "g7-prob",
-  "g8-system", "g8-pyth", "g8-cyl", "g8-cone", "g8-tri",
-  "g9-foil", "g9-quadform", "g10-polygon", "g10-similar", "g10-trig", "g10-sector", "g10-surface",
-  "g11-geo", "g11-vertex", "g12-unit", "g12-tangent", "g12-dot",
+export const HERO_POOLS = [
+  ["g8-pyth", "g10-polygon", "g5-volume", "g10-surface", "g9-growth", "g8-system", "g11-comb", "g2-time5"],
+  ["g2-hundreds", "g1-tensones", "g2-regroup", "g6-lcm", "g3-area", "g7-prob", "g1-time"],
+  ["g9-solvefactor", "g11-log", "g12-tangent", "g8-roots", "g10-pyramid", "g9-factor", "g11-complex"],
 ];
-/** Three bands so the three pictures always span the school years: one early, one middle, one high. */
-const BANDS = [[0, 4], [5, 8], [9, 12]] as const;
+/** The big tile starts first, the others a beat later each; a change waits until no other tile changed for this long. */
+const STAGGER = 600, GAP = 1200;
 
-/** A moving lesson picture that plays, then moves on to another from its band. Tap for the next one. */
-function LandingPicture({ rng, band, big, delay }: { rng: Rng; band: readonly [number, number]; big?: boolean; delay: number }) {
-  const [n, setN] = useState(0);
-  const pool = useMemo(() => rng.shuffle(SHOWY.filter(id => { const g = lessonById(id)?.grade; return g != null && g >= band[0] && g <= band[1]; })), [rng, band]);
-  const shot = useMemo(() => {
-    for (let k = 0; k < pool.length; k++) {
-      const id = pool[(n + k) % pool.length]!, ex = showcasePicture(id, rng);
-      if (ex) return { id, grade: lessonById(id)!.grade, ex };
-    }
-    return null;
-  }, [n, pool, rng]);
+type Shot = { id: string; grade: number; ex: Pictured };
+
+/** The next lesson in a pool whose picture draws, from a grade the other tiles aren't showing. */
+function nextShot(pool: string[], from: number, avoid: number[], rng: Rng): [Shot, number] | null {
+  for (let k = 1; k <= pool.length; k++) {
+    const at = (from + k) % pool.length, id = pool[at]!, grade = lessonById(id)?.grade;
+    if (grade == null || avoid.includes(grade)) continue;
+    const ex = showcasePicture(id, rng);
+    if (ex) return [{ id, grade, ex }, at];
+  }
+  return null;
+}
+
+/** One hero tile: a lesson's moving picture with its grade and title. Tap to skip to the next one. */
+function HeroTile({ shot, n, big, start, next }: { shot: Shot; n: number; big: boolean; start: number; next: () => void }) {
+  const [on, setOn] = useState(start === 0 || reduceMotion());
+  useEffect(() => { if (on) return; const t = setTimeout(() => setOn(true), start); return () => clearTimeout(t); }, [on, start]);
   useEffect(() => {
-    if (reduceMotion() || !shot) return;
-    const t = setTimeout(() => setN(k => k + 1), 2400 + shot.ex.timeline.length * 750 + (n ? 0 : delay));
+    if (reduceMotion() || !on) return;
+    const t = setTimeout(next, 2400 + shot.ex.timeline.length * 750);
     return () => clearTimeout(t);
-  }, [shot, n, delay]);
-  if (!shot) return null;
+  }, [shot, on, next]);
   const g = gradeOf(shot.grade), entry = entryById(shot.id);
   return (
     // the card stays put; only what's inside it fades over to the next picture
-    <figure className={`lhpic${big ? "" : " sm"}`} style={tintStyle(g) as CSSProperties} onClick={() => setN(k => k + 1)}>
-      <figcaption key={`c${n}`}><GradeNum grade={shot.grade} /><span>{big && <small>See it first</small>}<b>{entry?.title ?? shot.id}</b></span></figcaption>
-      <div className="lhd" key={`d${n}`}><PlayingDiagram ex={shot.ex} /></div>
+    <figure className={`lhpic${big ? "" : " sm"}`} style={tintStyle(g) as CSSProperties} onClick={next}>
+      <figcaption key={`c${n}`}><GradeNum grade={shot.grade} /><span><small>See it first</small><b>{entry?.title ?? shot.id}</b></span></figcaption>
+      <div className="lhd" key={`d${n}`}>{on && <PlayingDiagram ex={shot.ex} />}</div>
     </figure>
   );
 }
 
-/** The hero box: one big moving picture and two smaller ones, each from a different part of school. */
+/** The hero box: three moving pictures from three different grades, one per pool, taking turns to change. */
 function HeroPictures({ rng }: { rng: Rng }) {
-  const bands = useMemo(() => rng.shuffle([...BANDS]), [rng]);
-  return <>{bands.map((b, i) => <LandingPicture key={b[0]} rng={rng} band={b} big={i === 0} delay={i * 1600} />)}</>;
+  const pools = useMemo(() => HERO_POOLS.map(p => rng.shuffle(p.filter(id => lessonById(id)))), [rng]);
+  const [tiles, setTiles] = useState(() => {
+    const out: { shot: Shot; at: number; n: number }[] = [];
+    for (const pool of pools) {
+      const r = nextShot(pool, -1, out.map(t => t.shot.grade), rng);
+      if (r) out.push({ shot: r[0], at: r[1], n: 0 });
+    }
+    return out;
+  });
+  const last = useRef(0);
+  const advance = useCallback((i: number) => {
+    const wait = last.current + GAP - Date.now();
+    if (wait > 0) { setTimeout(() => advance(i), wait); return; }
+    last.current = Date.now();
+    setTiles(ts => {
+      const r = nextShot(pools[i]!, ts[i]!.at, ts.filter((_, j) => j !== i).map(t => t.shot.grade), rng);
+      return r ? ts.map((t, j) => (j === i ? { shot: r[0], at: r[1], n: t.n + 1 } : t)) : ts;
+    });
+  }, [pools, rng]);
+  const nexts = useMemo(() => tiles.map((_, i) => () => advance(i)), [tiles.length, advance]); // eslint-disable-line react-hooks/exhaustive-deps
+  return <>{tiles.map((t, i) => <HeroTile key={i} shot={t.shot} n={t.n} big={i === 0} start={i * STAGGER} next={nexts[i]!} />)}</>;
 }
 
 /** The first screen on a new device: what Bento is, the real thing working, and the grade shelf to start from. */

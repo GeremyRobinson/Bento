@@ -4,6 +4,7 @@ import { CATALOG } from "../curriculum/catalog";
 import { GRADES, gradeOf, inkOf, tintStyle } from "../curriculum/grades";
 import type { Rng } from "../curriculum/generators/rng";
 import { Fill, GradeNum } from "./Shelf";
+import { SlipTile, SolveTile } from "./StepDemos";
 
 /**
  * The landing page's feature tiles: each one is a small working piece of the app (today's plan ticking off, a times
@@ -173,16 +174,17 @@ const F = {
   today: { el: TodayTile, size: "wide" }, facts: { el: FactsTile, size: "tall" }, battery: { el: BatteryTile, size: "one" },
   book: { el: BookTile, size: "one" }, report: { el: ReportTile, size: "wide" }, help: { el: HelpTile, size: "one" },
   review: { el: ReviewTile, size: "one" }, count: { el: CountTile, size: "one" }, private: { el: PrivateTile, size: "one" },
+  steps: { el: SolveTile, size: "wide" }, slips: { el: SlipTile, size: "wide" },
 } satisfies Record<string, Feature>;
 
 /**
- * Orders that pack four columns by three rows with no gaps (and two columns on phones), so whichever is drawn
+ * Orders that pack four columns by four rows with no gaps (and two columns on phones), so whichever is drawn
  * the box stays a clean rectangle. Bento is variety: a different arrangement each visit.
  */
 const ORDERS: (keyof typeof F)[][] = [
-  ["today", "facts", "battery", "book", "help", "review", "report", "count", "private"],
-  ["facts", "report", "count", "help", "book", "battery", "today", "review", "private"],
-  ["battery", "today", "facts", "review", "help", "book", "count", "report", "private"],
+  ["steps", "facts", "battery", "today", "slips", "book", "help", "review", "report", "count", "private"],
+  ["facts", "slips", "report", "count", "help", "steps", "book", "battery", "today", "review", "private"],
+  ["battery", "today", "facts", "review", "steps", "help", "book", "slips", "count", "report", "private"],
 ];
 
 /** The whole feature box, freshly arranged and coloured on every visit. */

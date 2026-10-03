@@ -44,9 +44,12 @@ describe.each(LESSONS.map(l => [l.id, l] as const))("%s lesson page", (_id, less
 });
 
 describe("the landing page's pictures", () => {
-  it("every showy lesson exists and draws a picture that fits a tile", async () => {
-    const { SHOWY, showcasePicture } = await import("../../screens/Welcome");
-    const { createRng } = await import("../../curriculum/generators/rng");
-    for (const id of SHOWY) expect(showcasePicture(id, createRng(7)), id).not.toBeNull();
+  it("every hero pool lesson exists and draws a picture that fits a tile, never an equation ladder", async () => {
+    const { HERO_POOLS, showcasePicture } = await import("../../screens/Welcome");
+    for (const id of HERO_POOLS.flat()) for (let s = 1; s <= 20; s++) {
+      const ex = showcasePicture(id, createRng(s));
+      expect(ex, id).not.toBeNull();
+      expect(ex!.diagram.kind, id).not.toBe("chain");
+    }
   });
 });
