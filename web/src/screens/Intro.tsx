@@ -38,7 +38,6 @@ export function Intro() {
   const home = () => go({ name: "home" }, "fwd");
   return (
     <div className="year">
-      <nav className="lnav"><b>Bento</b><button className="lback" onClick={home}>My lessons ›</button></nav>
       <section className="yhero">
         <GradeBadge grade={g} gxp={progress.gxp[g] ?? 0} />
         <h1>{grade.name}</h1>

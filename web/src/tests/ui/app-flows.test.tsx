@@ -93,7 +93,7 @@ describe("home", () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: new RegExp(`Up next.*${LESSON}`) }));
     tap("Start practice ›");
-    tap("Home");
+    tap("Lessons");
     // the unfinished lesson waits in the top bar; each grade's big card keeps showing its own next lesson
     const resume = screen.getByRole("button", { name: new RegExp(`Resume ${LESSON}, 5th grade, problem 1 of 8`) });
     expect(resume).toHaveTextContent(`Resume · 5th grade${LESSON}1/8`);
@@ -109,7 +109,7 @@ describe("home", () => {
     renderApp();
     fireEvent.click(document.querySelector(".yearlink")!);
     expect(screen.getByText("This year: fractions and decimals.")).toBeInTheDocument();
-    tap("My lessons ›");
+    tap("Lessons");
     fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /7th/ }));
     tap("Start the year ›");
@@ -128,7 +128,7 @@ describe("unit test and check-up", () => {
     expect(screen.queryByRole("button", { name: /Hints?$/ })).toBeNull();
     expect(screen.getByRole("button", { name: "Quit" })).toBeInTheDocument();
     expect(solveRun()).toBeGreaterThanOrEqual(6);
-    expect(screen.getByText("Whole numbers test: done")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "You are here" })).toHaveTextContent("LessonsWhole numbers testDone");
     expect(screen.getByText("All steps right")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Advanced" })).toBeInTheDocument();
     tap("Take it again");
@@ -143,7 +143,7 @@ describe("unit test and check-up", () => {
     tap("Grade check-up");
     expect(screen.getByText("5th grade check-up: no hints, one try per step")).toBeInTheDocument();
     solveRun();
-    expect(screen.getByText("5th grade check-up: done")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "You are here" })).toHaveTextContent("Lessons5th grade check-upDone");
     tap("All lessons");
     const stat = [...document.querySelectorAll(".statgrid .st")].find(s => s.textContent!.includes("grade check-up"))!;
     expect(stat.querySelector(".score b")!.textContent).toBe("4");
@@ -171,7 +171,7 @@ describe("report, grown-up page and back to basics", () => {
     expect(screen.getByRole("heading", { level: 2, name: "What you did" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "For the grown-up" })).toBeInTheDocument();
     expect(screen.getByText(/Practiced/)).toHaveTextContent(`Practiced ${LESSON}.`);
-    tap("Back");
+    tap(`Back to ${LESSON}`);
     expect(screen.getByRole("button", { name: "Start practice ›" })).toBeInTheDocument();
   });
 
@@ -210,7 +210,7 @@ describe("report, grown-up page and back to basics", () => {
     expect(recent[1]).toBeDisabled();
     fireEvent.click(recent[0]!);
     expect(screen.getByText(/Typed/)).toHaveTextContent("Typed 141, answer 1410. Lost the place value (quick retry).");
-    tap("Back");
+    tap(`Back to ${LESSON}`);
     expect(screen.getByRole("button", { name: "Start practice ›" })).toBeInTheDocument();
   });
 

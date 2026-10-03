@@ -7,7 +7,6 @@ import { CATEGORIES } from "../engine/diagnosis/diagnose";
 import { LEVELS, type Level } from "../engine/mastery/levels";
 import { lastScore } from "../engine/mastery/progress";
 import type { Mistake } from "../engine/session/types";
-import { HomeIcon } from "../components/primitives/icons";
 import { ScoreChip } from "../components/primitives/Score";
 
 const explain = (m: Pick<Mistake, "cat" | "label" | "msg">) =>
@@ -30,10 +29,6 @@ export function Parent() {
 
   return (
     <>
-      <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
-        <span className="ctl grow" style={{ background: "none" }}>For the grown-up</span>
-      </div>
       <div className="bgrown">
         <section className="panel">
           <div className="head"><h2>Scores by grade</h2><span className="muted">0 to 4</span></div>

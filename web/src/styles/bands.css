@@ -1,7 +1,7 @@
 /* One size and type system for every grade. Age changes the canvas behind it (see the end of this file), and each grade brings its own palette. */
 /* ---- sizes, the same in every grade ---- */
 .wrap{
-  --fs:18px; --lh:26px; --small:15px; --w-bold:800; --w-mid:700;
+  --fs:18px; --lh:26px; --small:15px; --w-bold:650; --w-mid:550;
   --s:8px; --u:16px; --sec:24px; --h:48px; --row:64px; --inset:8px;
   --math:52px; --ask:40px; --slot:64px; --key:64px; --work:24px;
   --r-panel:36px;

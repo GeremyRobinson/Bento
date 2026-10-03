@@ -46,7 +46,6 @@ export function Results() {
   const low = rep.mode === "practice" && rep.level <= 1;
   return (
     <>
-      <div className="bar"><span className="grow">{rep.title}: done</span><span className="ctl badged"><span className="badge on">⭐</span><span className="mono">{progress.xp}</span></span></div>
       <div className="bdone">
         <section className="panel">
           <div className={`donehead s${rep.level}`}>
@@ -75,11 +74,9 @@ export function Results() {
 
 /** A saved report, opened from the lesson's "Last time" tile or from the grown-up page. */
 export function ReportScreen({ rep }: { rep: SessionReport | undefined }) {
-  const { go } = useApp();
-  const back = () => go(rep && lessonById(rep.key) ? { name: "learn", lessonId: rep.key } : { name: "parent" }, "back");
   return (
     <>
-      <div className="bar"><button className="ctl" onClick={back}>Back</button><span className="ctl grow" style={{ background: "none" }}>{rep ? `${rep.title}: ${when(rep.date)}` : "Report"}</span></div>
+      {rep && <header className="phead"><h1>{rep.title}</h1><span className="muted">{when(rep.date)}</span></header>}
       {rep ? <SessionReportView rep={rep} /> : <p className="empty">That report isn't saved on this device.</p>}
     </>
   );

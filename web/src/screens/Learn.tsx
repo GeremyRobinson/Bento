@@ -11,7 +11,7 @@ import { entriesInGrade, isReady } from "../app/curriculum";
 import { BuildUp } from "../components/BuildUp";
 import type { Rng } from "../curriculum/generators/rng";
 import type { AnyLesson } from "../curriculum/schemas/lesson";
-import { Chevron, HomeIcon } from "../components/primitives/icons";
+import { Chevron } from "../components/primitives/icons";
 import { MathLine, Rich } from "../components/primitives/MathLine";
 import { ScoreChip } from "../components/primitives/Score";
 import type { Explanation } from "../explanations/schema";
@@ -98,15 +98,11 @@ export function Learn({ lessonId }: { lessonId: string }) {
   return (
     <>
       <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
-        <span className="dots-nav" aria-label={`Part ${at + 1} of ${last + 1}`}>
+        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "back")} aria-label="Previous lesson"><Chevron dir="left" /></button>
+        <span className="dots-nav grow" aria-label={`Part ${at + 1} of ${last + 1}`}>
           {ex.timeline.map((_, i) => <span key={i} className={`dot ${i < at ? "ok" : i === at ? "busy" : ""}`} />)}
         </span>
         <button className="ctl pbtn" onClick={() => startLesson(lesson.id)}>Practice</button>
-      </div>
-      <div className="bar">
-        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "back")} aria-label="Previous lesson"><Chevron dir="left" /></button>
-        <span className="grow" style={{ textAlign: "center" }}>{lesson.title}</span>
         <button className="ctl circ" disabled={!next} onClick={() => next && go({ name: "learn", lessonId: next.id }, "fwd")} aria-label="Next lesson"><Chevron dir="right" /></button>
       </div>
       <div className="blearn">

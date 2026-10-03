@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { playTone, readSettings, speak } from "../app/settings";
 import { useApp } from "../app/AppState";
 import { withTransition } from "../app/transition";
-import { HomeIcon } from "../components/primitives/icons";
 import { MathLine, Rich } from "../components/primitives/MathLine";
 import { ProblemView } from "../components/practice/ProblemView";
 import { FeedbackBox } from "../components/practice/FeedbackBox";
@@ -78,10 +77,7 @@ export function Practice() {
   return (
     <>
       <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
-        {mixed
-          ? <button className="ctl" onClick={quit}>Quit</button>
-          : <button className="ctl" onClick={() => go({ name: "learn", lessonId: lesson.id }, "back")} aria-label="Back to the lesson">Lesson</button>}
+        {mixed && <button className="ctl" onClick={quit}>Quit</button>}
         <span className="steps" aria-label={`Problem ${s.i + 1} of ${n}`}>
           {s.items.map((_, i) => <span key={i} className={`dot ${i < s.i ? "ok" : i === s.i ? "busy" : ""}`} />)}
         </span>

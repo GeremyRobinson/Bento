@@ -3,7 +3,6 @@ import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, u
 import { COMING_SOON } from "../curriculum/catalog";
 import { gradeOf, lineOf } from "../curriculum/grades";
 import { lastScore, timesDone } from "../engine/mastery/progress";
-import { TopBar } from "../components/TopBar";
 import { BigRing, ScoreChip } from "../components/primitives/Score";
 import { gradePattern } from "../components/primitives/gradePattern";
 
@@ -28,7 +27,6 @@ export function Home() {
   let k = 0;
   return (
     <>
-      <TopBar />
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="hero t0 b-hero"><div className="pat" style={{ backgroundImage: gradePattern(g) }} />
           <div><span className="hline">{lineOf(g).name}</span><h1><button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} title="See the year">{grade.name}<span aria-hidden> ›</span></button></h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>

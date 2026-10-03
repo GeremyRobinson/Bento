@@ -13,6 +13,7 @@ import { ReportScreen, Results } from "../screens/Results";
 import { Welcome } from "../screens/Welcome";
 import { useApp } from "./AppState";
 import { isTopLevel } from "./routes";
+import { TopBar } from "../components/TopBar";
 import { canCrossFade } from "./transition";
 
 /** Picks the screen for the route and sets the grade band and tint the styles key off. */
@@ -65,6 +66,7 @@ export function App() {
   const viewKey = [route.name, route.name === "learn" ? route.lessonId : route.name === "report" ? route.key : "", top ? chosenGrade : ""].join("|");
   return (
     <main id="app" className={`wrap t${tint}${canCrossFade() ? "" : " fresh"}`} data-band={bandOf(grade)} data-grade={grade} key={viewKey}>
+      <TopBar grade={grade} />
       {screen}
       {sheetOpen && <GradeSheet />}
     </main>

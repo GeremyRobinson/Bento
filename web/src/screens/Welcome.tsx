@@ -8,6 +8,7 @@ import type { Rng } from "../curriculum/generators/rng";
 import { PlayingDiagram } from "../components/diagrams/PlayingDiagram";
 import { GradeBadge } from "../components/primitives/Score";
 import { SlipTile, SolveTile } from "../components/StepDemos";
+import { Advanced } from "../components/Advanced";
 import type { Explanation } from "../explanations/schema";
 
 /**
@@ -78,28 +79,23 @@ function Shot({ id, size, color, ex, k, tail }: Showcase & { ex: Pictured; k: nu
 
 /** The first screen on a new device: what Bento is, real lesson pictures, and the grade choice built in. */
 export function Welcome() {
-  const { progress, chooseGrade, deps, go } = useApp();
+  const { progress, chooseGrade, deps } = useApp();
   const shots = useMemo(() => pickShowcase(deps().rng), []); // eslint-disable-line react-hooks/exhaustive-deps
   const demoRng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="land">
-      <nav className="lnav"><b>Bento</b>
-        {progress.chosen
-          ? <button className="lback" onClick={() => go({ name: "home" }, "fwd")}>My lessons ›</button>
-          : <span>Kindergarten to 12th grade</span>}
-      </nav>
       <section className="lhero">
         <h1>Math that finally clicks.</h1>
         <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
         <div className="lpick"><span>Pick your grade to start</span>
-          <div className="lgrades">{LINES.map(line => (
+          <div className="lgrades">{LINES.filter(l => l.grades.length).map(line => (
             <div key={line.id} className={`lgroup lgroup-${line.id}`}>
               <span className="lgname">{line.name.replace("Bento ", "")}</span>
               <div className="lgbtns">{line.grades.length ? line.grades.map(n => { const g = gradeOf(n); return (
                 <button key={g.grade} className="lg" style={{ "--tint": g.color, "--j": g.grade } as CSSProperties} aria-label={g.name} onClick={() => chooseGrade(g.grade)}>
                   <GradeBadge grade={g.grade} gxp={progress.gxp[g.grade] ?? 0} />
                 </button>
-              ); }) : <span className="lgsoon" title={line.soon?.join(", ")}>AP<small>soon</small></span>}</div>
+              ); }) : null}</div>
             </div>
           ))}</div>
         </div>
@@ -108,6 +104,7 @@ export function Welcome() {
       <section className="lshots">{shots.map((s, k) => <Shot key={s.id} {...s} k={k} />)}</section>
       <section className="lsec"><h2>One step at a time.</h2><p>Big problems get split into small moves. Each one is checked the moment you enter it.</p></section>
       <section className="lpair"><SolveTile rng={demoRng} /><SlipTile rng={demoRng} /></section>
+      <Advanced />
       <section className="lfeats">
         <article className="lf"><h3>Help that steps back.</h3><p>Hints and worked steps fade as you get stronger, until it's just you and the problem.</p></article>
         <article className="lf"><h3>Review that sticks.</h3><p>A few old problems every day, picked from the skills you're shakiest on.</p></article>

@@ -1,10 +1,10 @@
 /* ---- welcome: a landing page that shows what Bento is, with the grade choice built in ---- */
 .land{max-width:1040px;margin:0 auto;display:grid;gap:calc(var(--u) * 2);padding:0 4px calc(var(--u) * 2)}
 .lnav{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);padding:6px 4px 0}
-.lnav b{font:700 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em}
+.lnav b{font:650 calc(var(--fs) * 1.25)/1 var(--sans);letter-spacing:-.01em}
 .lnav span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
 .lhero{display:grid;justify-items:center;gap:calc(var(--u) + 4px);text-align:center;padding:calc(var(--u) * 3) var(--u) var(--u);animation:rise .7s var(--ease) both}
-.lhero h1{font:700 clamp(38px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;text-wrap:balance}
+.lhero h1{font:650 clamp(38px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;text-wrap:balance}
 .lhero p{max-width:540px;font-size:calc(var(--fs) * 1.1);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
 .lpick{max-width:100%;margin-top:var(--s);display:grid;justify-items:center;gap:10px;background:var(--well);border-radius:var(--r-panel);padding:var(--u) calc(var(--u) - 4px) calc(var(--u) - 4px)}
 .lpick>span{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted);letter-spacing:.01em}
@@ -13,7 +13,7 @@
 .lg:hover{background:var(--card);transform:translateY(-2px)}
 .lg:active{transform:scale(.94)}
 .lsec{display:grid;justify-items:center;gap:6px;text-align:center;padding:calc(var(--u) * 2) var(--u) 0}
-.lsec h2{font:700 clamp(28px,4.5vw,44px)/1.1 var(--sans);letter-spacing:-.03em}
+.lsec h2{font:650 clamp(28px,4.5vw,44px)/1.1 var(--sans);letter-spacing:-.03em}
 .lsec p{max-width:520px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.02)}
 .lshots{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr);grid-auto-flow:row dense}
 @media (min-width:700px){.lshots{grid-template-columns:repeat(2,minmax(0,1fr))}.lshot.big,.lshot.wide,.lshot.tail{grid-column:1 / -1}}
@@ -30,7 +30,7 @@
 .lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule)}
 .lf h3{font-size:calc(var(--fs) * 1.05);font-weight:var(--w-bold)}
 .lf p{color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * .95)}
-.lk{font-size:12px;font-weight:var(--w-bold);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.lk{font-size:12px;font-weight:var(--w-bold);letter-spacing:.08em;color:var(--muted)}
 .lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
 .lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
 .lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
@@ -63,8 +63,8 @@
 .year{width:100%;max-width:1040px;margin:0 auto;display:grid;gap:calc(var(--u) * 2);padding:0 4px calc(var(--u) * 2)}
 .yhero{display:grid;justify-items:center;gap:calc(var(--u) - 2px);text-align:center;padding:calc(var(--u) * 2) var(--u) 0;animation:rise .7s var(--ease) both}
 .yhero .gbadge{transform:scale(1.5);margin-bottom:12px}
-.yhero h1{font:700 clamp(40px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--tint,var(--text))}
-.yhero .ysub{font:700 clamp(20px,3vw,28px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--text)}
+.yhero h1{font:650 clamp(40px,7vw,68px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--tint,var(--text))}
+.yhero .ysub{font:650 clamp(20px,3vw,28px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--text)}
 .yhero p{max-width:540px;color:var(--muted);font-weight:var(--w-mid);line-height:1.5;font-size:calc(var(--fs) * 1.05);text-wrap:pretty}
 .yhero .ctl.big{margin-top:6px;height:56px;padding:0 28px;font-size:calc(var(--fs) * 1.1)}
 .yunits{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
@@ -74,11 +74,11 @@
 .yunit .ypic .viz-cap,.yunit .ypic .replay{display:none}
 .yunit .ypic .viz-svg,.yunit .ypic .am{max-height:220px;width:100%}
 .yunit .k{font-size:var(--small);font-weight:var(--w-bold);color:var(--muted)}
-.yunit h2{font:700 calc(var(--fs) * 1.5)/1.15 var(--sans);letter-spacing:-.02em;margin:2px 0 8px}
+.yunit h2{font:650 calc(var(--fs) * 1.5)/1.15 var(--sans);letter-spacing:-.02em;margin:2px 0 8px}
 .yunit ol{list-style:none;padding:0;margin:0;display:grid;gap:2px;counter-reset:l}
 .yunit li{counter-increment:l}
 .yunit li button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:8px 10px;margin:0 -10px;border-radius:12px;font-weight:var(--w-mid);transition:background .15s}
-.yunit li button::before{content:counter(l);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--well);font:700 13px/1 var(--num);color:var(--muted)}
+.yunit li button::before{content:counter(l);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--well);font:650 13px/1 var(--num);color:var(--muted)}
 .yunit li button:hover:not(:disabled){background:var(--well)}
 @media (min-width:700px){.yunit.solo{grid-column:1 / -1;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:none;align-items:center}}
 .yunit li.soon button{color:var(--muted)}
@@ -86,10 +86,10 @@
 /* the landing grade picker, grouped by product line */
 .lgrades{gap:6px 18px;align-items:flex-start}
 .lgroup{display:grid;justify-items:center;gap:2px}
-.lgname{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
+.lgname{font-size:12px;font-weight:650;color:var(--muted);letter-spacing:.02em}
 .lgbtns{display:flex;gap:2px}
-.lgsoon{width:54px;height:54px;margin:4px;border-radius:50%;display:grid;place-items:center;align-content:center;background:linear-gradient(135deg,#0b0d12,#2a2140);color:#f5d08a;font:800 16px/1 var(--num)}
-.lgsoon small{font:700 9px/1 var(--sans);color:#b9bdc9;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.lgsoon{width:54px;height:54px;margin:4px;border-radius:50%;display:grid;place-items:center;align-content:center;background:linear-gradient(135deg,#0b0d12,#2a2140);color:#f5d08a;font:650 16px/1 var(--num)}
+.lgsoon small{font:650 9px/1 var(--sans);color:#b9bdc9;letter-spacing:.06em;margin-top:2px}
 
 /* the two step tiles play: rows fill in, a slip shakes, the fix lands; a tap brings another problem */
 .ldemo{cursor:pointer;grid-template-rows:auto 1fr auto;-webkit-user-select:none;user-select:none}
@@ -112,3 +112,32 @@
 .lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--faint);margin-top:4px}
 .ldemo:hover .lnew{color:var(--muted)}
 .ldemo .lsteps>div:not(.q),.ldemo .lmiss>div:not(.q){align-items:center}
+
+/* ---- Bento Advanced: the AP line, introduced like a pro product. Always on its own dark canvas, in light hairlines. ---- */
+.ladv{--adv-ink:#f5f5f7;--adv-dim:#86868b;--adv-glow:#a78bfa;margin-top:calc(var(--u) * 2);background:radial-gradient(120% 80% at 50% 0%,#1d1b2e 0%,#0a0a0c 62%);color:var(--adv-ink);
+  border-radius:var(--r-panel);padding:calc(var(--u) * 4) calc(var(--u) + 4px) calc(var(--u) * 2.5);display:grid;justify-items:center;text-align:center;gap:calc(var(--u) - 4px);
+  overflow:hidden;color-scheme:dark;animation:rise .8s var(--ease) both}
+.adv-eyebrow{font-size:calc(var(--fs) * .95);font-weight:600;color:var(--adv-dim)}
+.ladv h2{font:650 clamp(44px,8vw,84px)/1 var(--sans);letter-spacing:-.045em;background:linear-gradient(100deg,#f5f5f7 20%,#c4b5fd 55%,#f0abfc 85%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.06em}
+.ladv>p{max-width:560px;color:var(--adv-dim);font-size:calc(var(--fs) * 1.08);line-height:1.5;font-weight:450;text-wrap:pretty}
+.adv-courses{width:100%;display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr));margin-top:calc(var(--u) * 1.5)}
+@media (min-width:900px){.adv-courses{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.adv-course{display:grid;gap:4px;justify-items:start;text-align:left;padding:var(--u);border-radius:var(--r-card);background:rgb(255 255 255 / .04);box-shadow:inset 0 0 0 1px rgb(255 255 255 / .08);animation:rise .7s var(--ease) both}
+.adv-course svg{width:100%;height:auto;margin-bottom:6px;overflow:visible}
+.adv-course h3{font-size:calc(var(--fs) * 1.02);font-weight:600;color:var(--adv-ink);letter-spacing:-.01em}
+.adv-course>span{font-size:12px;font-weight:600;color:var(--adv-dim)}
+.adv-soon{margin-top:calc(var(--u) * 1.5);font-size:var(--small);font-weight:600;color:var(--adv-ink);padding:8px 16px;border-radius:999px;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22)}
+.adv-line{fill:none;stroke:var(--adv-ink);stroke-width:2;stroke-linecap:round}
+.adv-faint{fill:none;stroke:rgb(255 255 255 / .16);stroke-width:1.25}
+.adv-dash{stroke-dasharray:4 5}
+.adv-fill{fill:color-mix(in srgb,var(--adv-glow) 38%,transparent)}
+.adv-dot{fill:var(--adv-glow)}
+.adv-draw{stroke-dasharray:400;animation:advDraw 2.4s var(--ease) .3s both}
+@keyframes advDraw{from{stroke-dashoffset:400}}
+.adv-sweep{transform-box:fill-box;transform-origin:left;animation:advSweep 2.6s var(--ease) .6s both}
+@keyframes advSweep{from{transform:scaleX(0)}}
+.adv-grow{transform-box:fill-box;transform-origin:bottom;animation:advGrow .9s var(--spring) both}
+@keyframes advGrow{from{transform:scaleY(0)}}
+.adv-spin{animation:advSpin 6s linear infinite}
+@keyframes advSpin{to{transform:rotate(-360deg)}}
+.ladv:not(.in),.ladv:not(.in) *{animation-play-state:paused}

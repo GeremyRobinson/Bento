@@ -13,7 +13,7 @@ export function RingSvg({ frac, r = 24 }: { frac: number; r?: number }) {
   return (
     <svg viewBox={`0 0 ${2 * r + 4} ${2 * r + 4}`} aria-hidden="true">
       <circle className="trk" cx={c} cy={c} r={r} />
-      <circle className="val" cx={c} cy={c} r={r} pathLength={1} style={{ strokeDasharray: 1, strokeDashoffset: (1 - frac).toFixed(3) }} />
+      {frac > 0 && <circle className="val" cx={c} cy={c} r={r} pathLength={1} style={{ strokeDasharray: 1, strokeDashoffset: (1 - frac).toFixed(3) }} />}
     </svg>
   );
 }

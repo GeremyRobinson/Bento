@@ -65,3 +65,6 @@
 .beat>button{display:flex;align-items:center;gap:var(--u);width:100%;padding:10px var(--u);border-radius:inherit;text-align:left;color:inherit;font:inherit}
 .beat>button:not([disabled]):hover{background:color-mix(in srgb,var(--tint) 8%,transparent)}
 .beat>button[disabled]{cursor:default;opacity:1}
+/* highlighted parts never touch: a little air between marks, and a marked sign keeps its own spacing outside the box */
+.mline mark{display:inline-flex;align-items:center;margin:0 .14em}
+.mline mark>.o:only-child{margin:0 .12em}

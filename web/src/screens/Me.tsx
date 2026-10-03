@@ -4,7 +4,6 @@ import { readSettings, speak, playTone, type Settings } from "../app/settings";
 import { gradeOf } from "../curriculum/grades";
 import { LEVEL_XP } from "../engine/mastery/levels";
 import { GradeLineup } from "../components/GradeLineup";
-import { HomeIcon } from "../components/primitives/icons";
 import { BigRing, gradeLevel } from "../components/primitives/Score";
 
 function Toggle({ label, note, on, set }: { label: string; note: string; on: boolean; set: (v: boolean) => void }) {
@@ -51,10 +50,6 @@ export function Me() {
 
   return (
     <>
-      <div className="bar">
-        <button className="ctl circ" onClick={() => go({ name: "home" }, "back")} aria-label="Home"><HomeIcon /></button>
-        <span className="ctl grow" style={{ background: "none" }}>Me</span>
-      </div>
       <div className="bme">
         <section className="tile mhero" style={{ "--tint": grade.color } as CSSProperties}>
           <BigRing frac={into / LEVEL_XP} label={lvl} />
