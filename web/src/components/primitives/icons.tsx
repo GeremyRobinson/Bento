@@ -5,3 +5,7 @@ export const HomeIcon = () => (
 export const Chevron = ({ dir }: { dir: "left" | "right" }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d={dir === "left" ? "M14.5 6l-6 6 6 6" : "M9.5 6l6 6-6 6"} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
 );
+
+export const Check = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+);

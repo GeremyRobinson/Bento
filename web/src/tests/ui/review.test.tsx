@@ -26,7 +26,7 @@ describe("today's review", () => {
     renderApp({ grade: 5, chosen: true, done: 2, lessons: { "g5-mult2": 1, "review-twin": 1 },
       scores: { "g5-mult2": scored(1), "review-twin": scored(3) }, seen: { "g5-mult2": t - 3 * day, "review-twin": t - day } });
     const tile = screen.getByRole("button", { name: /Today's review/ });
-    expect(tile).toHaveTextContent("about 8");
+    expect(tile).toHaveTextContent("5 min");
     fireEvent.click(tile);
     // a mixed run: Quit rather than Lesson, and each problem names its lesson
     expect(screen.getByRole("button", { name: "Quit" })).toBeInTheDocument();

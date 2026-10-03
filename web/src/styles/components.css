@@ -469,7 +469,7 @@
   .trail .tback{display:grid}
   .trail li:not(:last-child){display:none}
   .trail li+li::before{content:none}
-  .top .gpick.slim{display:none}
+  .top:has(.trail) .gpick.slim{display:none}
 }
 .top .tnote{color:var(--muted);font-size:var(--small);font-weight:550;padding-right:14px}
 .top.guest .lback{margin:0;padding:0 16px;height:44px;display:grid;place-items:center}
@@ -477,3 +477,62 @@
 .phead{display:flex;align-items:baseline;justify-content:space-between;gap:var(--u);flex-wrap:wrap;padding:0 var(--s)}
 .phead h1{font-size:calc(var(--fs) * 1.6);letter-spacing:-.02em}
 .top.guest .resume{display:none}
+
+/* ---- home, stripped back: today's plan, the year's progress, the units. Space does the work, not boxes. ---- */
+.bhome .today,.bhome .b-stats,.bhome .b-weak{background:var(--card);box-shadow:0 0 0 1px var(--rule);padding:calc(var(--u) * 1.75)}
+.today{gap:0;align-content:start}
+.today .yearlink{justify-self:start;font-size:var(--small);font-weight:600;color:var(--tint);margin:0 -6px 6px}
+.today h1{font:650 clamp(40px,6vw,60px)/1 var(--sans);letter-spacing:-.035em}
+.today .sub{color:var(--muted);margin-top:10px;font-weight:450}
+.plan{list-style:none;margin:calc(var(--u) * 1.5) 0 0;padding:0;display:grid}
+.plan li+li{border-top:1px solid var(--rule)}
+.pitem{width:100%;display:flex;align-items:center;gap:var(--u);padding:14px 0;text-align:left;border-radius:14px;transition:opacity .2s}
+.pitem:hover .ptext b{color:var(--tint)}
+.pmark{flex:none;width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--faint);display:grid;place-items:center;color:var(--on-tint)}
+.pitem.now .pmark{box-shadow:inset 0 0 0 2px var(--tint)}
+.pitem.done .pmark{background:var(--tint);box-shadow:none}
+.ptext{flex:1;display:grid;gap:2px;min-width:0}
+.ptext small{font-size:13px;color:var(--muted);font-weight:550}
+.ptext b{font-size:calc(var(--fs) * 1.08);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .15s}
+.pitem.done .ptext b{color:var(--muted);font-weight:500}
+.pmin{color:var(--muted);font-size:var(--small);font-weight:500;white-space:nowrap}
+.pitem .ctl.go{height:40px;padding:0 20px}
+.bhome .b-stats{justify-items:center;text-align:center;align-content:center;gap:12px}
+.b-stats p{color:var(--text);line-height:1.5}
+.b-stats p b{font-weight:650}
+.b-stats .gtline{display:flex;align-items:center;gap:8px}
+.b-weak h3{font-size:var(--fs);font-weight:650}
+@media (min-width:700px){
+  .bhome>.today{grid-column:1 / -1}
+}
+@media (min-width:900px) and (orientation:landscape){
+  .bhome>.today{grid-column:1 / span 2;grid-row:1 / span 2}
+  .bhome.tall>.today{grid-row:1 / span 2}
+  .bhome>.b-stats{grid-column:3;grid-row:1 / span 2}
+  .bhome.tall>.b-stats{grid-row:1}
+  .bhome>.b-weak{grid-column:3}
+}
+.top .gtext b{font-size:16px}
+/* units: one quiet card each, lessons as hairline rows instead of pills inside a well */
+.units>.panel{background:var(--card);box-shadow:0 0 0 1px var(--rule);padding:calc(var(--u) * 1.25) calc(var(--u) * 1.25) var(--s);gap:var(--s)}
+.units .unit{padding:0;min-height:36px}
+.units .unit h3{color:var(--text);font-size:var(--fs);font-weight:650;letter-spacing:-.01em}
+.units .unit .ctl{height:36px;padding:0 14px;background:none!important;box-shadow:inset 0 0 0 1px var(--rule);font-size:var(--small);font-weight:550;color:var(--muted)}
+.units .unit .ctl:hover{color:var(--text);box-shadow:inset 0 0 0 1px var(--faint)}
+.units .lessons{gap:0}
+.units .lesson{background:none;border-radius:12px;height:52px;padding:0 6px;font-weight:500;gap:12px}
+.units .lessons>.lesson+.lesson{box-shadow:0 -1px 0 var(--rule)}
+.units .lesson:hover{background:none}
+.units .lesson:hover .name{color:var(--tint)}
+.units .lesson .badge{min-width:0;height:auto;background:none!important;color:var(--muted)!important;font:500 var(--small)/1 var(--sans);font-variant-numeric:tabular-nums;width:22px;justify-content:flex-start}
+.units .lesson .badge.on{color:var(--tint)!important;font-weight:650}
+.units .lesson .name{transition:color .15s}
+.units .facts{background:none}
+.bhome .b-stats>.ctl{background:none!important;box-shadow:inset 0 0 0 1px var(--rule);height:40px;padding:0 18px;font-size:var(--small);font-weight:550}
+.bhome .b-stats>.ctl:hover{box-shadow:inset 0 0 0 1px var(--faint)}
+.units .lesson .dot.busy{background:var(--tint)}
+@media (max-width:699px){
+  .bhome .b-stats{grid-template-columns:auto 1fr;justify-items:start;text-align:left;column-gap:var(--u)}
+  .bhome .b-stats .ring{grid-row:span 3;margin:0}
+  .bhome .b-stats>.ctl{justify-self:start}
+}

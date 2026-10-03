@@ -1,71 +1,65 @@
 import { useApp } from "../app/AppState";
 import { doneCount, entriesInGrade, gradeAverage, isReady, testKey, testReady, unitsInGrade, type Entry } from "../app/curriculum";
 import { COMING_SOON } from "../curriculum/catalog";
-import { gradeOf, lineOf } from "../curriculum/grades";
+import { gradeOf } from "../curriculum/grades";
+import { todayPlan, upNext, type TodayItem } from "../app/today";
+import { Check } from "../components/primitives/icons";
 import { lastScore, timesDone } from "../engine/mastery/progress";
 import { BigRing, ScoreChip } from "../components/primitives/Score";
-import { gradePattern } from "../components/primitives/gradePattern";
 
+
+const KIND = { lesson: "Up next", review: "Review", test: "Unit test" } as const;
 
 /**
- * Home is a bento grid: the big tile is what to do next; review, progress and practice-again sit beside it;
- * units fill the rest. Every lesson of the grade is listed; the ones still being rebuilt show as "soon".
+ * Home: today's short plan first (one tap starts it), how the year is going beside it, then every unit of the grade.
+ * Lessons still being rebuilt show as "soon".
  */
 export function Home() {
-  const { progress, go, startTest, startReview, canReview, deps } = useApp();
+  const { progress, go, startLesson, startTest, startReview, canReview, deps } = useApp();
   const g = progress.grade ?? 5, grade = gradeOf(g), list = entriesInGrade(g), units = unitsInGrade(g);
   const isDone = (id: string) => timesDone(progress, id) > 0;
-  const ready = list.filter(c => isReady(c.id));
-  const next = ready.find(c => !isDone(c.id));
-  const pick = next ?? [...ready].sort((a, b) => (lastScore(progress, a.id) ?? 9) - (lastScore(progress, b.id) ?? 9))[0];
+  const next = upNext(progress, g);
+  const plan = todayPlan(progress, g, deps().now, canReview());
+  const first = plan.find(i => !i.done);
   const done = doneCount(progress, list), avg = gradeAverage(progress, g);
   const weak = list.filter(c => { const s = lastScore(progress, c.id); return s != null && s <= 1; });
   const gt = progress.tests[testKey(g)];
-  const hasReview = canReview(), rd = progress.reviews[new Date(deps().now).toDateString()];
   const open = (c: Entry) => go({ name: "learn", lessonId: c.id });
+  const run = (i: TodayItem) => i.kind === "lesson" ? (i.done ? startLesson(i.id) : go({ name: "learn", lessonId: i.id }))
+    : i.kind === "review" ? startReview() : startTest(i.key);
+  const doneScore = (i: TodayItem) => i.kind === "review" ? progress.reviews[new Date(deps().now).toDateString()]
+    : i.kind === "lesson" ? lastScore(progress, i.id) : progress.tests[i.key]?.last;
+  const minutes = plan.filter(i => !i.done).reduce((m, i) => m + i.minutes, 0);
 
   let k = 0;
   return (
     <>
       <div className={`bhome${weak.length ? " tall" : ""}`}>
-        <section className="hero t0 b-hero"><div className="pat" style={{ backgroundImage: gradePattern(g) }} />
-          <div><span className="hline">{lineOf(g).name}</span><h1><button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} title="See the year">{grade.name}<span aria-hidden> ›</span></button></h1><p className="sub">{grade.subtitle} · {list.length} lesson{list.length === 1 ? "" : "s"}</p></div>
-          {units.length > 1 && (
-            <div className="uprog">{units.map(u => { const d = doneCount(progress, u.entries); return (
-              <div key={u.name}><span className="k">{u.name}</span><span className="bar2"><i className={d ? undefined : "zero"} style={{ width: `${(100 * d / u.entries.length).toFixed(1)}%` }} /></span><span className="mono">{d}/{u.entries.length}</span></div>
-            ); })}</div>
-          )}
-          {pick ? (
-            <button className="upnext" onClick={() => open(pick)}>
-              <span className="k">{next ? "Up next" : "Practice"} · {pick.unit || "Lesson"} · lesson {list.indexOf(pick) + 1}</span><b>{pick.title}</b>
-              <span className="row">{lastScore(progress, pick.id) != null ? <ScoreChip n={lastScore(progress, pick.id)} words /> : <span className="muted">Learn it, then practice</span>}<span className="ctl go">Start ›</span></span>
-            </button>
-          ) : (
-            <div className="upnext soonnext">
-              <span className="k">On the way</span><b>{list.length ? `${list[0]!.title} and the rest are almost ready` : "New lessons are almost ready"}</b>
-              <span className="row"><span className="muted">Pick another grade to keep going.</span></span>
-            </div>
+        <section className="tile today">
+          <button className="yearlink" onClick={() => go({ name: "intro" }, "fwd")} aria-label={`See the year: ${grade.name}`}>{grade.name}<span aria-hidden> ›</span></button>
+          <h1>Today</h1>
+          <p className="sub">{!plan.length ? "New lessons for this grade are almost ready." : first ? `About ${minutes} minutes.` : "All done for today. Nicely done."}</p>
+          {plan.length > 0 && (
+            <ol className="plan">{plan.map(i => (
+              <li key={i.kind}>
+                <button className={`pitem${i.done ? " done" : ""}${i === first ? " now" : ""}`} onClick={() => run(i)}
+                  aria-label={i.kind === "review" ? (i.done ? "Today's review: done" : "Today's review") : i.kind === "lesson" && !i.done ? `${i.again ? "Practice" : "Up next"}: ${i.title}` : undefined}>
+                  <span className="pmark" aria-hidden>{i.done ? <Check /> : null}</span>
+                  <span className="ptext"><small>{i.kind === "lesson" && i.again ? "Practice" : KIND[i.kind]}</small><b>{i.title}</b></span>
+                  {i === first ? <span className="ctl go">Start</span> : i.done ? <ScoreChip n={doneScore(i)} /> : <span className="pmin">{i.minutes} min</span>}
+                </button>
+              </li>
+            ))}</ol>
           )}
         </section>
-        {hasReview && (
-          <button className="tile b-review" onClick={startReview}>
-            <span className={`badge${rd != null ? " on" : ""}`}>↻</span>
-            <span className="name"><b>{rd != null ? "Today's review: done" : "Today's review"}</b><small className="muted">Mixed problems from lessons you've done</small></span>
-            {rd != null ? <ScoreChip n={rd} /> : <span className="muted">about 8</span>}
-          </button>
-        )}
-        <section className={`tile b-stats${hasReview ? "" : " solo"}`}>
-          <div className="statgrid">
-            <div className="st"><BigRing small frac={list.length ? done / list.length : 0} label={done} /><span className="k">of {list.length} lessons done</span></div>
-            <div className="st"><span className="v">{avg == null ? "—" : avg.toFixed(1)}</span><span className="k">average score of 4</span></div>
-            <div className="st"><span className="v">{gt ? <ScoreChip n={gt.last} /> : "—"}</span><span className="k">grade check-up</span></div>
-          </div>
-          <div className="actions">
-            {testReady(g) && <button className="ctl go" onClick={() => startTest(testKey(g))}>Grade check-up</button>}
-          </div>
+        <section className="tile b-stats">
+          <BigRing frac={list.length ? done / list.length : 0} label={done} />
+          <p><b>of {list.length}</b> lessons done{avg != null && <><br /><span className="muted">Average score {avg.toFixed(1)} of 4</span></>}</p>
+          {gt && <p className="muted gtline">Grade check-up <ScoreChip n={gt.last} /></p>}
+          {testReady(g) && <button className="ctl" onClick={() => startTest(testKey(g))}>Grade check-up</button>}
         </section>
         {weak.length > 0 && (
-          <section className="tile b-weak"><div className="unit"><h3>Practice again</h3></div>
+          <section className="tile b-weak"><h3>Practice again</h3>
             <div className="lessons">{weak.slice(0, 3).map(c => (
               <button key={c.id} className="lesson" disabled={!isReady(c.id)} onClick={() => open(c)}><ScoreChip n={lastScore(progress, c.id)} /><span className="name">{c.title}</span></button>
             ))}</div>
@@ -88,7 +82,7 @@ export function Home() {
                   <button key={c.id} className={`lesson t${(k - 1) % 3}${live ? "" : " soon"}`} disabled={!live} onClick={() => open(c)}
                     aria-label={live ? undefined : `${c.title}, coming soon`}>
                     <span className={`badge${isDone(c.id) ? " on" : ""}`}>{k}</span><span className="name">{c.title}</span>
-                    {sc != null ? <ScoreChip n={sc} /> : c === next ? <><span className="muted">up next</span><span className="dot busy" /></> : live ? <span className="dot" /> : <span className="muted">soon</span>}
+                    {sc != null ? <ScoreChip n={sc} /> : c === next?.entry ? <span className="dot busy" aria-label="up next" /> : live ? <span className="dot" /> : <span className="muted">soon</span>}
                   </button>
                 );
               })}</div>

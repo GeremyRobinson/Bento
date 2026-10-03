@@ -31,20 +31,20 @@ describe("first launch: landing → grade → home", () => {
     expect(document.querySelectorAll(".yunit")).toHaveLength(4);
     expect(document.querySelectorAll(".yunit li")).toHaveLength(grade5.length);
     tap("Start the year ›");
-    expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
-    expect(screen.getByText(`Fractions and decimals · ${grade5.length} lessons`)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See the year: 5th grade" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Today" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: new RegExp(`Up next.*${LESSON}`) })).toBeInTheDocument();
 
     // the wordmark goes back to the landing page, which now offers the way back
     fireEvent.click(screen.getByRole("button", { name: "Bento home page" }));
     tap("My lessons ›");
-    expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See the year: 5th grade" })).toBeInTheDocument();
   });
 
   it("returning learners skip the landing page", () => {
     renderApp({ grade: 5, chosen: true });
     expect(screen.queryByText("Math that finally clicks.")).toBeNull();
-    expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See the year: 5th grade" })).toBeInTheDocument();
   });
 });
 
@@ -77,7 +77,7 @@ describe("home", () => {
     fireEvent.click(within(sheet).getByRole("button", { name: /2nd/ }));
     expect(screen.queryByRole("dialog")).toBeNull();
     tap("Start the year ›");
-    expect(screen.getByRole("heading", { level: 1, name: "2nd grade" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See the year: 2nd grade" })).toBeInTheDocument();
     expect(document.querySelector("main")!.dataset.band).toBe("little");
     expect(screen.getByRole("heading", { level: 3, name: "Coming soon" })).toBeInTheDocument();
     for (const t of COMING_SOON[2]!) expect(screen.getByText(t)).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe("home", () => {
     tap("Start the year ›");
     fireEvent.click(screen.getByRole("button", { name: "Change grade" }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: /7th/ }));
-    expect(screen.getByRole("heading", { level: 1, name: "7th grade" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "See the year: 7th grade" })).toBeInTheDocument();
   });
 });
 
@@ -145,8 +145,7 @@ describe("unit test and check-up", () => {
     solveRun();
     expect(screen.getByRole("navigation", { name: "You are here" })).toHaveTextContent("Lessons5th grade check-upDone");
     tap("All lessons");
-    const stat = [...document.querySelectorAll(".statgrid .st")].find(s => s.textContent!.includes("grade check-up"))!;
-    expect(stat.querySelector(".score b")!.textContent).toBe("4");
+    expect(document.querySelector(".gtline .score b")!.textContent).toBe("4");
   });
 
   it("a wrong answer in a test shows the answer and moves on", () => {

@@ -3,9 +3,8 @@ import { useApp } from "../app/AppState";
 import type { Route } from "../app/routes";
 import { gradeOf } from "../curriculum/grades";
 import { lessonById } from "../curriculum/registry";
-import { LEVEL_XP } from "../engine/mastery/levels";
 import { currentItem, lessonOfItem } from "../engine/session/practice";
-import { GradeBadge, gradeLevel } from "./primitives/Score";
+import { GradeBadge } from "./primitives/Score";
 import { Chevron } from "./primitives/icons";
 
 /** A simple person: a head and shoulders. */
@@ -50,7 +49,7 @@ export function TopBar({ grade }: { grade: number }) {
   const app = useApp();
   const { progress, openSheet, go, route } = app;
   const welcome = route.name === "welcome";
-  const g = grade, gxp = progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
+  const g = grade, gxp = progress.gxp[g] ?? 0;
   const { trail, lit } = placeOf(route, app);
   const back = [...trail].reverse().find(c => c.to);
   // an unfinished lesson waits here, on every page, instead of taking over a grade's own "up next"
@@ -62,9 +61,8 @@ export function TopBar({ grade }: { grade: number }) {
         <span>Bento</span>
       </button>
       {welcome ? <span className="grow" /> : <>
-        <button className={`gpick${trail.length ? " slim" : ""}`} onClick={() => openSheet(true)} aria-label="Change grade">
+        <button className="gpick slim" onClick={() => openSheet(true)} aria-label="Change grade">
           <GradeBadge grade={g} gxp={gxp} />
-          {!trail.length && <span className="gtext"><b>{gradeOf(g).name}</b><small>Level {lvl} · {into}/{LEVEL_XP} XP</small></span>}
         </button>
         {trail.length > 0 && (
           <nav className="trail" aria-label="You are here">
@@ -91,8 +89,6 @@ export function TopBar({ grade }: { grade: number }) {
           : <span className="tnote">Kindergarten to 12th grade</span>
         : (
           <button className={`mebtn${lit === 3 ? " on" : ""}`} onClick={() => go({ name: "me" }, "fwd")} aria-label={`Me: ${progress.streak} day streak, ${progress.xp} XP`}>
-            <span className="mestat"><i aria-hidden>🔥</i><span className="mono">{progress.streak}</span></span>
-            <span className="mestat"><i aria-hidden>⭐</i><span className="mono">{progress.xp}</span></span>
             <span className="meav" aria-hidden><MeIcon /></span>
           </button>
         )}
