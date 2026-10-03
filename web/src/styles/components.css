@@ -519,11 +519,9 @@
 .units .unit h3{color:var(--text);font-size:var(--fs);font-weight:650;letter-spacing:-.01em}
 .units .unit .ctl{height:36px;padding:0 14px;background:none!important;box-shadow:inset 0 0 0 1px var(--rule);font-size:var(--small);font-weight:550;color:var(--muted)}
 .units .unit .ctl:hover{color:var(--text);box-shadow:inset 0 0 0 1px var(--faint)}
-.units .lessons{gap:0}
-.units .lesson{background:none;border-radius:12px;height:52px;padding:0 6px;font-weight:500;gap:12px}
-.units .lessons>.lesson+.lesson{box-shadow:0 -1px 0 var(--rule)}
-.units .lesson:hover{background:none}
-.units .lesson:hover .name{color:var(--tint)}
+.units .lessons{gap:2px}
+.units .lesson{background:none;border-radius:999px;height:52px;padding:0 14px;font-weight:500;gap:12px;transition:background .15s}
+.units .lesson:not([disabled]):hover{background:var(--tint-soft)}
 .units .lesson .badge{min-width:0;height:auto;background:none!important;color:var(--muted)!important;font:500 var(--small)/1 var(--sans);font-variant-numeric:tabular-nums;width:22px;justify-content:flex-start}
 .units .lesson .badge.on{color:var(--tint)!important;font-weight:650}
 .units .lesson .name{transition:color .15s}
@@ -548,3 +546,8 @@
 .pdots{display:flex;gap:6px}
 .pdots i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--faint)}
 .pdots i.on{background:var(--tint);box-shadow:none}
+.pitem{padding:14px 12px;margin:0 -12px;width:calc(100% + 24px);border-radius:18px;transition:background .15s}
+.pitem:hover{background:var(--tint-soft)}
+.pitem:hover .ptext b{color:inherit}
+.plan li+li{border-top:0}
+.plan{gap:2px}
