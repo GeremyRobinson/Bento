@@ -176,3 +176,9 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
 .lbar .dots-nav button.dot{padding:0;border:0;cursor:pointer}
 .lbar .dots-nav button.dot:disabled{cursor:default}
 .lbar .dots-nav button.dot:not(:disabled):hover{background:var(--muted)}
+
+/* today's plan rows are pills like every other row, with the Start pill sitting concentric inside them,
+   and the card's bottom edge as far from the last row as its sides are */
+.pitem{border-radius:999px;padding:10px 10px 10px 14px;margin:0 -14px;width:calc(100% + 28px)}
+.pitem .ctl.go{height:40px}
+.bhome .today:has(.plan:last-child){padding-bottom:calc(var(--u) * 1.75 - 14px)}
