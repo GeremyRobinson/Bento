@@ -274,7 +274,7 @@
 .bb{display:inline-flex;align-items:flex-end;gap:3px;flex-wrap:wrap;max-width:150px}
 .bb .rod{width:10px;height:60px;border-radius:3px;background:var(--tint)}
 .bb .cube{width:10px;height:10px;border-radius:2px;background:color-mix(in srgb,var(--tint) 55%,var(--card))}
-.viz-svg{width:min(100%, calc(var(--w) * 1.15px), calc(min(54vh, 400px) * var(--w) / var(--h)));height:auto;overflow:visible}
+.viz-svg{width:min(100%, calc(var(--w) * 1.15px), calc(min(54vh, 400px) * var(--w) / var(--h)));height:auto;overflow:visible;display:block;justify-self:center;margin-inline:auto}
 .viz-svg text{font-family:var(--num);font-size:17px;fill:var(--text);text-anchor:middle;dominant-baseline:central}
 .viz-svg text.sm{font-size:15px;font-family:var(--sans);font-weight:700} .viz-svg text.xs{font-size:12px;fill:var(--muted)} .viz-svg text.big{font-size:28px}
 .viz-svg text.lbl{font-weight:600;fill:var(--tint)} .viz-svg text.lbl.big{font-size:22px} .viz-svg text.acc{fill:var(--acc)} .viz-svg text.onlbl{fill:var(--on-tint)}
