@@ -82,7 +82,7 @@ export const SLIPS: ((rng: Rng) => SlipDemo)[] = [
   rng => {
     const a = rng.int(2, 9), b = rng.int(2, 9), c = rng.int(2, 9);
     return { kind: "order", grade: 6, q: [num(a), op("+"), num(b), op("×"), num(c)], wrong: [num((a + b) * c)], right: [num(a + b * c)],
-      why: "Multiply comes first.", detail: `${b} × ${c} = ${b * c}, then ${a} + ${b * c} = ${a + b * c}.` };
+      why: "Multiply before you add.", detail: `${b} × ${c} = ${b * c}, then ${a} + ${b * c} = ${a + b * c}.` };
   },
   rng => {
     const a = rng.int(2, 9), b = rng.int(2, 9);
@@ -92,7 +92,7 @@ export const SLIPS: ((rng: Rng) => SlipDemo)[] = [
   rng => {
     const b = rng.int(2, 12), c = rng.int(b + 1, 20);
     return { kind: "undo", grade: 6, q: [x, op("−"), num(b), op("="), num(c)], wrong: [x, op("="), num(c - b)], right: [x, op("="), num(c + b)],
-      why: "You undid it the wrong way.", detail: `To undo taking away ${b}, add ${b} to both sides: x = ${c} + ${b} = ${c + b}.` };
+      why: "Undo a minus with a plus.", detail: `To undo taking away ${b}, add ${b} to both sides: x = ${c} + ${b} = ${c + b}.` };
   },
   rng => {
     const a = rng.int(3, 12);

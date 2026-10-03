@@ -12,7 +12,7 @@ const grade5 = CATALOG.filter(c => c.grade === 5);
 describe("first launch: landing → grade → home", () => {
   it("shows the landing page, then the chosen grade's home", () => {
     renderApp({ grade: null, chosen: false });
-    expect(screen.getByRole("heading", { level: 1, name: "Math that finally clicks." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Math that clicks." })).toBeInTheDocument();
     expect(screen.getByText("Counting to calculus, with unit tests and a check-up for every grade.")).toBeInTheDocument();
 
     // the hero box plays three real lesson pictures, one big and two small, each with its grade, all from different grades
@@ -47,7 +47,7 @@ describe("first launch: landing → grade → home", () => {
 
   it("returning learners skip the landing page", () => {
     renderApp({ grade: 5, chosen: true });
-    expect(screen.queryByText("Math that finally clicks.")).toBeNull();
+    expect(screen.queryByText("Math that clicks.")).toBeNull();
     expect(screen.getByRole("heading", { level: 1, name: "5th grade" })).toBeInTheDocument();
   });
 });
@@ -55,7 +55,7 @@ describe("first launch: landing → grade → home", () => {
 describe("no grade until one is chosen", () => {
   for (const hash of ["#/", "#/year", "#/learn/no-such-lesson"]) it(`${hash} opens the landing page's grade shelf`, () => {
     renderApp({ grade: null, chosen: false }, {}, hash);
-    expect(screen.getByRole("heading", { name: "Pick your grade." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Every grade, K to 12th." })).toBeInTheDocument();
     expect(document.querySelector("#app")!.getAttribute("data-grade")).toBe("none");
   });
   it("the hub and facts stay neutral and ask for a grade", () => {
@@ -64,7 +64,7 @@ describe("no grade until one is chosen", () => {
       expect(document.querySelector("#app")!.getAttribute("data-grade")).toBe("none");
       expect(screen.queryByText(/5th grade/)).toBeNull();
       fireEvent.click(screen.getAllByRole("button", { name: "Choose your grade" })[0]!);
-      expect(screen.getByRole("heading", { name: "Pick your grade." })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Every grade, K to 12th." })).toBeInTheDocument();
       unmount();
     }
   });

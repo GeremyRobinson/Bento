@@ -47,7 +47,7 @@ function answers(p: RoundProblem): AnswerModel {
         id: "between", label: `Find the ${place(to)} around it`, question: `${n} is between which two ${place(to)}?`,
         prompt: b => [b.lo!, text(" and "), b.hi!], ans: { lo, hi },
         wrong: [
-          ...(to === 100 ? [[{ lo: lo10, hi: lo10 + 10 }, "Used tens", `Those are tens. We are rounding to the nearest hundred, so look for hundreds.`] as [Record<string, number>, string, string]] : []),
+          ...(to === 100 ? [[{ lo: lo10, hi: lo10 + 10 }, "Used tens", `Those are tens. This rounds to the nearest hundred, so look for hundreds.`] as [Record<string, number>, string, string]] : []),
           [{ lo: lo - to, hi: lo }, "One step too low", `${n} is more than ${lo}. Look for the ${place(to, false)} just above it.`],
           [{ lo: hi, hi: hi + to }, "One step too high", `${n} is less than ${hi}. Look for the ${place(to, false)} just below it.`],
         ],

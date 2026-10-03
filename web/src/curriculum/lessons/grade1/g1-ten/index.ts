@@ -42,7 +42,7 @@ function explain(p: MakeTenProblem, model: AnswerModel) {
   const { a, b } = p, need = expectedOf(model, "ten"), left = expectedOf(model, "break"), sum = expectedOf(model, "add");
   return chainExplanation({
     heading: "Make a ten first",
-    idea: ["Fill up a ten first: break the second number into the part that makes 10 and the rest. Tens are easy to add!"],
+    idea: ["Fill up a ten first: break the second number into the part that makes 10 and the rest. Tens are easy to add."],
     statement: [num(a), op("+"), num(b)],
     caption: `Borrow ${need} from the ${b} to fill the ten.`,
     alt: `${a} + ${b} becomes ${a} + ${need} + ${left}, then 10 + ${left} = ${sum}.`,
@@ -51,7 +51,7 @@ function explain(p: MakeTenProblem, model: AnswerModel) {
         lines: [[num(a), op("+"), num(b)]], answerStep: "ten", result: need },
       { id: "break", narration: `Break ${b} into ${need} and ${left}.`, math: [num(b), op("="), num(need), op("+"), num(left)],
         lines: [[num(a), op("+"), mark(need), op("+"), num(left)]], answerStep: "break", result: left },
-      { id: "add", narration: `Now it's 10 + ${left} = ${sum}. Tens are easy to add!`, math: [num(10), op("+"), num(left), op("="), num(sum)],
+      { id: "add", narration: `Now it's 10 + ${left} = ${sum}.`, math: [num(10), op("+"), num(left), op("="), num(sum)],
         lines: [[mark(10), op("+"), num(left), op("="), num(sum)]], answerStep: "add", result: sum },
     ],
   });

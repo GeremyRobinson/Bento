@@ -57,7 +57,7 @@ export function explainCombination(p: CombinationProblem, answers: AnswerModel):
     }),
     timeline: beats(4),
     steps: [
-      { id: "things", narration: `There are ${n} things to choose from, and we take ${k}.`, math: mt`C(${n}, ${k})`, state: 0 },
+      { id: "things", narration: `There are ${n} things to choose from, and you take ${k}.`, math: mt`C(${n}, ${k})`, state: 0 },
       { id: "ordered", narration: `Pick one at a time: ${n} choices first, then ${n - 1}${k === 3 ? `, then ${n - 2}` : ""}. That's ${top} ordered picks.`, math: mt`${picks(p)} = ${top}`, state: 1, answerStep: "ordered", result: top },
       { id: "orders", narration: `But the same ${k} things can come out in ${f} different orders, and they are still one group.`, math: mt`${k}! = ${f}`, state: 2, answerStep: "orders", result: f },
       { id: "divide", narration: `So divide out the repeats: ${top} ÷ ${f} = ${ways}.`, math: mt`${top} ÷ ${f} = ${ways}`, state: 3, answerStep: "divide", result: ways },

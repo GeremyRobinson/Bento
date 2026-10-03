@@ -40,7 +40,7 @@ export function explainTangent(p: TangentProblem, model: AnswerModel): Explanati
     }),
     timeline: beats(3),
     steps: [
-      { id: "curve", narration: `This is f(x) = ${fx}. We want how steep it is at x = ${f(k)}.`, math: [text("f(x)"), op("="), ...poly([[a, "x²"], [b, "x"]])], state: 0 },
+      { id: "curve", narration: `This is f(x) = ${fx}. Find how steep it is at x = ${f(k)}.`, math: [text("f(x)"), op("="), ...poly([[a, "x²"], [b, "x"]])], state: 0 },
       { id: "derivative", narration: `Bring each power down: 2 × ${f(a)} = ${f(da)} for x², and ${f(b)} stays for the x term. So f′(x) = ${lineText(da, b, "").slice(3)}.`,
         math: [text("f′(x)"), op("="), ...poly([[da, "x"], [b, ""]])], state: 1, answerStep: "derivative", result: da },
       { id: "slope", narration: `The tangent's slope is f′ at x = ${f(k)}: ${f(da)} · ${paren(k)} ${signed(b)} = ${f(slope)}. The line touches the curve at ${pt(k, fk)}.`,

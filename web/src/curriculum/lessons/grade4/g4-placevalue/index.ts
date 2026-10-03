@@ -74,7 +74,7 @@ function answers(p: RoundProblem): AnswerModel {
         prompt: s => [text("next digit"), op("="), s], ans: next,
         wrong: slips(next, [[d, "Read the place itself", `${d} is the ${ONE[place]}s digit. Look one place to its right, in the ${lower}.`]]),
         hint: `Look one place to the right of the ${name}.`,
-        explain: `The digit in the ${lower} is ${next}. ${up ? "That's 5 or more, so we round up." : "That's less than 5, so we round down."}`,
+        explain: `The digit in the ${lower} is ${next}. ${up ? "That's 5 or more, so round up." : "That's less than 5, so round down."}`,
       }),
       oneBox({
         id: "round", label: "Round", prompt: s => [text(N), op("≈"), s], ans: R,

@@ -74,7 +74,7 @@ function answers(p: SubRegroupProblem): AnswerModel {
         id: "answer", label: "Answer",
         prompt: s => [num(a), op("−"), num(b), op("="), s], ans: diff,
         wrong: slips(diff, [
-          [(at - bt) * 10 + (bo - ao), "Smaller from bigger", `It looks like you did ${bo} − ${ao} in the ones. You can't take ${bo} from ${ao}, so trade a ten first.`],
+          [(at - bt) * 10 + (bo - ao), "Smaller from bigger", `You did ${bo} − ${ao} in the ones. You can't take ${bo} from ${ao}, so trade a ten first.`],
           [(at - bt) * 10 + ones, "Forgot the traded ten", `You traded a ten, so there is one ten less: ${at - 1} − ${bt} = ${tens}.`],
           [tens + ones * 10, "Swapped the digits", `Tens go on the left: ${count(tens, "ten")} and ${count(ones, "one")}.`],
         ]),

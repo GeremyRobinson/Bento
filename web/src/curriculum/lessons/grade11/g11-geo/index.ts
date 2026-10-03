@@ -65,7 +65,7 @@ export function explainGeo(p: GeoProblem, model: AnswerModel): Explanation {
     }),
     timeline: beats(4),
     steps: [
-      { id: "terms", narration: `The sequence starts ${first4(p).map(f).join(", ")}. We want term ${n}.`, math: geoMath(p), state: 0 },
+      { id: "terms", narration: `The sequence starts ${first4(p).map(f).join(", ")}. Find term ${n}.`, math: geoMath(p), state: 0 },
       { id: "r", narration: `Divide a term by the one before it: ${f(a * r)} ÷ ${f(a)} = ${f(r)}. Each jump multiplies by ${f(r)}.`,
         math: [text("r"), op("="), num(a * r), op("÷"), num(a), op("="), num(r)], state: 1, answerStep: "r", result: r },
       { id: "pow", narration: `From term 1 to term ${n} is ${count(n - 1, "jump")}, so multiply by ${f(r)} ${n - 1} times: ${f(r)}${supText(n - 1)} = ${f(pw)}.`,

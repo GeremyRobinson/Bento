@@ -28,7 +28,7 @@ export function explainSolveFactor(p: SolveFactorProblem, model: AnswerModel): E
     }),
     timeline: beats(3),
     steps: [
-      { id: "eq", narration: `We want the x values that make ${polyText([[1, "x²"], [b, "x"], [c, ""]])} equal 0: where the graph crosses the x-axis.`, math: solveFactorMath(p), state: 0 },
+      { id: "eq", narration: `Find the x values that make ${polyText([[1, "x²"], [b, "x"], [c, ""]])} equal 0: where the graph crosses the x-axis.`, math: solveFactorMath(p), state: 0 },
       { id: "factor", narration: `Find two numbers that multiply to ${f(c)} and add to ${f(-b)}: ${f(m)} and ${f(n)}.`,
         math: [text("(x − "), num(m), text(")(x − "), num(n), text(")"), op("="), num(0)], state: 1, answerStep: "factor", result: m },
       { id: "roots", narration: `Set each factor to 0: x − ${f(m)} = 0 gives x = ${f(m)}, and x − ${f(n)} = 0 gives x = ${f(n)}.`,

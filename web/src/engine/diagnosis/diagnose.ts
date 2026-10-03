@@ -8,9 +8,9 @@ export const CATEGORIES: Record<MistakeCategory, [name: string, meaning: string,
   sign: ["Sign mix-up", "The size of the number was right but the sign was flipped.", "Before checking, ask: should this be positive or negative?"],
   reuse: ["Reused an earlier number", "Typed the answer from an earlier step instead of doing the new one.", "Read what each new step is asking before answering."],
   place: ["Place value or decimal point", "The digits were right but a zero or the decimal point was in the wrong place.", "Estimate first, then line up place values."],
-  off1: ["Off by one", "Answers exactly 1 away: usually a counting or small adding slip.", "Count again slowly, or check by working backwards."],
+  off1: ["Off by one", "The answer was exactly 1 off, usually a counting slip.", "Count again slowly, or check by working backwards."],
   digits: ["Digits mixed up", "The right digits typed in the wrong order.", "Read the answer back before tapping Check."],
-  close: ["Arithmetic slip", "Right method, but the arithmetic was a little off.", "Redo the multiplying or adding carefully; an estimate catches these."],
+  close: ["Arithmetic slip", "Right method, but the arithmetic was a little off.", "Estimate first. A quick estimate catches most of these."],
   swap: ["Boxes swapped", "The right numbers in the wrong boxes.", "Check which box is which before typing."],
   flip: ["Fraction flipped", "Top and bottom of the fraction were switched.", "The part goes on top and the whole on the bottom."],
   plan: ["Picked the wrong next step", "Knew how to do the steps but not which one comes next.", "Before solving, say the plan out loud: what has to happen first?"],
@@ -19,14 +19,14 @@ export const CATEGORIES: Record<MistakeCategory, [name: string, meaning: string,
 
 /** What the student is told for each recognised slip. */
 export const SAY: Partial<Record<MistakeCategory, string>> = {
-  sign: "So close! The size is right. Check the sign: should it be positive or negative?",
+  sign: "The size is right. Check the sign.",
   reuse: "That's the number from an earlier step. This step asks for something new.",
   place: "The digits look right. Check where the zeros or the decimal point go.",
-  off1: "Just 1 away! Count again carefully.",
+  off1: "You're 1 away. Count again.",
   digits: "Right digits, wrong order. Read it back.",
-  close: "Close! Redo the arithmetic carefully.",
+  close: "Close. Do the math again.",
   swap: "Right numbers, wrong boxes. Swap them.",
-  flip: "Flipped! Check which number goes on top.",
+  flip: "Top and bottom are flipped.",
 };
 
 const digitsOf = (x: number) => String(Math.abs(round6(x))).replace(".", "").split("").sort().join("");
@@ -67,7 +67,7 @@ export function diagnose(expected: Record<string, number>, typed: Record<string,
 export function nudge(expected: Record<string, number>, typed: Record<string, number | null>, band: Band): string {
   const ids = Object.keys(expected), little = band === "little";
   const say = (got: number, want: number) =>
-    eq(got, want) ? "" : got > want ? (little ? "Too many! Count again." : "That's too big.") : (little ? "Too few! Count again." : "That's too small.");
+    eq(got, want) ? "" : got > want ? (little ? "Too many. Count again." : "That's too big.") : (little ? "Too few. Count again." : "That's too small.");
   if (ids.includes("n") && ids.includes("d")) {
     const vn = typed.n, vd = typed.d;
     if (vn == null || !vd) return "";

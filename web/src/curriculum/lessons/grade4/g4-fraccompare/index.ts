@@ -131,7 +131,7 @@ function explain(p: FracCompareProblem, model: AnswerModel): Explanation {
   const common = apart ? 1 : 0, first = L === b ? common : common + 1, second = L === d ? first : first + 1, cmp = second + 1;
   const steps: ExplanationStep[] = [
     { id: "start", state: 0, math: [frac(a, b), text(" ? "), frac(c, d)],
-      narration: `${cap(pieceName(b))} and ${pieceName(d)} are different sizes, so we can't just count pieces yet.` },
+      narration: `${cap(pieceName(b))} and ${pieceName(d)} are different sizes, so you can't count pieces yet.` },
   ];
   if (apart) steps.push({ id: "common", state: common, answerStep: "common", result: expectedOf(model, "common"), math: [text(`${b} × ${L / b} = ${L},  ${d} × ${L / d} = ${L}`)],
     narration: `${b} and ${d} both go into ${L}. Cut both wholes into ${pieceName(L)}.` });

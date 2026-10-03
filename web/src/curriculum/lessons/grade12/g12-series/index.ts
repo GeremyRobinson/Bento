@@ -53,7 +53,7 @@ export function explainSeries(p: ArithmeticSeries, model: AnswerModel) {
     diagram,
     alt: diagram.alt,
     steps: [
-      { id: "terms", narration: `Start at ${f(a)} and go up by ${f(d)} each time. We want the first ${f(n)} terms.`, math: [...firstTerms(p), op("+"), text("…")] },
+      { id: "terms", narration: `Start at ${f(a)} and go up by ${f(d)} each time. Add the first ${f(n)} terms.`, math: [...firstTerms(p), op("+"), text("…")] },
       { id: "last", narration: `Term ${f(n)} is ${f(n - 1)} ${noun(n - 1, "jump")} of ${f(d)} from the first: ${f(last)}.`, math: m(a, op("+"), n - 1, op("×"), d, op("="), last), answerStep: "last", result: last },
       { id: "pair", narration: `Pair the first and last terms: ${f(a)} + ${f(last)} = ${f(pair)}.`, math: m(a, op("+"), last, op("="), pair), answerStep: "pair", result: pair },
       { id: "sum", narration: pairs, math: m(pair, op("×"), n, op("÷"), 2, op("="), sum), answerStep: "sum", result: sum },

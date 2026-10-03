@@ -255,7 +255,7 @@ export function pickPlan(s: PracticeSession, index: number): PracticeSession {
   }
   const isLater = stepsOf(s).slice(s.step + 1).some(t => t.base === choice);
   return { ...s, pick: { ...pk, misses }, fx: "shake", mistakes: [...s.mistakes, mistake],
-    feedback: { type: "bad", strong: "Not yet.", text: isLater ? "That step comes later. What has to happen first?" : "That step isn't part of this problem." } };
+    feedback: { type: "bad", strong: "Look again.", text: isLater ? "That step comes later. What has to happen first?" : "That step isn't part of this problem." } };
 }
 
 // ---------------------------------------------------------------- typing
@@ -307,7 +307,7 @@ export function check(s: PracticeSession, progress: Progress, deps: Deps): Pract
   const ids = step.choices ? ["c"] : answerIds(step.slots);
   const values = Object.fromEntries(ids.map(id => [id, parseNumber(s.values[id])]));
   if (Object.values(values).every(x => x == null)) {
-    return { ...s, fx: "feedback", feedback: { type: "hint", text: "Tap a box and use the number pad to type your answer." } };
+    return { ...s, fx: "feedback", feedback: { type: "hint", text: "Tap a box, then type your answer on the number pad." } };
   }
   const r = checkStep(step, values);
   if (r.ok) return pass(s, false, progress, deps);
@@ -329,7 +329,7 @@ export function check(s: PracticeSession, progress: Progress, deps: Deps): Pract
 
   if (step.skipped) { // the shortcut missed: do this one the long way
     next = loadStep({ ...next, skipThis: false, collapsed: false, maxPts: next.maxPts + 1, step: leadOf(currentItem(next)) }, deps);
-    return { ...next, fx: "shake", feedback: { type: "bad", strong: "Not quite.", text: "Let's do this one step by step." } };
+    return { ...next, fx: "shake", feedback: { type: "bad", strong: "Look again.", text: "This one needs the steps. Here they are." } };
   }
   if (isTest(next)) {
     const shownValues = Object.fromEntries(Object.entries(expected).map(([k, v]) => [k, formatNumber(v)]));
@@ -342,7 +342,7 @@ export function check(s: PracticeSession, progress: Progress, deps: Deps): Pract
   const lines: string[] = [];
   if (rushed) lines.push("Slow down a little and read the step again.");
   if (canShowMe({ test: false, misses: next.misses, hinted: next.hinted })) lines.push("Stuck? Tap **Show me**.");
-  return { ...next, feedback: { type: "bad", strong: "Not yet.", text: msg, lines } };
+  return { ...next, feedback: { type: "bad", strong: "Look again.", text: msg, lines } };
 }
 
 /** Hints are limited: about one for every two problems, and only after a first try. */
@@ -350,8 +350,8 @@ export function hint(s: PracticeSession, deps: Deps): PracticeSession {
   const step = currentStep(s);
   if (!step || isTest(s)) return s;
   if (s.hinted) return { ...s, fx: "feedback", feedback: { type: "hint", strong: "Hint:", text: step.hint } };
-  if (!s.hintsLeft) return { ...s, fx: "feedback", feedback: { type: "hint", text: "No hints left in this lesson. Give it your best try. **Show me** opens after two tries." } };
-  if (!s.misses && deps.now - s.stepT0 < HINT_WAIT_MS) return { ...s, fx: "feedback", feedback: { type: "hint", text: "Give it one try first. The hint opens after you try." } };
+  if (!s.hintsLeft) return { ...s, fx: "feedback", feedback: { type: "hint", text: "You've used this lesson's hints. **Show me** opens after two tries." } };
+  if (!s.misses && deps.now - s.stepT0 < HINT_WAIT_MS) return { ...s, fx: "feedback", feedback: { type: "hint", text: "Try it once first. Then the hint opens." } };
   return {
     ...s, hinted: true, hintsLeft: s.hintsLeft - 1, hints: s.hints + 1, prob: { ...s.prob, hints: s.prob.hints + 1 }, fx: "feedback",
     feedback: { type: "hint", strong: "Hint:", text: step.hint },
@@ -405,14 +405,14 @@ function pass(s: PracticeSession, shown: boolean, progress: Progress, deps: Deps
   const lines: string[] = [];
   if (!isTest(next) && (pr.wrong || pr.shown) && next.items.length < MAX_LESSON_LENGTH) {
     next = { ...next, items: [...next.items, makeItem(lessonOfItem(it), next.items.length, deps.rng)], extra: next.extra + 1 };
-    lines.push("I added one more problem like this so you can practice it.");
+    lines.push("One more like this is coming up, for practice.");
   }
   void progress;
   if (isTest(next)) return { ...next, feedback: { type: "good", strong: `Problem done. +${xp} XP` } };
   if (shown) return { ...next, feedback: { type: "hint", text: `Here's how: ${step.explain}`, lines: [`**+${xp} XP.** That one was tricky, and you finished it.`, ...lines] } };
   if (band === "little") return { ...next, feedback: { type: "good", pop: "big", strong: `You solved it! +${xp} XP`, lines } };
-  if (band === "middle" || band === "high") return { ...next, feedback: { type: "good", strong: `Solved. +${xp} XP`, text: clean ? "(no mistakes)" : "", lines } };
-  return { ...next, feedback: { type: "good", pop: "star", strong: `Solved! +${xp} XP`, text: clean ? "(no mistakes bonus)" : "", lines } };
+  if (band === "middle" || band === "high") return { ...next, feedback: { type: "good", strong: `Solved. +${xp} XP`, text: clean ? "No mistakes." : "", lines } };
+  return { ...next, feedback: { type: "good", pop: "star", strong: `Solved! +${xp} XP`, text: clean ? "No mistakes." : "", lines } };
 }
 
 // ---------------------------------------------------------------- moving on and finishing

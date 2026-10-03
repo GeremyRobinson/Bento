@@ -72,11 +72,11 @@ export function unlikeAnswers(p: UnlikeFractionsProblem): AnswerModel {
       const x = v.x ?? null;
       if (x === L) return { ok: true };
       if (x === b + d) return { ok: false, generic: false, kind: "Added the denominators",
-        message: `It looks like you added ${b} + ${d}. The bottom number tells the **size of the pieces**, so we can't add them. We need a number that both ${b} and ${d} divide into evenly.` };
+        message: `You added ${b} + ${d}. The bottom number is the **size of the pieces**, so it doesn't get added. Find a number that ${b} and ${d} both go into evenly.` };
       if (sub && x === Math.abs(b - d)) return { ok: false, generic: false, kind: "Subtracted the denominators",
-        message: `It looks like you subtracted ${big} − ${small}. The bottom number tells the **size of the pieces**, so we don't subtract it. We need a number that both ${b} and ${d} divide into evenly.` };
+        message: `You subtracted ${big} − ${small}. The bottom number is the **size of the pieces**, so it doesn't get subtracted. Find a number that ${b} and ${d} both go into evenly.` };
       if (x != null && x > 0 && x % b === 0 && x % d === 0) return { ok: false, generic: false, kind: "Common denominator, but not the least",
-        message: `${x} works, because both ${b} and ${d} go into it. But there is a **smaller** one, and smaller numbers make the rest easier. Try again.` };
+        message: `${x} works, since ${b} and ${d} both go into it. There's a **smaller** one, though, and it keeps the numbers easier.` };
       if (x == null || !(x > 0)) return { ok: false, generic: false, kind: "Finding the LCD", message: "Type a number first." };
       const bad = x % b !== 0 ? b : d;
       return { ok: false, generic: false, kind: "Finding the LCD", message: `${bad} doesn't go into ${x} evenly (${x} ÷ ${bad} has a remainder). Both bottom numbers must divide into it.` };
@@ -100,8 +100,8 @@ export function unlikeAnswers(p: UnlikeFractionsProblem): AnswerModel {
         if (x === n) return { ok: false, generic: false, kind: "Changed the bottom but not the top",
           message: `You changed the bottom from ${den} to ${L}, but kept the top as ${n}. Whatever you multiply the bottom by, multiply the top by the same number.` };
         if (x === n + (L - den)) return { ok: false, generic: false, kind: "Added instead of multiplied",
-          message: `It looks like you added ${L - den} to the top because the bottom went up by ${L - den}. Fractions stay equal when we **multiply** top and bottom by the same number. What times ${den} makes ${L}?` };
-        return { ok: false, generic: false, kind: "Rewriting a fraction", message: `Not quite. Ask: ${den} × **?** = ${L}. Then multiply the top, ${n}, by that same number.` };
+          message: `You added ${L - den} to the top because the bottom went up by ${L - den}. A fraction stays the same only when you **multiply** top and bottom by the same number. What times ${den} makes ${L}?` };
+        return { ok: false, generic: false, kind: "Rewriting a fraction", message: `Ask yourself: ${den} × **?** = ${L}. Then multiply the top, ${n}, by that number.` };
       },
       hint: `${den} × ? = ${L}. Whatever you multiply the bottom by, do the same to the top.`,
       explain: `${den} × ${k} = ${L}, so ${n} × ${k} = ${N}.`,
@@ -120,9 +120,9 @@ export function unlikeAnswers(p: UnlikeFractionsProblem): AnswerModel {
       if (n == null || dd == null) return { ok: false, soft: true, message: "Fill in both boxes, the top and the bottom." };
       if (n === S && dd === L) return { ok: true };
       if (!sub && dd === 2 * L) return { ok: false, generic: false, kind: "Added the denominators",
-        message: `You added the bottoms too (${L} + ${L}). The pieces are already the same size, ${L}ths, so the bottom stays **${L}**. Think: ${A} slices + ${C} slices of the same pizza = ${S} slices, still ${L}ths.` };
+        message: `You added the bottoms too (${L} + ${L}). The pieces are already the same size, ${L}ths, so the bottom stays **${L}**. Picture a pizza: ${A} slices plus ${C} slices is ${S} slices, still ${L}ths.` };
       if (sub && dd === 0) return { ok: false, generic: false, kind: "Subtracted the denominators",
-        message: `You subtracted the bottoms too (${L} − ${L} = 0). The pieces are already the same size, ${L}ths, so the bottom stays **${L}**. Think: ${A} slices take away ${C} slices = ${S} slices, still ${L}ths.` };
+        message: `You subtracted the bottoms too (${L} − ${L} = 0). The pieces are already the same size, ${L}ths, so the bottom stays **${L}**. Picture a pizza: ${A} slices take away ${C} is ${S} slices, still ${L}ths.` };
       if (dd !== L) return { ok: false, generic: false, kind: "Changed the denominator",
         message: `When the bottoms match, the bottom stays the same: **${L}**. Only the tops get ${sub ? "subtracted" : "added"}.` };
       if (sub && n === A + C) return { ok: false, generic: false, kind: "Added instead of subtracting", message: `You added ${A} + ${C}. Look at the sign: this one is a **minus**.` };
@@ -175,11 +175,11 @@ export function unlikePicture(p: UnlikeFractionsProblem) {
   });
 }
 
-const HEADINGS = { add: "Cut them into same size pieces", sub: "Subtracting works the same way", mix: "Watch the sign" };
+const HEADINGS = { add: "Cut them into same-size pieces", sub: "Subtracting works the same way", mix: "Watch the sign" };
 const IDEAS = {
   add: ["The bottom number tells you the size of the pieces. Different sizes can't be added yet.",
-    "Every problem goes in 5 steps: find the LCD, rewrite the first, rewrite the second, add, simplify."],
-  sub: ["Before we can take away, the pieces have to be the same size.",
+    "Every problem takes the same 5 steps: find the LCD, rewrite both fractions, add, then simplify."],
+  sub: ["Before you can take away, the pieces have to be the same size.",
     "Never subtract the bottoms: you can't cut something into 0 pieces."],
   mix: ["This lesson mixes plus and minus problems. The first three steps are exactly the same. At step 4, look at the sign before you add or take away."],
 };

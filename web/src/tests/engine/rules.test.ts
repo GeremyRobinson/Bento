@@ -60,7 +60,7 @@ describe("mistake diagnosis", () => {
   });
   it("nudges by size, in words that fit the age", () => {
     expect(nudge({ x: 10 }, { x: 12 }, "kid")).toBe("That's too big.");
-    expect(nudge({ x: 10 }, { x: 8 }, "little")).toBe("Too few! Count again.");
+    expect(nudge({ x: 10 }, { x: 8 }, "little")).toBe("Too few. Count again.");
   });
 });
 

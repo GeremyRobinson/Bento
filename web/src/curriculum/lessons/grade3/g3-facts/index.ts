@@ -41,7 +41,7 @@ function answers(p: FactProblem): AnswerModel {
           [(a - 1) * b + 1, "Counted on by 1", `Each jump is ${b}, not 1. ${(a - 1) * b} + ${b} = ${P}.`],
           [(a - 1) * b, "Stopped one jump short", `That's only ${count(a - 1, "jump")} of ${b}. Make ${count(a, "jump")}.`],
           [(a + 1) * b, "One jump too many", `That's ${count(a + 1, "jump")} of ${b}. Stop after ${count(a, "jump")}.`],
-          [a + b, "Added the two numbers", `${a} + ${b} puts them together once. We need ${count(a, "group")} of ${b}.`],
+          [a + b, "Added the two numbers", `${a} + ${b} puts them together once. You need ${count(a, "group")} of ${b}.`],
         ],
         hint: `Add ${b} to the last number you see.`,
         explain: `${count(a, "jump")} of ${b} land on ${P}.`,

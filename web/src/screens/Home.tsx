@@ -54,7 +54,7 @@ function GradeHome({ g }: { g: number }) {
       <div className={`bhome${weak.length ? " tall" : ""}`}>
         <section className="tile today">
           <h2>Today</h2>
-          <p className="sub">{!plan.length ? "New lessons for this grade are almost ready." : first ? `About ${minutes} minutes.` : "All done for today. Nicely done."}</p>
+          <p className="sub">{!plan.length ? "New lessons for this grade are almost ready." : first ? `About ${minutes} minutes.` : "That's everything for today."}</p>
           {plan.length > 0 && (
             <ol className="plan">{plan.map(i => (
               <li key={i.kind}>

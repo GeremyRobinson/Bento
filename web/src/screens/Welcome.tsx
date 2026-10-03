@@ -144,19 +144,19 @@ export function Welcome({ shelf = false }: { shelf?: boolean }) {
   return (
     <div className="land">
       <section className="lhero">
-        <h1>Math that <span>finally clicks.</span></h1>
-        <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
+        <h1>Math that <span>clicks.</span></h1>
+        <p>Watch each idea play out, then solve it one step at a time. If you slip, Bento shows you the exact step and why.</p>
         <div className="lcta"><button className="ctl go" onClick={toShelf}>Choose your grade</button><span>Free. No account.</span></div>
       </section>
       <section className="lhbox">
         <HeroPictures rng={rng} />
       </section>
-      <section className="lsec" id="lshelf"><h2>Pick your grade.</h2><p>Every grade is a book of chapters, Kindergarten to 12th. Start anywhere, and change any time.</p></section>
+      <section className="lsec" id="lshelf"><h2>Every grade, K to 12th.</h2><p>Each grade is a book of chapters. Start in any one and switch whenever you like.</p></section>
       <div className="lshelf"><Shelf current={null} onPick={chooseGrade} /></div>
-      <section className="lsec"><h2>Everything in one box.</h2><p>Bento is more than lessons. Here's the rest of it, working.</p></section>
+      <section className="lsec"><h2>Everything in one box.</h2><p>Lessons, plus everything that helps them stick.</p></section>
       <FeatureBox rng={rng} />
       <Advanced />
-      <footer className="lfoot">Bento · Free. Private. No account needed.</footer>
+      <footer className="lfoot">Bento · Kindergarten to 12th grade</footer>
     </div>
   );
 }

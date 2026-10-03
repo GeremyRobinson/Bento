@@ -60,7 +60,7 @@ function answers(p: SkipProblem): AnswerModel {
         wrong: slips(by, [
           [1, "Counted by ones", by === 10 ? "Only the tens digit changes, by 1 ten. So the jump is 10." : by === 100 ? "Only the hundreds digit changes, by 1 hundred. So the jump is 100." : `The numbers grow by more than 1. Count up from ${v[0]} to ${v[1]}.`],
           by === 100 && [10, "Jumped by 10", "The tens digit stays the same. The hundreds digit grows by 1, so the jump is 100."],
-          [v[1]!, "Wrote the next number", `${v[1]} is the next number. How far did we jump to get there from ${v[0]}?`],
+          [v[1]!, "Wrote the next number", `${v[1]} is the next number. How far is the jump from ${v[0]}?`],
         ]),
         hint: `Count up from ${v[0]} to ${v[1]}.`,
         explain: `${v[0]} + ${by} = ${v[1]}, and ${v[1]} + ${by} = ${v[2]}. The jump is ${by}.`,

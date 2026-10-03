@@ -42,10 +42,10 @@ function answers({ b, k }: UnitFracProblem): AnswerModel {
       id: "one", label: "Name one part", question: `One part of ${b} equal parts is…`,
       prompt: f => [text("one part "), op("="), f], N: 1, D: b,
       wrong: [
-        [b, 1, "Flipped the fraction", `The bottom number says how many equal parts make the whole: ${b}. The top says how many we take: 1.`],
+        [b, 1, "Flipped the fraction", `The bottom number says how many equal parts make the whole: ${b}. The top says how many you take: 1.`],
         [1, b - 1, "Counted the other parts", `The bottom counts all ${count(b, "part")} of the whole, not just the other ${b - 1}.`],
       ],
-      hint: `The whole is cut into ${count(b, "part")} and we take 1. That's 1 on top, ${b} on the bottom.`,
+      hint: `The whole is cut into ${count(b, "part")} and you take 1. That's 1 on top, ${b} on the bottom.`,
       explain: `One of ${b} equal parts is 1/${b}, one ${pieceName(b, false)}.`,
     }),
   ];
@@ -89,7 +89,7 @@ function explain(p: UnitFracProblem, model: AnswerModel): Explanation {
   const one = model.steps.find(s => s.id === "one")!, d = one.slots.find(s => s.id === "d")!.expected!;
   return {
     heading: "Equal parts of a whole",
-    idea: ["The bottom number says how many equal parts make the whole.", "The top number says how many of those parts we have."],
+    idea: ["The bottom number says how many equal parts make the whole.", "The top number says how many of those parts you have."],
     statement: [text("shaded "), op("="), text("?")],
     diagram: unitFracPicture(p),
     caption: `${k === 1 ? "One part" : `${count(k, "part")}`} of the bar ${k === 1 ? "is" : "are"} shaded.`,

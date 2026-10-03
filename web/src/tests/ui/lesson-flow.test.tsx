@@ -43,11 +43,11 @@ describe("a whole lesson in the browser", () => {
     fireEvent.click(screen.getByRole("button", { name: "Show all" }));
     expect(pic.getAttribute("data-split")).toBe("true");
     expect(pic.getAttribute("data-sum")).toBe("true");
-    expect(screen.getByText("That's the whole problem. Your turn!")).toBeInTheDocument();
+    expect(screen.getByText("That's the whole problem. Your turn.")).toBeInTheDocument();
     expect(screen.getAllByText(`Add the parts to fill the whole rectangle: ${a * b}.`).length).toBeGreaterThan(0);
 
     // a new example redraws everything from a new problem
-    fireEvent.click(screen.getByRole("button", { name: "Another one" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show another" }));
     expect(document.querySelector(".math .mline")!.getAttribute("data-plain")).not.toBe(statement);
 
     fireEvent.click(screen.getByRole("button", { name: "Start practice ›" }));
@@ -56,7 +56,7 @@ describe("a whole lesson in the browser", () => {
     const pad = () => document.querySelector(".tray") as HTMLElement;
     fireEvent.click(within(pad()).getByRole("button", { name: "1" }));
     fireEvent.click(screen.getByRole("button", { name: "Check" }));
-    expect(screen.getByRole("status")).toHaveTextContent("Not yet.");
+    expect(screen.getByRole("status")).toHaveTextContent("Look again.");
     act(() => { t += 10000; });
     for (let guard = 0; guard < 60; guard++) {
       const finish = screen.queryByRole("button", { name: /Next problem|Finish lesson/ });

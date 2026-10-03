@@ -136,14 +136,14 @@ export function Learn({ lessonId }: { lessonId: string }) {
                 </li>
               ))}
             </ol>
-            {(finished || at === 0) && <p className="note">{finished ? "That's the whole problem. Your turn!" : ex.diagram?.kind === "areaModel" ? "Tap Play to watch it split up." : "Tap Play to watch it step by step."}</p>}
+            {(finished || at === 0) && <p className="note">{finished ? "That's the whole problem. Your turn." : ex.diagram?.kind === "areaModel" ? "Tap Play to watch it split up." : "Tap Play to watch it step by step."}</p>}
           </div>
           <div className="actions" style={{ justifyContent: "space-between" }}>
             <button className="ctl" disabled={at === 0} onClick={() => step(-1)}>Back</button>
             <span className="actions">
               {finished ? (
                 <>
-                  <button className="ctl" onClick={() => { setExample(fresh()); setAt(0); }}>Another one</button>
+                  <button className="ctl" onClick={() => { setExample(fresh()); setAt(0); }}>Show another</button>
                   <button className="ctl go" onClick={() => startLesson(lesson.id)}>Start practice</button>
                 </>
               ) : (
@@ -181,7 +181,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
           {sc != null && (
             <section className="tile helptile">
               <span className="k">Help in practice</span><b>{HELP_TIERS[tier]}</b>
-              <span className="muted">{["It fades as your score grows.", "Score 3 to go to final answers.", "Miss one and the steps come back."][tier]}</span>
+              <span className="muted">{["It fades as your score grows.", "Score 3 to switch to final answers only.", "Miss one and the steps come back."][tier]}</span>
             </section>
           )}
           {low && <BuildUp lessonId={lesson.id} />}

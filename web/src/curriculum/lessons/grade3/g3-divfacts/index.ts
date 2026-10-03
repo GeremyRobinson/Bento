@@ -31,7 +31,7 @@ function answers({ a, b }: DivFactProblem): AnswerModel {
         id: "think", label: "Think multiplication", question: `${count(b, "group")} of what make ${a}?`,
         prompt: x => [num(b), op("×"), x, op("="), num(a)], ans: q,
         wrong: [
-          [a - b, "Subtracted", `Taking ${b} away once leaves ${a - b}. We want ${b} equal groups that make ${a}.`],
+          [a - b, "Subtracted", `Taking ${b} away once leaves ${a - b}. You want ${b} equal groups that make ${a}.`],
           [q + 1, "One too many in each group", `${b} × ${q + 1} = ${b * (q + 1)}. That's more than ${a}.`],
           [q - 1, "One too few in each group", `${b} × ${q - 1} = ${b * (q - 1)}. That's less than ${a}.`],
           [a, "Wrote the total", `${a} is all the dots together. How many go in each of the ${count(b, "group")}?`],

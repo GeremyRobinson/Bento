@@ -62,7 +62,7 @@ describe("a practice run", () => {
     let s = startPractice("g5-mult2", p, deps());
     const want = expectedValues(currentStep(s)!).x!;
     s = check(type(s, { x: want / 10 }), p, deps());
-    expect(s.feedback).toMatchObject({ type: "bad", strong: "Not yet." });
+    expect(s.feedback).toMatchObject({ type: "bad", strong: "Look again." });
     expect(s.feedback?.text).toMatch(/The tens digit stands for \d+0, so add a zero\./);
     expect(s.mistakes[0]).toMatchObject({ kind: "Lost the place value", cat: "concept" });
     expect(showMeAvailable(s)).toBe(false);
@@ -83,7 +83,7 @@ describe("a practice run", () => {
     let s = startPractice("g5-mult2", p, deps());
     s = hint(s, { now: s.stepT0 + 1000, rng });
     expect(s.hinted).toBe(false);
-    expect(s.feedback?.text).toMatch(/one try first/);
+    expect(s.feedback?.text).toMatch(/Try it once first/);
     s = hint(s, { now: s.stepT0 + 16000, rng });
     expect(s.hinted).toBe(true);
     expect(s.hintsLeft).toBe(3);
@@ -97,7 +97,7 @@ describe("a practice run", () => {
     expect(s.pick?.options).toContain("Multiply by the tens");
     const wrong = s.pick!.options.findIndex(o => o !== s.pick!.right);
     s = pickPlan(s, wrong);
-    expect(s.feedback?.strong).toBe("Not yet.");
+    expect(s.feedback?.strong).toBe("Look again.");
     expect(s.mistakes[0]!.cat).toBe("plan");
     s = pickPlan(s, s.pick!.options.indexOf(s.pick!.right));
     expect(s.pick).toBeNull();
@@ -111,7 +111,7 @@ describe("a practice run", () => {
     expect(currentStep(s)!.label).toBe("Final answer");
     s = check(type(s, { x: 1 }), p, deps());
     expect(s.collapsed).toBe(false);
-    expect(s.feedback?.text).toBe("Let's do this one step by step.");
+    expect(s.feedback?.text).toBe("This one needs the steps. Here they are.");
     expect(currentStep(s)!.label).toBe("Step 1 · Multiply by the tens");
     // and "Show steps" turns the shortcut off by choice
     let s2 = startPractice("g5-mult2", p, deps());

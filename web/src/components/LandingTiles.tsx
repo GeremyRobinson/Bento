@@ -50,7 +50,7 @@ export function TodayTile({ tint, k, size }: TileProps) {
   const { t, box } = useBeat(1100, 3);
   const at = t % 6; // three ticks, then a rest before it starts over
   return (
-    <Tile box={box} size={size} tint={tint} k={k} title="Today" label="About ten minutes a day: a new lesson, a quick fact sprint, and a few problems you were shaky on.">
+    <Tile box={box} size={size} tint={tint} k={k} title="Today" label="About ten minutes a day. One new lesson, a quick fact sprint and a few problems you missed before.">
       <ol className="ltoday">{rows.map(([kind, name], i) => (
         <li key={kind} className={i < at ? "done" : i === Math.min(at, 2) ? "now" : ""}>
           <span className="lmark">{i < at && <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></svg>}</span>
@@ -69,7 +69,7 @@ export function FactsTile({ tint, k, rng, size }: TileProps) {
   const step = t % (N * N * 2 + 12); // fill in, settle, then start over
   const lv = (i: number) => { const r = order.indexOf(i); return Math.max(0, Math.min(3, Math.floor((step - r) / 12))); };
   return (
-    <Tile box={box} size={size} tint={tint} k={k} title="Facts by heart" label="Times tables, squares, powers. Each fact fills in as you learn it, two minutes a day.">
+    <Tile box={box} size={size} tint={tint} k={k} title="Facts by heart" label="Times tables, squares and powers. Each fact fills in once you know it. Two minutes a day.">
       <div className="lfacts" style={{ "--n": N } as CSSProperties}>
         {Array.from({ length: N * N }, (_, i) => { const a = Math.floor(i / N) + 1, b = (i % N) + 1; return (
           <span key={i} className={lv(i) >= 3 ? "k" : undefined} style={{ "--lv": lv(i) } as CSSProperties}>{a * b}</span>
@@ -101,7 +101,7 @@ export function BookTile({ tint, k, size }: TileProps) {
   const { t, box } = useBeat(1500, 1);
   const zoom = t % 4; // 0 page, 1 chapter, 2 year, 3 back to the page
   return (
-    <Tile box={box} size={size} tint={tint} k={k} title="Bento is a book" label="Pinch a page closed to see its chapter, the year, then every grade.">
+    <Tile box={box} size={size} tint={tint} k={k} title="Bento is a book" label="Pinch a page to zoom out to its chapter, then the year, then every grade.">
       <div className={`lbook z${zoom === 3 ? 0 : zoom}`}>
         {Array.from({ length: 9 }, (_, i) => <span key={i} className={i === 4 ? "page" : ""} />)}
       </div>
@@ -114,7 +114,7 @@ export function ReportTile({ tint, k, size }: TileProps) {
   const rows = [["Added the bottoms", 5], ["Dropped a carry", 3], ["Multiply comes first", 1]] as const;
   const { t, box } = useBeat(3200, 1);
   return (
-    <Tile box={box} size={size} tint={tint} k={k} title="A report for your grown-up" label="Scores, time spent and the exact mistakes made, so everyone knows what to work on next.">
+    <Tile box={box} size={size} tint={tint} k={k} title="A report for your grown-up" label="Scores, time and the exact mistakes, so you both know what to work on next.">
       <div className="lreport" key={t}>{rows.map(([name, n], i) => (
         <div key={name}><span>{name}</span><i style={{ "--w": n / 5, "--d": i } as CSSProperties} /><b>{n}×</b></div>
       ))}</div>
@@ -140,7 +140,7 @@ export function ReviewTile({ tint, k, rng, size }: TileProps) {
   const cards = useMemo(() => rng.shuffle(["3/4 + 1/8", "48 × 6", "2x + 5 = 17", "7²", "0.6 × 0.4", "−3 × −8"]), [rng]);
   const { t, box } = useBeat(1800, 0);
   return (
-    <Tile box={box} size={size} tint={tint} k={k} title="Review that sticks" label="Old problems come back, picked from what you're shakiest on.">
+    <Tile box={box} size={size} tint={tint} k={k} title="Review that sticks" label="Problems you missed come back until you've got them.">
       <div className="lreview">{[0, 1, 2].map(i => (
         <span key={(t + i) % cards.length} className={i ? undefined : "top"} style={{ "--j": i } as CSSProperties}>{cards[(t + i) % cards.length]}</span>
       ))}</div>

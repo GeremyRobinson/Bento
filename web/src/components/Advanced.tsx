@@ -84,7 +84,7 @@ export function Advanced() {
     <section className="ladv" ref={box} aria-labelledby="adv-title">
       <h2 id="adv-title" aria-label="Bento squared">Bento²</h2>
       <p className="adv-tag">Bento, maxed out.</p>
-      <p>The pro side of Bento. It picks up where 12th grade's calculus ends: {line.soon?.slice(0, -1).join(", ").toLowerCase()} and {line.soon?.at(-1)?.toLowerCase()}. Then it keeps going, to the math that shaped AI, space travel, relativity and quantum physics.</p>
+      <p>The pro side of Bento. It starts where 12th grade ends, with {line.soon?.slice(0, -1).join(", ").toLowerCase()} and {line.soon?.at(-1)?.toLowerCase()}. Then it goes on to the math behind AI, space travel, relativity and quantum physics.</p>
       <div className="adv-courses">
         {HORIZON.map((h, k) => (
           <article key={h.id} className="adv-course" style={{ animationDelay: `${k * 0.08}s` }}>
@@ -94,7 +94,7 @@ export function Advanced() {
           </article>
         ))}
       </div>
-      <span className="adv-soon">Coming later</span>
+      <span className="adv-soon">Coming soon</span>
     </section>
   );
 }
