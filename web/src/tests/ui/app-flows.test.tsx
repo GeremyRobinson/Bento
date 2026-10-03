@@ -52,6 +52,24 @@ describe("first launch: landing → grade → home", () => {
   });
 });
 
+describe("no grade until one is chosen", () => {
+  for (const hash of ["#/", "#/year", "#/learn/no-such-lesson"]) it(`${hash} opens the landing page's grade shelf`, () => {
+    renderApp({ grade: null, chosen: false }, {}, hash);
+    expect(screen.getByRole("heading", { name: "Pick your grade." })).toBeInTheDocument();
+    expect(document.querySelector("#app")!.getAttribute("data-grade")).toBe("none");
+  });
+  it("the hub and facts stay neutral and ask for a grade", () => {
+    for (const hash of ["#/me", "#/facts"]) {
+      const { unmount } = renderApp({ grade: null, chosen: false }, {}, hash);
+      expect(document.querySelector("#app")!.getAttribute("data-grade")).toBe("none");
+      expect(screen.queryByText(/5th grade/)).toBeNull();
+      fireEvent.click(screen.getAllByRole("button", { name: "Choose your grade" })[0]!);
+      expect(screen.getByRole("heading", { name: "Pick your grade." })).toBeInTheDocument();
+      unmount();
+    }
+  });
+});
+
 describe("home", () => {
   it("lists every lesson of the grade, with unit tests, the check-up and the grown-up page", () => {
     renderApp();

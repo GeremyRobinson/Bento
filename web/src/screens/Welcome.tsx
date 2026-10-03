@@ -135,10 +135,12 @@ function HeroPictures({ rng }: { rng: Rng }) {
 }
 
 /** The first screen on a new device: what Bento is, the real thing working, and the grade shelf to start from. */
-export function Welcome() {
+export function Welcome({ shelf = false }: { shelf?: boolean }) {
   const { chooseGrade, deps } = useApp();
   const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const toShelf = () => document.getElementById("lshelf")?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  const toShelf = () => document.getElementById("lshelf")?.scrollIntoView?.({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  // sent here to choose a grade: open at the shelf
+  useEffect(() => { if (shelf) document.getElementById("lshelf")?.scrollIntoView?.({ block: "start" }); }, [shelf]);
   return (
     <div className="land">
       <section className="lhero">

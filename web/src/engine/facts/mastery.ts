@@ -74,7 +74,7 @@ export interface SprintAnswer { key: string; right: boolean; ms: number }
 
 /** Saves a finished sprint: each fact's level, the sprint itself, a little XP (1 per right answer) and the day's streak. */
 export function finishSprint<P extends { facts: Record<string, FactRecord>; sprints: SprintRecord[]; xp: number; gxp: Record<number, number>; streak: number; last: string }>(
-  p: P, table: string, grade: number, answers: SprintAnswer[], now: number,
+  p: P, table: string, grade: number | null, answers: SprintAnswer[], now: number,
 ): P {
   const facts = { ...p.facts };
   for (const a of answers) facts[a.key] = updateFact(facts[a.key], a.right, a.ms, now);
@@ -83,7 +83,7 @@ export function finishSprint<P extends { facts: Record<string, FactRecord>; spri
   return {
     ...p, facts,
     sprints: [...p.sprints, { date: now, table, right, total: answers.length, ms }].slice(-200),
-    xp: p.xp + right, gxp: { ...p.gxp, [grade]: (p.gxp[grade] ?? 0) + right },
+    xp: p.xp + right, gxp: grade == null ? p.gxp : { ...p.gxp, [grade]: (p.gxp[grade] ?? 0) + right },
     streak: p.last === today ? p.streak : p.last === yesterday ? p.streak + 1 : 1, last: today,
   };
 }

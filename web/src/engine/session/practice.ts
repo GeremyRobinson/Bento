@@ -434,7 +434,7 @@ export function finishRun(s: PracticeSession, progress: Progress, now: number): 
   };
   const p: Progress = JSON.parse(JSON.stringify(progress)); // plain data; works on older iPads too
   p.xp += s.xpEarned;
-  const grade = s.mode === "test" ? Number(s.key.split(":")[1]) : s.mode === "review" ? (p.grade ?? 5) : requireLesson(s.key).grade;
+  const grade = s.mode === "test" ? Number(s.key.split(":")[1]) : s.mode === "review" ? (p.grade ?? requireLesson(s.probs.at(-1)?.lessonId ?? s.items[0]!.lessonId).grade) : requireLesson(s.key).grade;
   p.gxp[grade] = (p.gxp[grade] ?? 0) + s.xpEarned;
   const today = new Date(now).toDateString(), yesterday = new Date(now - 864e5).toDateString();
   if (p.last !== today) p.streak = p.last === yesterday ? p.streak + 1 : 1;

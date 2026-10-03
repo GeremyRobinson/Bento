@@ -29,7 +29,8 @@ export const GRADES: GradeDefinition[] = [
 ];
 
 export const bandOf = (g: number): Band => (g <= 2 ? "little" : g <= 5 ? "kid" : g <= 8 ? "middle" : "high");
-export const gradeOf = (g: number): GradeDefinition => GRADES[g] ?? GRADES[5]!;
+/** A grade by number. Never a stand-in for "no grade chosen": out-of-range numbers clamp to K or 12th. */
+export const gradeOf = (g: number): GradeDefinition => GRADES[Math.max(0, Math.min(GRADES.length - 1, Math.round(g) || 0))]!;
 
 const lum = (hex: string) => {
   const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));

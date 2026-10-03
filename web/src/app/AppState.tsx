@@ -180,7 +180,7 @@ export function AppProvider(props: {
           show({ name: "results" });
         });
       },
-      saveSprint: (table, answers) => { if (answers.length) setProgress(p => finishSprint(p, table, p.grade ?? 5, answers, now())); },
+      saveSprint: (table, answers) => { if (answers.length) setProgress(p => finishSprint(p, table, p.grade, answers, now())); },
       setSettings: patch => setProgress(p => ({ ...p, settings: { ...readSettings(p.settings), ...patch } })),
       exportBackup: () => JSON.stringify(makeBackup(data.progress, data.reports, now())),
       importBackup: async json => {

@@ -70,10 +70,12 @@ function placeOf(route: Route, app: ReturnType<typeof useApp>, grade: number): P
  * (chapter and page), steps back one page, and opens the contents, which zoom out from the page to its chapter, the
  * year, and every grade. Pinching the page closed does the same.
  */
-export function Island({ grade }: { grade: number }) {
+export function Island({ grade: chosen, guest }: { grade: number | null; guest?: boolean }) {
   const app = useApp();
   const { progress, go, route } = app;
-  const welcome = route.name === "welcome";
+  // the landing page, and any grade page reached before a grade is chosen, get the plain guest island
+  const welcome = !!guest || route.name === "welcome" || chosen == null;
+  const grade = chosen ?? 0;
   const place = placeOf(route, app, grade);
   const [open, setOpen] = useState<Level | null>(null);
   const start: Level = route.name === "home" ? "shelf" : place.lesson ? "chapter" : "year";

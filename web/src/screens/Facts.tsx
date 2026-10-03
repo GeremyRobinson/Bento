@@ -20,8 +20,23 @@ export function Facts({ table, start = false }: { table?: string; start?: boolea
 }
 
 function FactsHome() {
+  const { progress, go } = useApp();
+  if (progress.grade == null) return (
+    <>
+      <header className="cover">
+        <h1>Facts</h1>
+        <p className="ysub">Know them by heart.</p>
+        <p className="muted">Each grade leans on its own facts: counting on, times tables, squares, powers. Choose your grade to see yours.</p>
+      </header>
+      <div className="actions"><button className="ctl go" onClick={() => go({ name: "welcome", shelf: true }, "fwd")}>Choose your grade</button></div>
+    </>
+  );
+  return <GradeFacts g={progress.grade} />;
+}
+
+function GradeFacts({ g }: { g: number }) {
   const { progress, go, deps } = useApp();
-  const g = progress.grade ?? 5, tables = [...tablesForGrade(g)].sort((a, b) => b.grades[0] - a.grades[0]), now = deps().now;
+  const tables = [...tablesForGrade(g)].sort((a, b) => b.grades[0] - a.grades[0]), now = deps().now;
   const today = sprintTableFor(progress.facts, tables, now), done = sprintDoneToday(progress.sprints, now);
   const [sprint, setSprint] = useState<FactTable | null>(null);
   if (sprint) return <Sprint t={sprint} onDone={() => setSprint(null)} />;

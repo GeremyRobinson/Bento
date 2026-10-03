@@ -1,6 +1,7 @@
 // Hash routes, so the app works from any folder on GitHub Pages and offline.
 export type Route =
-  | { name: "welcome" }
+  /** the landing page; `shelf` opens it at the grade shelf, for anyone who reached a grade page without choosing one */
+  | { name: "welcome"; shelf?: boolean }
   | { name: "home" }
   | { name: "learn"; lessonId: string }
   | { name: "practice" }
@@ -17,7 +18,7 @@ const decode = (s: string) => { try { return decodeURIComponent(s); } catch { re
 export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decode);
   switch (parts[0]) {
-    case "welcome": return { name: "welcome" };
+    case "welcome": return parts[1] === "grades" ? { name: "welcome", shelf: true } : { name: "welcome" };
     case "year": return { name: "home" };
     case "learn": return parts[1] ? { name: "learn", lessonId: parts[1] } : { name: "home" };
     case "practice": return { name: "practice" };
@@ -32,7 +33,7 @@ export function parseRoute(hash: string): Route {
 
 export function routeHash(r: Route): string {
   switch (r.name) {
-    case "welcome": return "#/welcome";
+    case "welcome": return r.shelf ? "#/welcome/grades" : "#/welcome";
     case "home": return "#/";
     case "learn": return `#/learn/${encodeURIComponent(r.lessonId)}`;
     case "practice": return "#/practice";

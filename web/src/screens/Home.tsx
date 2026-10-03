@@ -8,6 +8,7 @@ import { lastScore, timesDone } from "../engine/mastery/progress";
 import { ScoreChip } from "../components/primitives/Score";
 import { Fill } from "../components/Shelf";
 import { ChapterPic } from "../components/Contents";
+import { Welcome } from "./Welcome";
 import { useMemo } from "react";
 
 
@@ -18,9 +19,15 @@ const KIND = { lesson: "Up next", review: "Review", test: "Unit test", facts: "F
  * year is going beside it, then every chapter with a moving picture and its pages.
  */
 export function Home() {
+  const { progress } = useApp();
+  // no grade chosen yet: choosing is the first thing, so the landing page's shelf stands in
+  return progress.grade == null ? <Welcome shelf /> : <GradeHome g={progress.grade} />;
+}
+
+function GradeHome({ g }: { g: number }) {
   const { progress, go, openSheet, startLesson, startTest, startReview, canReview, deps } = useApp();
   const rng = useMemo(() => deps().rng, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const g = progress.grade ?? 5, grade = gradeOf(g), list = entriesInGrade(g), units = unitsInGrade(g);
+  const grade = gradeOf(g), list = entriesInGrade(g), units = unitsInGrade(g);
   const isDone = (id: string) => timesDone(progress, id) > 0;
   const next = upNext(progress, g);
   const plan = todayPlan(progress, g, deps().now, canReview());

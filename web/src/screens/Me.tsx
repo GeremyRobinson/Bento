@@ -35,7 +35,8 @@ export function Me() {
   const { progress, go, chooseGrade, setSettings, exportBackup, importBackup, startTest } = useApp();
   const st = readSettings(progress.settings);
   const set = (patch: Partial<Settings>) => setSettings(patch);
-  const g = progress.grade ?? 5, grade = gradeOf(g), gxp = progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
+  // before a grade is chosen the hub stays neutral and asks for one; nothing assumes a grade
+  const g = progress.grade, grade = g == null ? null : gradeOf(g), gxp = g == null ? 0 : progress.gxp[g] ?? 0, { lvl, into } = gradeLevel(gxp);
   const lessonsDone = Object.keys(progress.lessons).length;
   const file = useRef<HTMLInputElement>(null);
   const save = () => {
@@ -53,14 +54,22 @@ export function Me() {
   return (
     <>
       <div className="bme">
-        <section className="tile mhero battery" style={tintStyle(grade) as CSSProperties}>
-          <Fill frac={into / LEVEL_XP} />
-          <span className="bbig" aria-hidden>{lvl}</span>
-          <div className="mh-text">
-            <span className="k">{grade.name} · level {lvl}</span>
-            <h1>Your Bento</h1>
-            <p className="muted">{into} of {LEVEL_XP} XP to level {lvl + 1}</p>
-          </div>
+        <section className="tile mhero battery" style={grade ? tintStyle(grade) as CSSProperties : undefined}>
+          {grade ? <>
+            <Fill frac={into / LEVEL_XP} />
+            <span className="bbig" aria-hidden>{lvl}</span>
+            <div className="mh-text">
+              <span className="k">{grade.name} · level {lvl}</span>
+              <h1>Your Bento</h1>
+              <p className="muted">{into} of {LEVEL_XP} XP to level {lvl + 1}</p>
+            </div>
+          </> : (
+            <div className="mh-text">
+              <h1>Your Bento</h1>
+              <p className="muted">Choose your grade to start. You can change it any time.</p>
+              <button className="ctl go" onClick={() => go({ name: "welcome", shelf: true }, "fwd")}>Choose your grade</button>
+            </div>
+          )}
           <div className="mstats">
             <div><b className="mono">{progress.streak}</b><span>day streak</span></div>
             <div><b className="mono">{progress.xp}</b><span>XP in all</span></div>
@@ -69,7 +78,7 @@ export function Me() {
         </section>
 
         <Tile title="Your grades" className="mgrades">
-          <button className="tlink" onClick={() => startTest(placeKey(g))}>Find my level ›</button>
+          {g != null && <button className="tlink" onClick={() => startTest(placeKey(g))}>Find my level ›</button>}
           <GradeLineup onPick={chooseGrade} />
         </Tile>
 

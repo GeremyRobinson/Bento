@@ -77,3 +77,6 @@ html[data-line="middle"] body{background-image:
 }
 /* high contrast wants a plain page */
 html[data-contrast="true"] body{background-image:none}
+
+/* no grade chosen yet: a neutral look, ink and text only, until the learner picks one */
+.wrap[data-grade="none"]{--l0:var(--text);--l1:var(--text);--l2:var(--text);--la:var(--muted);--k0:var(--text);--k1:var(--text);--k2:var(--text)}

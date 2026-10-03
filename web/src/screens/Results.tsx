@@ -69,7 +69,7 @@ export function Results() {
   const lesson = lessonById(rep.key), test = rep.mode === "test", review = rep.mode === "review";
   const grade = lesson ? lessonsInGrade(lesson.grade) : [], k = lesson ? grade.indexOf(lesson) : -1, next = grade[k + 1];
   const lastLesson = lessonById(rep.probs[rep.probs.length - 1]?.lessonId ?? "");
-  const band = bandOf(lesson?.grade ?? lastLesson?.grade ?? progress.grade ?? 5);
+  const band = bandOf(lesson?.grade ?? lastLesson?.grade ?? progress.grade ?? 9);
   const low = rep.mode === "practice" && rep.level <= 1;
   return (
     <>
