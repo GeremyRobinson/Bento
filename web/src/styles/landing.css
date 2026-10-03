@@ -10,9 +10,10 @@
 :root[data-theme="dark"] .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}
 
 /* the hero box: a lesson's picture playing, a problem solving itself, and a slip being explained */
-.lhbox{display:grid;gap:var(--s);grid-template-columns:minmax(0,1fr)}
-@media (min-width:700px){.lhbox{grid-template-columns:repeat(2,minmax(0,1fr))}.lhpic{grid-column:1 / -1}}
-@media (min-width:960px){.lhbox{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(250px,auto))}.lhpic{grid-column:span 2;grid-row:span 2}.lhbox>.ldemo{grid-column:span 2}}
+/* the hero box: one big moving picture and two smaller ones beside it (below it, side by side, on narrower screens) */
+.lhbox{display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr))}
+.lhpic:not(.sm){grid-column:1 / -1}
+@media (min-width:960px){.lhbox{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(250px,auto))}.lhpic:not(.sm){grid-column:span 2;grid-row:span 2}.lhpic.sm{grid-column:span 2}}
 .lhpic{margin:0;background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;grid-template-rows:auto 1fr;gap:var(--u);cursor:pointer;box-shadow:0 0 0 1px var(--rule);animation:fadeIn .7s var(--ease) both;min-height:340px}
 .lhpic figcaption{display:flex;align-items:center;gap:14px;min-width:0}
 .lhpic .gnum{font-size:40px;flex:none;white-space:nowrap}
@@ -20,10 +21,15 @@
 .lhpic figcaption>span:not(.gnum){display:grid;gap:2px;min-width:0}
 .lhpic figcaption>span:not(.gnum) small{font-size:13px;font-weight:550;color:var(--muted)}
 .lhpic b{font-size:calc(var(--fs) * 1.05);font-weight:650;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lhpic .lhd{display:grid;align-items:center;min-height:0}
+.lhpic figcaption,.lhpic .lhd{animation:fadeIn .6s var(--ease) both}
 .lhpic .viz{align-self:center;min-height:0}
 .lhpic .viz-cap,.lhpic .replay{display:none}
 .lhpic .viz-svg,.lhpic .am{max-height:400px;width:100%}
-.lhbox>.ldemo{min-height:250px}
+.lhpic.sm{min-height:250px;padding:var(--u)}
+.lhpic.sm .gnum{font-size:30px}
+.lhpic.sm .viz-svg,.lhpic.sm .am{max-height:220px}
+@media (max-width:699px){.lhpic{min-height:300px}.lhpic.sm{min-height:200px;padding:12px;gap:8px}.lhpic.sm .gnum{font-size:24px}.lhpic.sm b{font-size:14px;white-space:normal;line-height:1.2}.lhpic.sm .viz-svg,.lhpic.sm .am{max-height:160px}}
 
 /* section heads */
 .lsec{display:grid;justify-items:center;gap:8px;text-align:center;padding:calc(var(--u) * 4) var(--u) var(--u)}
@@ -107,42 +113,8 @@
 .lcount span{color:var(--muted);font-weight:550}
 .lprivate svg{width:72px;height:72px;fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .lprivate circle{fill:var(--ink);stroke:none}
-
-/* the step demos, as cards */
-.lf{background:var(--card);border-radius:var(--r-panel);padding:calc(var(--u) + 4px);display:grid;gap:6px;align-content:start;box-shadow:0 0 0 1px var(--rule)}
-.lk{font-size:13px;font-weight:var(--w-bold);color:var(--muted)}
-.lchip{flex:none;font-size:12px;line-height:22px;padding:0 9px;border-radius:999px;background:var(--tint-soft);color:var(--ink);font-weight:var(--w-bold)}
-.lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
-.lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
-.lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
-.lsteps b{color:var(--ink);font-weight:650}
-.lsteps .sum{background:var(--tint-soft)}
-.lmiss .bad{background:color-mix(in srgb,var(--err) 12%,var(--card))} .lmiss .bad b{color:var(--err-ink);font-weight:650;text-decoration:line-through 2px}
-.lmiss p{font-family:var(--sans);margin-top:6px;color:var(--text);line-height:1.5}
-.lmiss p b{color:var(--err-ink)}
 .lfoot{text-align:center;color:var(--muted);font-size:var(--small);font-weight:var(--w-mid);padding-top:calc(var(--u) * 2)}
-@media (prefers-reduced-motion:reduce){.ltile,.lhpic,.lbook,.lbook span,.lreview span,.lreport i::after,.lmark svg{animation:none;transition:none}}
-
-/* the two step tiles play: rows fill in, a slip shakes, the fix lands; a tap brings another problem */
-.ldemo{cursor:pointer;grid-template-rows:auto 1fr auto;-webkit-user-select:none;user-select:none}
-.ldemo .lk{display:flex;align-items:center;gap:8px}
-.ldemo .lk .lchip{text-transform:none;letter-spacing:0}
-.ldemo .lsteps>div,.ldemo .lmiss>div,.ldemo .lmiss p{transition:opacity .45s var(--ease),transform .45s var(--ease)}
-.ldemo .off{opacity:0;transform:translateY(8px)}
-.ldemo .lsteps>div.off b{opacity:0}
-.ldemo .lsteps>div.on b{animation:popIn .4s var(--ease) .25s both;display:inline-block}
-.ldemo .lsteps>div:not(.q)>span{color:var(--muted);font-family:var(--sans);font-weight:var(--w-mid);font-size:calc(var(--fs) * .95)}
-.ldemo .lsteps>div:not(.q)>span .n{font-family:var(--num);font-weight:550}
-.ldemo .lsteps>div>b{font-weight:650}
-.ldemo .lmiss .bad b{position:relative;text-decoration:none}
-.ldemo .lmiss .bad b::after{content:"";position:absolute;left:-3px;right:-3px;top:52%;height:2px;border-radius:2px;background:currentColor;transform-origin:left;transform:scaleX(0);transition:transform .35s var(--ease) .15s}
-.ldemo .lmiss .bad.shook b::after{transform:scaleX(1)}
-.ldemo .shook{animation:shake .5s ease .2s both}
-.lmiss .good{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:color-mix(in srgb,var(--ok) 14%,var(--card));font-size:calc(var(--fs) * 1.05)}
-.lmiss .good b{color:color-mix(in srgb,var(--ok) 70%,var(--text));font-weight:650}
-.lmiss .good.on b{animation:popIn .4s var(--ease) .2s both;display:inline-block}
-.lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--muted);margin-top:4px}
-.ldemo .lsteps>div:not(.q),.ldemo .lmiss>div:not(.q){align-items:center}
+@media (prefers-reduced-motion:reduce){.ltile,.lhpic,.lhpic figcaption,.lhpic .lhd,.lbook,.lbook span,.lreview span,.lreport i::after,.lmark svg{animation:none;transition:none}}
 
 /* ---- Bento Advanced: the AP line, introduced like a pro product. Always on its own dark canvas, in light hairlines. ---- */
 .ladv{--adv-ink:#f5f5f7;--adv-dim:#86868b;--adv-glow:#a78bfa;margin-top:calc(var(--u) * 2);background:radial-gradient(120% 80% at 50% 0%,#1d1b2e 0%,#0a0a0c 62%);color:var(--adv-ink);
