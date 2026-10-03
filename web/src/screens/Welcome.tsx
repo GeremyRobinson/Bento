@@ -49,8 +49,8 @@ export function pickShowcase(rng: Rng): (Showcase & { ex: Pictured })[] {
 
 type Pictured = Explanation & { diagram: NonNullable<Explanation["diagram"]> };
 
-/** Long ladders of math lines (five or more) make a tile tall and thin, so showcases pass them over for another lesson. */
-const tooTall = (d: Pictured["diagram"]) => d.kind === "chain" && d.lines.length > 4;
+/** Showcases want pictures, not ladders of equations: those look crammed in a tile (G, 2026-10-03), so they're passed over. */
+const tooTall = (d: Pictured["diagram"]) => d.kind === "chain";
 
 /** A fresh problem's explanation picture for a showcase lesson, or null while the lesson isn't rebuilt (or has no picture that fits a tile). */
 export function showcasePicture(id: string, rng: Rng): Pictured | null {
