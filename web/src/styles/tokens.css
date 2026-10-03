@@ -4,6 +4,8 @@
 :root{
   --text:#1b1d22; --muted:#626879; --faint:#c9ccd4; --rule:#e4e6eb; --page:#fbfbfd; --well:#f1f2f6; --card:#fff; --hover:#e8eaf0;
   --ok:#1fbf5f; --busy:#f5a524; --err:#ef4444; --on-tint:#fff;
+  /* text versions of ok and err, 4.5:1 or better on card and on their own soft grounds; the chip fills for scores 3 and 0 */
+  --ok-ink:#15803d; --err-ink:#b91c1c; --score3:#3b82f6; --score0:#9aa0ad;
   /* one typeface for words and numbers. Inter with its friendlier cuts: a single-storey a, an l with a tail and an I with bars,
      so letters and digits never get mixed up. Numbers use even-width figures so columns line up. */
   --sans:"Inter",-apple-system,"SF Pro Text",system-ui,"Helvetica Neue",Arial,sans-serif;
@@ -13,6 +15,6 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}}
-:root[data-theme="dark"]{--text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; color-scheme:dark}
+  --text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; --ok-ink:#4ade80; --err-ink:#f87171; color-scheme:dark}}
+:root[data-theme="dark"]{--text:#eef0f4; --muted:#979eae; --faint:#4a4f5c; --rule:#2b2f38; --page:#0e1014; --well:#181b22; --card:#21252e; --hover:#2b303b; --ok-ink:#4ade80; --err-ink:#f87171; color-scheme:dark}
 

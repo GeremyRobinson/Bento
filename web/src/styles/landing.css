@@ -4,7 +4,7 @@
 .lhero h1{font:650 clamp(46px,9vw,104px)/.96 var(--sans);letter-spacing:-.05em;text-wrap:balance}
 .lhero p{max-width:560px;font-size:calc(var(--fs) * 1.12);line-height:1.5;color:var(--muted);font-weight:var(--w-mid);text-wrap:pretty}
 .lcta{display:flex;align-items:center;gap:var(--u);flex-wrap:wrap;justify-content:center;margin-top:4px}
-.lcta .ctl.go{--tint:#1b1d22;--ink:#1b1d22;height:52px;padding:0 28px;font-size:17px;font-weight:600}
+.lcta .ctl.go{--tint:#1b1d22;--ink:#1b1d22;height:52px;padding:0 28px;font-size:17px;font-weight:650}
 .lcta>span{color:var(--muted);font-size:var(--small);font-weight:var(--w-mid)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}}
 :root[data-theme="dark"] .lcta .ctl.go{background:#eef0f4 !important;color:#14161b !important}
@@ -59,7 +59,7 @@
 .ltoday li.now{background:var(--tint-soft)}
 .ltoday li>span:last-child{display:grid;gap:1px;min-width:0}
 .ltoday small{font-size:12px;font-weight:550;color:var(--muted)}
-.ltoday b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ltoday b{font-size:15px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lmark{flex:none;width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--faint);display:grid;place-items:center;transition:background .3s,box-shadow .3s}
 .ltoday li.now .lmark{box-shadow:inset 0 0 0 2px var(--ink)}
 .ltoday li.done .lmark{background:var(--ok);box-shadow:none}
@@ -67,12 +67,12 @@
 @keyframes tick{from{stroke-dashoffset:16}}
 
 .lfacts{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px;width:100%;max-width:300px}
-.lfacts span{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font:500 clamp(10px,1.3vw,14px)/1 var(--num);font-variant-numeric:tabular-nums;color:var(--muted);
+.lfacts span{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font:550 clamp(10px,1.3vw,14px)/1 var(--num);font-variant-numeric:tabular-nums;color:var(--muted);
   background:color-mix(in srgb,var(--tint) calc(var(--lv) * 30%),var(--well));transition:background .5s var(--ease),color .5s}
 .lfacts span.k{color:var(--on-tint);font-weight:650}
 
 .lbatt{display:flex;flex-direction:column;gap:6px;width:min(100%,210px);height:150px;padding:14px 18px 16px;border-radius:calc(var(--r-panel) - 8px);background:var(--page);box-shadow:0 0 0 1px var(--rule);text-align:left}
-.lbatt b{font-size:14px;font-weight:600;line-height:1.3}
+.lbatt b{font-size:14px;font-weight:650;line-height:1.3}
 .lbatt .gnum{font-size:40px}
 
 .lbook{display:grid;grid-template-columns:repeat(3,28px);grid-auto-rows:36px;gap:6px;padding:10px;border-radius:16px;transition:transform .8s var(--ease),background .8s}
@@ -93,12 +93,12 @@
 .lreport b{font-weight:650;font-variant-numeric:tabular-nums;text-align:right}
 
 .lhelp{display:grid;gap:6px;justify-items:center}
-.lhelp span{padding:8px 18px;border-radius:999px;background:var(--well);font-size:15px;font-weight:600;color:var(--muted);transition:background .5s var(--ease),color .5s,opacity .5s,transform .5s var(--spring)}
+.lhelp span{padding:8px 18px;border-radius:999px;background:var(--well);font-size:15px;font-weight:650;color:var(--muted);transition:background .5s var(--ease),color .5s,opacity .5s,transform .5s var(--spring)}
 .lhelp span.on{background:var(--ink);color:var(--on-tint);transform:scale(1.06)}
 .lhelp span.gone{opacity:.3;transform:scale(.94)}
 
 .lreview{display:grid;place-items:center;width:100%}
-.lreview span{grid-area:1/1;padding:14px 22px;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--rule),0 10px 24px -14px rgba(15,20,30,.35);font:600 20px/1 var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;
+.lreview span{grid-area:1/1;padding:14px 22px;border-radius:18px;background:var(--card);box-shadow:0 0 0 1px var(--rule),0 10px 24px -14px rgba(15,20,30,.35);font:650 20px/1 var(--num);font-variant-numeric:tabular-nums;white-space:nowrap;
   transform:translateY(calc(var(--j) * 14px)) scale(calc(1 - var(--j) * .08));z-index:calc(3 - var(--j));opacity:calc(1 - var(--j) * .3);animation:rise .5s var(--ease) both}
 .lreview span.top{color:var(--ink)}
 
@@ -115,11 +115,11 @@
 .lsteps,.lmiss{display:grid;gap:6px;font-family:var(--num)}
 .lsteps .q,.lmiss .q{font-size:calc(var(--fs) * 1.7);margin:2px 0 4px}
 .lsteps>div:not(.q),.lmiss .bad{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:var(--well);font-size:calc(var(--fs) * 1.05)}
-.lsteps b{color:var(--ink);font-weight:600}
+.lsteps b{color:var(--ink);font-weight:650}
 .lsteps .sum{background:var(--tint-soft)}
-.lmiss .bad{background:color-mix(in srgb,#ef4444 12%,var(--card))} .lmiss .bad b{color:#dc2626;font-weight:600;text-decoration:line-through 2px}
+.lmiss .bad{background:color-mix(in srgb,var(--err) 12%,var(--card))} .lmiss .bad b{color:var(--err-ink);font-weight:650;text-decoration:line-through 2px}
 .lmiss p{font-family:var(--sans);margin-top:6px;color:var(--text);line-height:1.5}
-.lmiss p b{color:#dc2626}
+.lmiss p b{color:var(--err-ink)}
 .lfoot{text-align:center;color:var(--muted);font-size:var(--small);font-weight:var(--w-mid);padding-top:calc(var(--u) * 2)}
 @media (prefers-reduced-motion:reduce){.ltile,.lhpic,.lbook,.lbook span,.lreview span,.lreport i::after,.lmark svg{animation:none;transition:none}}
 
@@ -132,33 +132,32 @@
 .ldemo .lsteps>div.off b{opacity:0}
 .ldemo .lsteps>div.on b{animation:popIn .4s var(--ease) .25s both;display:inline-block}
 .ldemo .lsteps>div:not(.q)>span{color:var(--muted);font-family:var(--sans);font-weight:var(--w-mid);font-size:calc(var(--fs) * .95)}
-.ldemo .lsteps>div:not(.q)>span .n{font-family:var(--num);font-weight:500}
-.ldemo .lsteps>div>b{font-weight:600}
+.ldemo .lsteps>div:not(.q)>span .n{font-family:var(--num);font-weight:550}
+.ldemo .lsteps>div>b{font-weight:650}
 .ldemo .lmiss .bad b{position:relative;text-decoration:none}
 .ldemo .lmiss .bad b::after{content:"";position:absolute;left:-3px;right:-3px;top:52%;height:2px;border-radius:2px;background:currentColor;transform-origin:left;transform:scaleX(0);transition:transform .35s var(--ease) .15s}
 .ldemo .lmiss .bad.shook b::after{transform:scaleX(1)}
 .ldemo .shook{animation:shake .5s ease .2s both}
 .lmiss .good{display:flex;justify-content:space-between;gap:var(--u);padding:9px 16px;border-radius:999px;background:color-mix(in srgb,var(--ok) 14%,var(--card));font-size:calc(var(--fs) * 1.05)}
-.lmiss .good b{color:color-mix(in srgb,var(--ok) 70%,var(--text));font-weight:600}
+.lmiss .good b{color:color-mix(in srgb,var(--ok) 70%,var(--text));font-weight:650}
 .lmiss .good.on b{animation:popIn .4s var(--ease) .2s both;display:inline-block}
-.lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--faint);margin-top:4px}
-.ldemo:hover .lnew{color:var(--muted)}
+.lnew{justify-self:end;font-size:12px;font-weight:var(--w-bold);color:var(--muted);margin-top:4px}
 .ldemo .lsteps>div:not(.q),.ldemo .lmiss>div:not(.q){align-items:center}
 
 /* ---- Bento Advanced: the AP line, introduced like a pro product. Always on its own dark canvas, in light hairlines. ---- */
 .ladv{--adv-ink:#f5f5f7;--adv-dim:#86868b;--adv-glow:#a78bfa;margin-top:calc(var(--u) * 2);background:radial-gradient(120% 80% at 50% 0%,#1d1b2e 0%,#0a0a0c 62%);color:var(--adv-ink);
   border-radius:var(--r-panel);padding:calc(var(--u) * 4) calc(var(--u) + 4px) calc(var(--u) * 2.5);display:grid;justify-items:center;text-align:center;gap:calc(var(--u) - 4px);
   overflow:hidden;color-scheme:dark;animation:rise .8s var(--ease) both}
-.adv-eyebrow{font-size:calc(var(--fs) * .95);font-weight:600;color:var(--adv-dim)}
+.adv-eyebrow{font-size:calc(var(--fs) * .95);font-weight:650;color:var(--adv-dim)}
 .ladv h2{font:650 clamp(44px,8vw,84px)/1 var(--sans);letter-spacing:-.045em;background:linear-gradient(100deg,#f5f5f7 20%,#c4b5fd 55%,#f0abfc 85%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.06em}
-.ladv>p{max-width:560px;color:var(--adv-dim);font-size:calc(var(--fs) * 1.08);line-height:1.5;font-weight:450;text-wrap:pretty}
+.ladv>p{max-width:560px;color:var(--adv-dim);font-size:calc(var(--fs) * 1.08);line-height:1.5;font-weight:400;text-wrap:pretty}
 .adv-courses{width:100%;display:grid;gap:var(--s);grid-template-columns:repeat(2,minmax(0,1fr));margin-top:calc(var(--u) * 1.5)}
 @media (min-width:900px){.adv-courses{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .adv-course{display:grid;gap:4px;justify-items:start;text-align:left;padding:var(--u);border-radius:var(--r-card);background:rgb(255 255 255 / .04);box-shadow:inset 0 0 0 1px rgb(255 255 255 / .08);animation:rise .7s var(--ease) both}
 .adv-course svg{width:100%;height:auto;margin-bottom:6px;overflow:visible}
-.adv-course h3{font-size:calc(var(--fs) * 1.02);font-weight:600;color:var(--adv-ink);letter-spacing:-.01em}
-.adv-course>span{font-size:12px;font-weight:600;color:var(--adv-dim)}
-.adv-soon{margin-top:calc(var(--u) * 1.5);font-size:var(--small);font-weight:600;color:var(--adv-ink);padding:8px 16px;border-radius:999px;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22)}
+.adv-course h3{font-size:calc(var(--fs) * 1.02);font-weight:650;color:var(--adv-ink);letter-spacing:-.01em}
+.adv-course>span{font-size:12px;font-weight:650;color:var(--adv-dim)}
+.adv-soon{margin-top:calc(var(--u) * 1.5);font-size:var(--small);font-weight:650;color:var(--adv-ink);padding:8px 16px;border-radius:999px;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22)}
 .adv-line{fill:none;stroke:var(--adv-ink);stroke-width:2;stroke-linecap:round}
 .adv-faint{fill:none;stroke:rgb(255 255 255 / .16);stroke-width:1.25}
 .adv-dash{stroke-dasharray:4 5}
@@ -176,7 +175,7 @@
 
 /* Bento²: the name is the headline */
 .ladv h2{font-size:clamp(64px,13vw,148px);letter-spacing:-.06em;line-height:.95}
-.adv-tag{font:600 clamp(22px,3vw,30px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--adv-ink);margin-top:-4px}
+.adv-tag{font:650 clamp(22px,3vw,30px)/1.2 var(--sans);letter-spacing:-.02em;color:var(--adv-ink);margin-top:-4px}
 .adv-trail{fill:var(--adv-glow);opacity:0;animation:advTrail 4s linear infinite}
 @keyframes advTrail{0%,8%{opacity:0}20%,70%{opacity:.5}100%{opacity:0}}
 .adv-bend{animation:advBend 5s var(--ease) infinite alternate}

@@ -27,8 +27,8 @@ Bento uses Inter, with its friendlier letterforms: a single-storey a, an l with 
 - **Case:** sentence case everywhere. No all-caps labels.
 - **Headlines:** big, tightly spaced and short.
 
-## 4. Colour means something
-Each grade has its own palette, and colour marks what belongs to you: your grade, your next step, your answer. Green means right. Red means look again; it switches to orange when Colour-blind friendly is on. Everything else is neutral grey.
+## 4. Color means something
+Each grade has its own palette, and color marks what belongs to you: your grade, your next step, your answer. Green means right. Red means look again; it switches to orange when Color-blind friendly is on. Everything else is neutral grey.
 
 ## 5. Motion explains
 Things move to show how the math works, like a box filling up, a carry sliding over or a step landing. Nothing moves just for decoration. Every animation ends on a finished still picture, so Less motion loses nothing.
@@ -41,12 +41,12 @@ Each grade is a book. Home is its cover: what the year is about, today's plan, t
 
 The island is the only navigation: a small floating capsule, the same on every screen. It says which chapter and page you're on, steps back one page, and holds you. Tap it, or pinch the page closed, and the book zooms out: the chapter, then the year, then every grade on the shelf. Pinch open or tap to go back in. You always know where you are because you watch the page shrink back into its place.
 
-A grade is always its number in its own colour (K, 1st, 12th), never a badge plus its name. Progress is always a fill: a card fills from the bottom in its colour, like a battery charging. In a row of steps, the one you're on stretches into a pill and glides along.
+A grade is always its number in its own color (K, 1st, 12th), never a badge plus its name. Progress is always a fill: a card fills from the bottom in its color, like a battery charging. In a row of steps, the one you're on stretches into a pill and glides along.
 
 Corners are concentric. A shape inside another sits the same gap in from its edges (8px), and its radius is the outer radius minus that gap. That's why a row hugging a card's corner is a full pill on iPad, and the card it sits in is rounder than the row.
 
 ## 8. Respect people
 No account is needed, there are no ads, and nothing leaves the device. Accessibility settings sit in the hub, not hidden away.
 
-## 9. Advanced is quieter, not louder
-Bento Advanced (the AP courses) uses the same system on a dark canvas, with hairline drawings and fewer colours. It feels premium because there's less on the page, not more.
+## 9. Bento² is quieter, not louder
+Bento² is the pro side of Bento. It starts where 12th grade (AP included) ends: linear algebra, multivariable calculus, probability and differential equations, then the math behind AI, space, relativity and quantum. It uses the same system on a dark canvas, with hairline drawings and fewer colors, like a calculator turned on its side. It feels premium because there's less on the page, not more.
