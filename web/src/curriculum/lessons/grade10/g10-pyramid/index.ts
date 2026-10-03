@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildBox3d } from "../../../../explanations/diagrams/box3d/build";
 import { expectedOf, ns, readNumbers } from "../../area-common/steps";
+import { aNum } from "../../../text";
 
 /** A pyramid on a square base of side s, height h; s·s·h divides by 3. */
 export interface PyramidProblem { s: number; h: number }
@@ -46,12 +47,12 @@ export function explainPyramid(p: PyramidProblem, answers: AnswerModel): Explana
         { text: `box: ${B} × ${h} = ${box}`, from: 2, until: 2 },
         { text: `pyramid: ${box} ÷ 3 = ${V}`, from: 3 },
       ],
-      alt: `A pyramid on a ${s} by ${s} base, ${h} tall, inside its box of ${box}; the pyramid is a third, ${V}.`,
+      alt: `A pyramid on ${aNum(s)} by ${s} base, ${h} tall, inside its box of ${box}; the pyramid is a third, ${V}.`,
     }),
     caption: "A pyramid fills a third of its box.",
     timeline: beats(4),
     steps: [
-      { id: "base", narration: `The base is a ${s} by ${s} square: ${B}.`, math: [num(s), op("×"), num(s), op("="), num(B)], state: 1, answerStep: "base", result: B },
+      { id: "base", narration: `The base is ${aNum(s)} by ${s} square: ${B}.`, math: [num(s), op("×"), num(s), op("="), num(B)], state: 1, answerStep: "base", result: B },
       { id: "box", narration: `A box on that base, ${h} tall, holds ${box}.`, math: [num(B), op("×"), num(h), op("="), num(box)], state: 2, answerStep: "box", result: box },
       { id: "third", narration: `The pyramid holds a third of the box: ${V}.`, math: [num(box), op("÷"), num(3), op("="), num(V)], state: 3, answerStep: "third", result: V },
     ],

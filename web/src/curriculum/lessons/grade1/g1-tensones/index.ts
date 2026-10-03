@@ -28,7 +28,7 @@ function answers({ n }: TensOnesProblem): AnswerModel {
           [n, "Typed the whole number", "Just the rods for now. How many long rods are there?"],
         ]),
         hint: "Touch each long rod and count: 1, 2, 3...",
-        explain: `There are ${plural(t, "rod", "rods")}, so ${plural(t, "ten", "tens")}.`,
+        explain: `There ${t === 1 ? "is" : "are"} ${plural(t, "rod", "rods")}, so ${plural(t, "ten", "tens")}.`,
       }),
       oneBox({
         id: "ones", label: "Count the ones", question: "How many little cubes are on their own?",

@@ -7,6 +7,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildFactorRects } from "../../../../explanations/diagrams/early-g4/factor-rects";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips, tapStep } from "../_kit";
+import { count, isAre } from "../../../text";
 
 /** The factor pairs of n, and a check: is n a multiple of t? */
 export interface FactorsProblem { n: number; t: number }
@@ -45,7 +46,7 @@ function answers({ n, t }: FactorsProblem): AnswerModel {
   const all = factorsOf(n), pairs = smallFactors(n).length, square = a2 * a2 === n, isMultiple = n % t === 0;
   const q = Math.floor(n / t), r = n % t;
   const pairStep = (id: string, a: number) => oneBox({
-    id, label: `Pair with ${a}`, question: `${a} rows of how many squares make ${n}?`,
+    id, label: `Pair with ${a}`, question: `${count(a, "row")} of how many squares make ${n}?`,
     prompt: s => [num(a), op("×"), s, op("="), num(n)], ans: n / a,
     wrong: slips(n / a, [
       [n - a, "Subtracted instead", `That's ${n} − ${a}. Look for the number that ${a} times makes ${n}.`],
@@ -65,7 +66,7 @@ function answers({ n, t }: FactorsProblem): AnswerModel {
           ? { 1: ["Missed a multiple", `Count by ${t}s: you land right on ${n}. ${t} × ${q} = ${n}, so ${n} is a multiple of ${t}.`] }
           : { 0: ["Not a multiple", `Count by ${t}s: ${t * q}, then ${t * (q + 1)}. You skip right over ${n}, with ${r} left over.`] },
         hint: `Count by ${t}s. Do you land exactly on ${n}?`,
-        explain: isMultiple ? `${t} × ${q} = ${n}, so yes, ${n} is a multiple of ${t}.` : `${t} × ${q} = ${t * q} and ${r} are left over, so no, ${n} is not a multiple of ${t}.`,
+        explain: isMultiple ? `${t} × ${q} = ${n}, so yes, ${n} is a multiple of ${t}.` : `${t} × ${q} = ${t * q} and ${r} ${isAre(r)} left over, so no, ${n} is not a multiple of ${t}.`,
         work: [text(isMultiple ? `${n} = ${t} × ${q}: yes` : `${n} = ${t} × ${q} + ${r}: no`)],
       }),
       oneBox({
@@ -86,7 +87,7 @@ function answers({ n, t }: FactorsProblem): AnswerModel {
 
 function explain(p: FactorsProblem, model: AnswerModel): Explanation {
   const { n, t } = p, [, a1, a2] = smallFactors(n) as [number, number, number];
-  const b1 = expectedOf(model, "pair1"), b2 = expectedOf(model, "pair2"), count = expectedOf(model, "count");
+  const b1 = expectedOf(model, "pair1"), b2 = expectedOf(model, "pair2"), total = expectedOf(model, "count");
   const all = factorsOf(n), q = Math.floor(n / t), r = n % t;
   return {
     heading: "Make every rectangle",
@@ -95,18 +96,18 @@ function explain(p: FactorsProblem, model: AnswerModel): Explanation {
     diagram: buildFactorRects({
       n, pairs: [{ a: 1, b: n, beat: 0 }, { a: a1, b: b1, beat: 1 }, { a: a2, b: b2, beat: 2 }],
       test: { t, beat: 3 }, list: { text: all.join(", "), beat: 4 },
-      alt: `${n} squares arranged as 1 × ${n}, ${a1} × ${b1} and ${a2} × ${b2}. In ${t} rows ${r ? `there are ${r} left over` : `they make ${t} × ${q}`}. The factors are ${all.join(", ")}.`,
+      alt: `${count(n, "square")} arranged as 1 × ${n}, ${a1} × ${b1} and ${a2} × ${b2}. In ${count(t, "row")} ${r ? `${r} ${r === 1 ? "is" : "are"} left over` : `they make ${t} × ${q}`}. The factors are ${all.join(", ")}.`,
     }),
-    caption: `${n} squares, in every rectangle they can make.`,
+    caption: `${count(n, "square")}, in every rectangle they can make.`,
     timeline: beats(5),
     steps: [
       { id: "start", state: 0, math: [num(1), op("×"), num(n), op("="), num(n)], narration: `Every number makes a long row: 1 × ${n}. So 1 and ${n} are factors.` },
-      { id: "pair1", state: 1, answerStep: "pair1", result: b1, math: [num(a1), op("×"), num(b1), op("="), num(n)], narration: `Put the squares in ${a1} rows: ${b1} in each. ${a1} and ${b1} are a pair.` },
+      { id: "pair1", state: 1, answerStep: "pair1", result: b1, math: [num(a1), op("×"), num(b1), op("="), num(n)], narration: `Put the squares in ${count(a1, "row")}: ${b1} in each. ${a1} and ${b1} are a pair.` },
       { id: "pair2", state: 2, answerStep: "pair2", result: b2, math: [num(a2), op("×"), num(b2), op("="), num(n)],
-        narration: a2 === b2 ? `${a2} rows of ${b2} make a square. ${a2} pairs with itself.` : `In ${a2} rows there are ${b2} in each. ${a2} and ${b2} are a pair.` },
+        narration: a2 === b2 ? `${count(a2, "row")} of ${b2} make a square. ${a2} pairs with itself.` : `In ${count(a2, "row")} there are ${b2} in each. ${a2} and ${b2} are a pair.` },
       { id: "multiple", state: 3, answerStep: "multiple", math: [text(r ? `${n} = ${t} × ${q} + ${r}` : `${n} = ${t} × ${q}`)],
-        narration: r ? `Try ${t} rows: ${r} ${r === 1 ? "square is" : "squares are"} left over. ${n} is not a multiple of ${t}.` : `Try ${t} rows: they come out even, ${q} in each. ${n} is a multiple of ${t}.` },
-      { id: "count", state: 4, answerStep: "count", result: count, math: [text(all.join(", "))], narration: `List both numbers of every pair: ${all.join(", ")}. That's ${count} factors.` },
+        narration: r ? `Try ${count(t, "row")}: ${r} ${r === 1 ? "square is" : "squares are"} left over. ${n} is not a multiple of ${t}.` : `Try ${count(t, "row")}: they come out even, ${q} in each. ${n} is a multiple of ${t}.` },
+      { id: "count", state: 4, answerStep: "count", result: total, math: [text(all.join(", "))], narration: `List both numbers of every pair: ${all.join(", ")}. That's ${total} factors.` },
     ],
   };
 }

@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { ns, supText, v, xp, type Slip } from "../../algebra-kit/steps";
 import { attempt, readInts, rule } from "../../algebra-kit/restore";
 import { beatExplanation } from "../../../../explanations/diagrams/algebra/chain";
+import { count as countOf } from "../../../text";
 
 /**
  * One exponent rule on powers of x: t = 0 multiplies xᵃ · xᵇ, t = 1 divides xᵃ⁺ᵇ ÷ xᵇ, t = 2 raises (xᵃ)ᵇ.
@@ -62,7 +63,7 @@ export function explainExponentRule(p: ExponentRule, model: AnswerModel) {
   const count = [
     `Count the x's: ${f(a)} + ${f(b)} = ${f(e)}.`,
     `The ${f(b)} x's on the bottom cancel ${f(b)} on the top: ${f(a + b)} − ${f(b)} = ${f(e)}.`,
-    `${f(b)} groups of ${f(a)} x's: ${f(a)} × ${f(b)} = ${f(e)}.`,
+    `${countOf(f(b), "group")} of ${f(a)} x's: ${f(a)} × ${f(b)} = ${f(e)}.`,
   ][t]!;
   return beatExplanation({
     heading: "Three exponent rules",
@@ -72,7 +73,7 @@ export function explainExponentRule(p: ExponentRule, model: AnswerModel) {
     alt: `${[`x to the ${f(a)} times x to the ${f(b)}`, `x to the ${f(a + b)} divided by x to the ${f(b)}`, `x to the ${f(a)}, all to the ${f(b)}`][t]}, written out as x's, makes x to the ${f(e)}.`,
     steps: [
       { id: "problem", narration: ["Two powers of x multiplied.", "A power of x divided by another.", "A power of x raised to a power."][t]!, math: shown(p) },
-      { id: "written", narration: ["Write out the x's.", "Write out the x's: matching x's on the top and bottom cancel.", `Write out the x's: ${f(b)} copies of x${supText(a)}.`][t]!, math: out },
+      { id: "written", narration: ["Write out the x's.", "Write out the x's: matching x's on the top and bottom cancel.", `Write out the x's: ${countOf(f(b), "copy", "copies")} of x${supText(a)}.`][t]!, math: out },
       { id: "exponent", narration: `${count} So it is x${supText(e)}.`, math: [...shown(p), op("="), ...xp(e)], answerStep: "exponent", result: e },
       { id: "try", narration: `Try x = 2: ${f(e)} twos multiplied make ${f(value)}.`, math: m(2, sup(e), op("="), value), answerStep: "try", result: value },
     ],

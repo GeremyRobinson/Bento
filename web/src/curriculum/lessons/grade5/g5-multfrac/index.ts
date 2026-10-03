@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildFracGrid } from "../../../../explanations/diagrams/frac-grid/build";
 import { expectedOf, finalForm, gcd, ms, readNumbers, simplifyStep } from "../../area-common/steps";
+import { count } from "../../../text";
 
 /** a/b × c/d, each fraction proper and in lowest terms. */
 export interface FracTimesProblem { a: number; b: number; c: number; d: number }
@@ -49,19 +50,19 @@ export function explainFracTimes(p: FracTimesProblem, answers: AnswerModel): Exp
       beats: { grid: 0, rows: 1, cols: 2, both: 3 },
       rowLabel: `${a}/${b}`, colLabel: `${c}/${d}`,
       notes: [
-        { text: `${a} of ${b} rows`, from: 1, until: 1, cls: "lbl" },
-        { text: `${c} of ${d} columns`, from: 2, until: 2, cls: "lbl acc" },
-        { text: `${N} of ${D} squares`, from: 3, until: 3, cls: "lbl" },
+        { text: `${a} of ${count(b, "row")}`, from: 1, until: 1, cls: "lbl" },
+        { text: `${c} of ${count(d, "column")}`, from: 2, until: 2, cls: "lbl acc" },
+        { text: `${N} of ${count(D, "square")}`, from: 3, until: 3, cls: "lbl" },
         { text: simplified ? `${N}/${D} = ${simple}` : `${N}/${D} is already simplest`, from: 4, cls: "lbl acc" },
       ],
-      alt: `A grid of ${b} rows and ${d} columns: ${a} rows and ${c} columns shaded overlap in ${N} of ${D} squares.`,
+      alt: `A grid of ${count(b, "row")} and ${count(d, "column")}: ${count(a, "row")} and ${count(c, "column")} shaded overlap in ${N} of ${count(D, "square")}.`,
     }),
-    caption: `${a}/${b} of the rows and ${c}/${d} of the columns overlap in ${N} of ${D} squares.`,
+    caption: `${a}/${b} of the rows and ${c}/${d} of the columns overlap in ${N} of ${count(D, "square")}.`,
     timeline: beats(5),
     steps: [
-      { id: "rows", narration: `Cut the whole into ${b} rows and shade ${a} of them: ${a}/${b}.`, math: [frac(a, b)], state: 1 },
-      { id: "cols", narration: `Cut it into ${d} columns too and shade ${c} of them: ${c}/${d} of that part.`, math: [frac(c, d), op("×"), frac(a, b)], state: 2 },
-      { id: "across", narration: `The overlap is ${a} × ${c} = ${N} of the ${b} × ${d} = ${D} squares.`, math: [frac(a, b), op("×"), frac(c, d), op("="), frac(N, D)], state: 3, answerStep: "across", result: N },
+      { id: "rows", narration: `Cut the whole into ${count(b, "row")} and shade ${a} of them: ${a}/${b}.`, math: [frac(a, b)], state: 1 },
+      { id: "cols", narration: `Cut it into ${count(d, "column")} too and shade ${c} of them: ${c}/${d} of that part.`, math: [frac(c, d), op("×"), frac(a, b)], state: 2 },
+      { id: "across", narration: `The overlap is ${a} × ${c} = ${N} of the ${b} × ${d} = ${count(D, "square")}.`, math: [frac(a, b), op("×"), frac(c, d), op("="), frac(N, D)], state: 3, answerStep: "across", result: N },
       { id: "simplify", narration: simplified ? `Divide top and bottom by ${gcd(N, D)}: ${simple}.` : `${N}/${D} can't be simplified.`, math: [frac(N, D), op("="), ...(F.num === 0 ? [answer("x", F.whole)] : [frac([answer("x", F.num)], [answer("x", F.den)])])], state: 4, answerStep: "simplify", result: simplifyResult },
     ],
   };

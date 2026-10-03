@@ -3,6 +3,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildCircleArea } from "../../../../explanations/diagrams/circle/build";
 import { asRecord, expected, mt, ns, numberField, round6 } from "../../_geometry/kit";
+import { aNum } from "../../../text";
 
 /** A circle with radius r; the lesson uses 3.14 for π. */
 export interface CircleAreaProblem {
@@ -38,7 +39,7 @@ export function explainCircleArea({ r }: CircleAreaProblem, answers: AnswerModel
     idea: ["Make a square on the radius: r × r.", "The circle holds about 3.14 of those squares."],
     statement: mt`A = 3.14 × ${r}${sup("2")}`,
     caption: `The circle holds 3.14 squares of ${r2}: ${area}.`,
-    diagram: buildCircleArea({ r, r2, area, pi: "3.14", squareBeat: 1, areaBeat: 2, alt: `A circle of radius ${r} with a ${r} by ${r} square on its radius. The circle holds about 3.14 of those squares: ${area}.` }),
+    diagram: buildCircleArea({ r, r2, area, pi: "3.14", squareBeat: 1, areaBeat: 2, alt: `A circle of radius ${r} with ${aNum(r)} by ${r} square on its radius. The circle holds about 3.14 of those squares: ${area}.` }),
     timeline: beats(3),
     steps: [
       { id: "circle", narration: `A circle with radius ${r}.`, math: mt`r = ${r}`, state: 0 },

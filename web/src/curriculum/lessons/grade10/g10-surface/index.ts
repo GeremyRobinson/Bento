@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildBox3d } from "../../../../explanations/diagrams/box3d/build";
 import { expectedOf, ns, plusChain, readNumbers } from "../../area-common/steps";
+import { aNum, cap } from "../../../text";
 
 /** The surface of an l × w × h box: three pairs of matching faces. */
 export interface SurfaceProblem { l: number; w: number; h: number }
@@ -41,7 +42,7 @@ export function explainSurface(p: SurfaceProblem, answers: AnswerModel): Explana
       text: { top: String(T), front: String(F), side: String(S) },
       labels: { l: String(l), w: String(w), h: String(h), from: 0 },
       lines: [{ text: `2 × (${T} + ${F} + ${S}) = ${total}`, from: 4 }],
-      alt: `An ${l} by ${w} by ${h} box: top ${T}, front ${F}, side ${S}, each one twice, ${total} in all.`,
+      alt: `${cap(aNum(l))} by ${w} by ${h} box: top ${T}, front ${F}, side ${S}, each one twice, ${total} in all.`,
     }),
     caption: "Three different faces, each one twice.",
     timeline: beats(5),

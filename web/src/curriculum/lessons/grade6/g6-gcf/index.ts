@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid";
 import { expectedOf, gcd, ms, ns, readNumbers, type Wrong } from "../../area-common/steps";
+import { count } from "../../../text";
 
 /** g·m + g·n, where m and n share no factor, so g is the greatest common factor. */
 export interface GcfProblem { g: number; m: number; n: number }
@@ -49,9 +50,9 @@ export function explainGcf(p: GcfProblem, answers: AnswerModel): Explanation {
       cells: [[{ text: String(A) }, { text: String(B) }]],
       units: 1,
       lines: [{ text: `${A} + ${B} = ${g}(${fm} + ${fn})`, from: 2 }],
-      alt: `Two rectangles of ${A} and ${B} squares with the same height ${g}: ${g} by ${fm} and ${g} by ${fn}.`,
+      alt: `Two rectangles of ${A} and ${count(B, "square")} with the same height ${g}: ${g} by ${fm} and ${g} by ${fn}.`,
     }),
-    caption: `${A} and ${B} are both ${g} rows tall: ${g} rows of ${fm} and ${g} rows of ${fn}.`,
+    caption: `${A} and ${B} are both ${count(g, "row")} tall: ${count(g, "row")} of ${fm} and ${count(g, "row")} of ${fn}.`,
     timeline: beats(3),
     steps: [
       { id: "gcf", narration: `${g} is the biggest number that divides both ${A} and ${B}.`, math: [text("GCF("), num(A), text(", "), num(B), text(")"), op("="), num(g)], state: 1, answerStep: "gcf", result: g },

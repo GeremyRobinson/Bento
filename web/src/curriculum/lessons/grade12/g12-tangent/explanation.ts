@@ -5,6 +5,7 @@ import { buildPlane } from "../../../../explanations/diagrams/plane/build";
 import type { Pt } from "../../../../explanations/diagrams/plane/schema";
 import { expected, f, lineText, P, poly, polyText, pt } from "../../_plane/kit";
 import type { TangentProblem } from "./problem";
+import { paren, signed } from "../../../text";
 
 /** The window shows the whole bend near the touching point: x from 0 to 1.5 past k, and the vertex when it is close. */
 export function tangentFit({ a, b, k }: TangentProblem): Pt[] {
@@ -42,7 +43,7 @@ export function explainTangent(p: TangentProblem, model: AnswerModel): Explanati
       { id: "curve", narration: `This is f(x) = ${fx}. We want how steep it is at x = ${f(k)}.`, math: [text("f(x)"), op("="), ...poly([[a, "x²"], [b, "x"]])], state: 0 },
       { id: "derivative", narration: `Bring each power down: 2 × ${f(a)} = ${f(da)} for x², and ${f(b)} stays for the x term. So f′(x) = ${lineText(da, b, "").slice(3)}.`,
         math: [text("f′(x)"), op("="), ...poly([[da, "x"], [b, ""]])], state: 1, answerStep: "derivative", result: da },
-      { id: "slope", narration: `The tangent's slope is f′ at x = ${f(k)}: ${f(da)} · ${f(k)} + ${f(b)} = ${f(slope)}. The line touches the curve at ${pt(k, fk)}.`,
+      { id: "slope", narration: `The tangent's slope is f′ at x = ${f(k)}: ${f(da)} · ${paren(k)} ${signed(b)} = ${f(slope)}. The line touches the curve at ${pt(k, fk)}.`,
         math: [num(da), op("·"), ...P(k), op("+"), ...P(b), op("="), num(slope)], state: 2, answerStep: "slope", result: slope },
     ],
   };

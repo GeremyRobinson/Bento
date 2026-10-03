@@ -34,7 +34,7 @@ export function bothSidesAnswers({ a, b, c, d, x }: BothSidesEquation): AnswerMo
   return {
     steps: [
       ns({ id: "gather", l: "Get x on one side", n: `Subtract ${cxText(c)} from both sides.`, a: s => [...s, v(), op("+"), num(b), op("="), num(d)], ans: a - c,
-        h: `${f(a)} − ${f(c)}.`, w: [[a + c, "Added instead of subtracted", `Subtract ${f(c)}x from both sides.`]] }),
+        h: `${f(a)} − ${f(c)}.`, w: [[a + c, "Added instead of subtracted", `Subtract ${cxText(c)} from both sides.`]] }),
       ns({ id: "move", l: "Move the number", a: s => [num(a - c), v(), op("="), ...s], ans: d - b, h: `Subtract ${f(b)} from both sides.`,
         w: [[d + b, "Added instead of subtracted", `To undo + ${f(b)}, subtract ${f(b)}.`]] }),
       ns({ id: "divide", l: "Divide", a: s => [v(), op("="), ...s], ans: x, h: `${f(d - b)} ÷ ${f(a - c)}.` }),

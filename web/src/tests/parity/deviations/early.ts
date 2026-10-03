@@ -1,6 +1,6 @@
 // The early grades now have full years, so their single lessons moved from "Skills" into real units (G, 2026-10-03).
 export const deviations: Record<string, Partial<Record<string, string>>> = {
-  "k-add": { unit: "kindergarten has units now; this lesson lives in Adding and subtracting" },
+  "k-add": { unit: "kindergarten has units now; this lesson lives in Adding and subtracting", hint: "\"There is 1 dot\", not \"There are 1 dot\" (Curriculum fixes-01, 2026-10-03)", explain: "same wording fix as the hint" },
   "g1-ten": { unit: "1st grade has units now; this lesson lives in Adding and subtracting" },
   "g2-regroup": { unit: "2nd grade has units now; this lesson lives in Adding and subtracting" },
   "g4-divide": { prompt: "the tens step asks for the biggest tens number, so only one answer fits (reviewer, 2026-10-03)", checks: "a new slip for too few tens" },

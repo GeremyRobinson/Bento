@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid";
 import { expectedOf, polyText, twoNums } from "../../area-common/steps";
+import { coef } from "../../../text";
 
 /** x² + (p + q)x + pq = (x + p)(x + q), with 1 ≤ p ≤ q. */
 export interface FactorProblem { p: number; qn: number }
@@ -59,7 +60,7 @@ export function explainFactor(prob: FactorProblem, answers: AnswerModel): Explan
         { text: `${p} × ${q} = ${p * q} and ${p} + ${q} = ${p + q}`, from: 1, until: 1 },
         { text: `(x + ${p})(x + ${q})`, from: 2 },
       ],
-      alt: `x² + ${p + q}x + ${p * q} as a square x by x, strips ${q}x and ${p}x, and ${p * q} in the corner: an (x + ${p}) by (x + ${q}) rectangle.`,
+      alt: `x² + ${p + q}x + ${p * q} as a square x by x, strips ${coef(q, "x")} and ${coef(p, "x")}, and ${p * q} in the corner: an (x + ${p}) by (x + ${q}) rectangle.`,
     }),
     caption: `${p} × ${q} = ${p * q} and ${p} + ${q} = ${p + q}.`,
     timeline: beats(3),

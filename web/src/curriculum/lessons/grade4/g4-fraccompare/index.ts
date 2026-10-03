@@ -9,6 +9,7 @@ import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { gcd, pieceName } from "../../_tape-family/steps";
 import { expectedOf, oneBox, restoreVia } from "../../_number-line/steps";
 import { COMPARE, compareIndex, signName, slips, tapStep } from "../_kit";
+import { count } from "../../../text";
 
 /** a/b compared with c/d. */
 export interface FracCompareProblem { a: number; b: number; c: number; d: number }
@@ -81,7 +82,7 @@ function answers(p: FracCompareProblem): AnswerModel {
   if (L !== b) steps.push(renameStep("first", a, b, L));
   if (L !== d) steps.push(renameStep("second", c, d, L));
   const tops = `${A}/${L} and ${C}/${L}`;
-  const why = k === 1 ? `${tops} are the same amount.` : `${A}/${L} has ${k === 0 ? "fewer" : "more"} pieces than ${C}/${L}.`;
+  const why = k === 1 ? `${tops} are the same amount.` : `${A}/${L} has ${count(k === 0 ? "fewer" : "more", "piece")} than ${C}/${L}.`;
   const wrong: Record<number, [string, string]> = {};
   for (const i of [0, 1, 2]) {
     if (i === k) continue;

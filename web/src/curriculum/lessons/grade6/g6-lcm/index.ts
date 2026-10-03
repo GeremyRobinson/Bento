@@ -4,6 +4,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine, fitRange, type Hop } from "../../../../explanations/diagrams/number-line/build";
 import { expectedOf, lcm, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+import { count } from "../../../text";
 
 /** LCM(a, b) with 2 ≤ a < b ≤ 12; when they share no factor, a × b is at most 60 */
 export interface LcmProblem { a: number; b: number }
@@ -45,7 +46,7 @@ function explain(p: LcmProblem, model: AnswerModel): Explanation {
     statement: [text("LCM("), num(a), text(", "), num(b), text(")"), op("="), num(L)],
     diagram: buildNumberLine({
       ...fitRange([0, L], { maxTicks: 30, pad: 0, minStep: 1 }),
-      hops, marks: [{ v: L, beat: 2, cls: "dota", label: `${L} ÷ ${a} = ${k} jumps` }],
+      hops, marks: [{ v: L, beat: 2, cls: "dota", label: `${L} ÷ ${a} = ${count(k, "jump")}` }],
       alt: `Number line from 0 to ${L}: jumps of ${b} above and jumps of ${a} below both land on ${L}.`,
     }),
     caption: `Both land on ${L} first.`,

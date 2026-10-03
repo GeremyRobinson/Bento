@@ -2,6 +2,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildChoose } from "../../../../explanations/diagrams/marbles/build";
 import { asRecord, expected, mt, ns, numberField } from "../../_geometry/kit";
+import { count } from "../../../text";
 
 /** Choose k (2 or 3) of n things when order doesn't matter. */
 export interface CombinationProblem {
@@ -52,7 +53,7 @@ export function explainCombination(p: CombinationProblem, answers: AnswerModel):
       orderedNote: `${k === 2 ? `${n} × ${n - 1}` : `${n} × ${n - 1} × ${n - 2}`} = ${top} ordered`,
       ordersNote: `${k}! = ${f} orders, one group`,
       groupsNote: `${top} ÷ ${f} = ${ways} ${what}`,
-      alt: `${n} dots labelled A to ${String.fromCharCode(64 + n)}. ${top} ordered picks; each ${k === 2 ? "pair" : "group"} appears in ${f} orders, so there are ${ways} ${what}.`,
+      alt: `${count(n, "dot")} labelled A to ${String.fromCharCode(64 + n)}. ${top} ordered picks; each ${k === 2 ? "pair" : "group"} appears in ${f} orders, so there are ${ways} ${what}.`,
     }),
     timeline: beats(4),
     steps: [

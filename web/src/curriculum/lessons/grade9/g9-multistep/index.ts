@@ -5,6 +5,7 @@ import { ns, v } from "../../algebra-kit/steps";
 import { attempt, readInts, rule } from "../../algebra-kit/restore";
 import { beatExplanation } from "../../../../explanations/diagrams/algebra/chain";
 import { block, buildBalance, xTiles } from "../../../../explanations/diagrams/algebra/balance";
+import { count } from "../../../text";
 
 /** a(x + b) = a·(x + b). */
 export interface MultiStepEquation { kind: "equation.multiStep"; a: number; b: number; x: number; c: number }
@@ -44,14 +45,14 @@ export function explainMultiStep(p: MultiStepEquation, model: AnswerModel) {
     { left: [xTiles(a), [block(ab)]], right: [[block(c)]], note: `${f(a)}(x + ${f(b)}) → ${f(a)}x + ${f(ab)} = ${f(c)}` },
     { left: [xTiles(a), [block(ab, { off: true })]], right: [[block(ax)], [block(ab, { off: true })]], note: `take ${f(ab)} off both` },
     { left: xTiles(a).map(t => [t]), right: Array.from({ length: a }, () => [block(x)]), note: `split into ${f(a)}: x = ${f(x)}` },
-  ], `A balance with ${f(a)} groups of x and ${f(b)} against ${f(c)}. That is ${f(a)} x's and ${f(ab)}; taking ${f(ab)} off both pans and splitting into ${f(a)} shows x = ${f(x)}.`);
+  ], `A balance with ${count(f(a), "group")} of x and ${f(b)} against ${f(c)}. That is ${f(a)} x's and ${f(ab)}; taking ${f(ab)} off both pans and splitting into ${f(a)} shows x = ${f(x)}.`);
   return beatExplanation({
     heading: "Distribute, then undo",
     statement: equation(p),
     diagram,
     alt: diagram.alt,
     steps: [
-      { id: "equation", narration: `${f(a)} groups of x + ${f(b)} balance ${f(c)}.`, math: equation(p) },
+      { id: "equation", narration: `${count(f(a), "group")} of x + ${f(b)} balance ${f(c)}.`, math: equation(p) },
       { id: "distribute", narration: `Distribute: ${f(a)} × x and ${f(a)} × ${f(b)} = ${f(ab)}, so ${f(a)}x + ${f(ab)} = ${f(c)}.`, math: m(a, v(), op("+"), ab, op("="), c), answerStep: "distribute", result: ab },
       { id: "subtract", narration: `Subtract ${f(ab)} from both sides: ${f(a)}x = ${f(ax)}.`, math: m(a, v(), op("="), c, op("−"), ab, op("="), ax), answerStep: "subtract", result: ax },
       { id: "divide", narration: `Divide by ${f(a)}: x = ${f(x)}.`, math: m(v(), op("="), ax, op("÷"), a, op("="), x), answerStep: "divide", result: x },

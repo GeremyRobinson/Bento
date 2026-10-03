@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAddTens } from "../../../../explanations/diagrams/early-g1/blocks";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, onesOf, plural, slips, tensOf } from "../_kit";
+import { count as countOf, verb } from "../../../text";
 
 /** n + k tens; the sum stays under 100 */
 export interface AddTensProblem { n: number; k: number }
@@ -34,7 +35,7 @@ function answers({ n, k }: AddTensProblem): AnswerModel {
           [t + add, "Added the whole number", `Add ${plural(k, "ten", "tens")}, not ${add}: ${t} + ${k}.`],
         ]),
         hint: `${t} + ${k}. Count on ${k} from ${t}.`,
-        explain: `${t} tens + ${k} tens = ${tens} tens.`,
+        explain: `${countOf(t, "ten")} + ${countOf(k, "ten")} = ${countOf(tens, "ten")}.`,
       }),
       oneBox({
         id: "sum", label: "Put it together", note: "The ones stay the same.",
@@ -66,7 +67,7 @@ function explain({ n }: AddTensProblem, model: AnswerModel): Explanation {
       beats: { added: 1, tens: 2, total: 3 },
       alt: `${n} as tens rods and ones cubes; ${plural(k, "more rod", "more rods")} join the tens to make ${sum}.`,
     }),
-    caption: `The tens go from ${t} to ${tens}. The ${o} ones stay.`,
+    caption: `The tens go from ${t} to ${tens}. The ${countOf(o, "one")} ${verb(o, "stays", "stay")}.`,
     timeline: beats(4),
     steps: [
       { id: "start", narration: `Here is ${n}: ${plural(t, "ten", "tens")} and ${plural(o, "one", "ones")}.`, math: [num(n)], state: 0 },

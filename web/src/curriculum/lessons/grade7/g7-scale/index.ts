@@ -4,12 +4,13 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, ints, ns } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 /** c cm on the map = km km for real; two towns are c·g cm apart on the map. */
 export interface ScaleProblem { c: number; km: number; g: number }
 
 export function createScale(c: number, km: number, g: number): ScaleProblem {
-  if (![c, km, g].every(x => Number.isInteger(x) && x > 0)) throw new Error(`not a scale problem: ${c} cm = ${km} km, ${g} groups`);
+  if (![c, km, g].every(x => Number.isInteger(x) && x > 0)) throw new Error(`not a scale problem: ${c} cm = ${km} km, ${count(g, "group")}`);
   return { c, km, g };
 }
 
@@ -36,7 +37,7 @@ export function scalePicture({ c, km, g }: ScaleProblem) {
       { length: g, parts: g, from: 2, fills: [{ a: 0, b: g, tone: "acc" }], each: [{ text: () => `${km} km` }], label: [{ text: "real" }],
         total: [{ text: `${g * km} km`, acc: true }] },
     ],
-    alt: `A map distance of ${c * g} cm cut into ${g} groups of ${c} cm; each group is ${km} km, so the real distance is ${g * km} km.`,
+    alt: `A map distance of ${c * g} cm cut into ${count(g, "group")} of ${c} cm; each group is ${km} km, so the real distance is ${g * km} km.`,
   });
 }
 
@@ -50,7 +51,7 @@ function explain(p: ScaleProblem, model: AnswerModel): Explanation {
     timeline: beats(3),
     steps: [
       { id: "groups", state: 1, answerStep: "groups", result: g, math: [num(c * g), op("÷"), num(c), op("="), num(g)],
-        narration: `Cut the ${c * g} cm into groups of ${c} cm: ${c * g} ÷ ${c} = ${g} groups.` },
+        narration: `Cut the ${c * g} cm into groups of ${c} cm: ${c * g} ÷ ${c} = ${count(g, "group")}.` },
       { id: "real", state: 2, answerStep: "real", result: real, math: [num(g), op("×"), num(km), op("="), num(real), text(" km")],
         narration: `Each group is ${km} km for real: ${g} × ${km} = ${real} km.` },
     ],

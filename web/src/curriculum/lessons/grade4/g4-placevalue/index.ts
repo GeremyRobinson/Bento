@@ -7,6 +7,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildRounding, commas } from "../../../../explanations/diagrams/early-g4/place-value";
 import { expectedOf, manyBoxes, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { boxSlips, slips } from "../_kit";
+import { aNum } from "../../../text";
 
 /** n rounded to the nearest `place` (10, 100, 1,000, 10,000 or 100,000). */
 export interface RoundProblem { n: number; place: number }
@@ -108,7 +109,7 @@ function explain(p: RoundProblem, model: AnswerModel): Explanation {
     steps: [
       { id: "start", state: 0, narration: `Here is ${N}, one digit in each place. We'll round it to the nearest ${ONE[place]}.`, math: [text(N)] },
       { id: "digit", state: 1, answerStep: "digit", result: d, math: [text(`${ONE[place]}s digit`), op("="), text(String(d))],
-        narration: `The ${name} holds a ${d}.` },
+        narration: `The ${name} holds ${aNum(d)}.` },
       { id: "between", state: 2, answerStep: "between", result: lo, math: [text(commas(lo)), op("<"), text(N), op("<"), text(commas(hi))],
         narration: `So ${N} sits between ${commas(lo)} and ${commas(hi)} on the number line.` },
       { id: "next", state: 3, answerStep: "next", result: next, math: [text("next digit"), op("="), text(String(next))],

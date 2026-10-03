@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildRegroupBlocks } from "../../../../explanations/diagrams/area-model/blocks";
 import { expectedOf, numStep, readNumbers } from "../../area-common/steps";
+import { count } from "../../../text";
 
 /** a + b with two-digit numbers whose ones make a ten or more; the sum stays under 100. */
 export interface RegroupProblem { a: number; b: number }
@@ -41,7 +42,7 @@ export function regroupAnswers(p: RegroupProblem): AnswerModel {
         hint: "Add the left-hand digits, then add 1 more.", explain: `${at} + ${bt} + 1 = ${at + bt + 1}.`, work: [text("Tens: "), num(at), op("+"), num(bt), op("+"), num(1), op("="), num(at + bt + 1)] }),
       numStep({ id: "answer", label: "Answer", prompt: x => [num(a), op("+"), num(b), op("="), x], ans: a + b,
         wrong: [[(at + bt) * 10 + O % 10, "Forgot the carried ten", "Check the tens: did you add the 1 you carried?"]],
-        hint: `${at + bt + 1} tens and ${O % 10} ones.`, explain: `${at + bt + 1} tens and ${O % 10} ones is ${a + b}.`, work: [num(a), op("+"), num(b), op("="), answer("x", a + b)] }),
+        hint: `${count(at + bt + 1, "ten")} and ${count(O % 10, "one")}.`, explain: `${count(at + bt + 1, "ten")} and ${count(O % 10, "one")} is ${a + b}.`, work: [num(a), op("+"), num(b), op("="), answer("x", a + b)] }),
     ],
     finalParts: [-1],
   };
@@ -56,16 +57,16 @@ export function explainRegroup(p: RegroupProblem, answers: AnswerModel): Explana
     statement: [num(a), op("+"), num(b)],
     diagram: buildRegroupBlocks({
       a, b, beats: { blocks: 0, ones: 1, regroup: 2, tens: 3, total: 4 },
-      text: { ones: `${ao} + ${bo} = ${O}`, regroup: `${O} = 10 + ${left}`, tens: `${at} + ${bt} + 1 = ${T} tens`, total: `${a} + ${b} = ${sum}` },
-      alt: `${a} as ${at} tens and ${ao} ones, ${b} as ${bt} tens and ${bo} ones. ${O} ones make a ten and ${left} ones; ${T} tens and ${left} ones make ${sum}.`,
+      text: { ones: `${ao} + ${bo} = ${O}`, regroup: `${O} = 10 + ${left}`, tens: `${at} + ${bt} + 1 = ${count(T, "ten")}`, total: `${a} + ${b} = ${sum}` },
+      alt: `${a} as ${count(at, "ten")} and ${count(ao, "one")}, ${b} as ${count(bt, "ten")} and ${count(bo, "one")}. ${count(O, "one")} make a ten and ${count(left, "one")}; ${count(T, "ten")} and ${count(left, "one")} make ${sum}.`,
     }),
-    caption: `${O} ones are too many for one place: trade ten of them for a ten.`,
+    caption: `${count(O, "one")} are too many for one place: trade ten of them for a ten.`,
     timeline: beats(5),
     steps: [
       { id: "ones", narration: `Ones first: ${ao} + ${bo} = ${O}.`, math: [num(ao), op("+"), num(bo), op("="), num(O)], state: 1, answerStep: "ones", result: O },
       { id: "regroup", narration: `${O} is 1 ten and ${left} one${left === 1 ? "" : "s"}. Write ${left} and carry the ten.`, math: [num(O), op("="), num(10), op("+"), num(left)], state: 2, answerStep: "regroup", result: left },
       { id: "tens", narration: `Tens: ${at} + ${bt} + the 1 you carried = ${T}.`, math: [num(at), op("+"), num(bt), op("+"), num(1), op("="), num(T)], state: 3, answerStep: "tens", result: T },
-      { id: "answer", narration: `${T} tens and ${left} one${left === 1 ? "" : "s"} is ${sum}.`, math: [num(a), op("+"), num(b), op("="), num(sum)], state: 4, answerStep: "answer", result: sum },
+      { id: "answer", narration: `${count(T, "ten")} and ${left} one${left === 1 ? "" : "s"} is ${sum}.`, math: [num(a), op("+"), num(b), op("="), num(sum)], state: 4, answerStep: "answer", result: sum },
     ],
   };
 }

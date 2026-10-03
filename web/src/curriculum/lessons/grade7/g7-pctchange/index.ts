@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, gcd, ns, round6 } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 /** O goes up or down by p%. */
 export interface PercentChangeProblem { O: number; p: number; up: boolean }
@@ -55,7 +56,7 @@ export function percentChangePicture(pr: PercentChangeProblem) {
       { row: 1, a, b, text: `${sign}${f(c)}`, side: "below", from: 1, until: 1, acc: true },
       { row: 1, a, b, text: `${f(c)} ÷ ${O} = ${f(round6(c / O))}`, side: "below", from: 2, acc: true },
     ],
-    alt: `${O} as ${100 / g} blocks of ${f(each)}; now ${f(N)}, a change of ${f(c)}, which is ${p}% of ${O}.`,
+    alt: `${O} as ${count(100 / g, "block")} of ${f(each)}; now ${f(N)}, a change of ${f(c)}, which is ${p}% of ${O}.`,
   });
 }
 

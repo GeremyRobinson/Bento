@@ -1,7 +1,7 @@
 // Turns rebuilt math and messages into the same plain form the legacy fixtures were recorded in,
 // so the parity tests compare what a student reads, not how it is built.
 import { formatNumber, type MathText, type MathToken } from "../../curriculum/schemas/math-text";
-import { singular } from "../../curriculum/plural";
+import { singular } from "./singular";
 
 /** Fractions as (n)/(d), superscripts as ^(x), subscripts as _(x), boxes as [id]. */
 export function legacyText(m: MathText): string {

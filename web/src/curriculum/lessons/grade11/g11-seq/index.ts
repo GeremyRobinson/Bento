@@ -4,6 +4,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine, fitRange, type Hop } from "../../../../explanations/diagrams/number-line/build";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+import { count } from "../../../text";
 
 /** first term a1, common difference d, and the term number n to find */
 export interface SequenceProblem { a1: number; d: number; n: number }
@@ -23,10 +24,10 @@ function answers({ a1, d, n }: SequenceProblem): AnswerModel {
         wrong: [[a1, "Common difference", `That's the first term. d is the jump: ${a1 + d} − ${a1}.`], [a1 + d, "Common difference", `That's the second term. Subtract: ${a1 + d} − ${a1}.`]],
         hint: `${a1 + d} − ${a1}.`, explain: `Each term goes up by ${d}.` }),
       oneBox({ id: "jumps", label: "Count the jumps", question: `From term 1 to term ${n}, how many jumps?`, prompt: s => [s], ans: n - 1,
-        wrong: [[n, "Off by one", `Term 1 is where you start, so it's ${n} − 1 jumps.`]],
-        hint: `${n} − 1.`, explain: `${n} − 1 = ${n - 1} jumps.`, work: [answer("x", n - 1), text(" jumps")] }),
+        wrong: [[n, "Off by one", `Term 1 is where you start, so it's ${n} minus 1, which is ${count(n - 1, "jump")}.`]],
+        hint: `${n} − 1.`, explain: `${n} − 1 = ${count(n - 1, "jump")}.`, work: [answer("x", n - 1), text(" jumps")] }),
       oneBox({ id: "climb", label: "Total climb", prompt: s => [num(n - 1), op("×"), num(d), op("="), s], ans: climb,
-        hint: `${n - 1} jumps of ${d}.`, explain: `${n - 1} × ${d} = ${climb}.` }),
+        hint: `${count(n - 1, "jump")} of ${d}.`, explain: `${n - 1} × ${d} = ${climb}.` }),
       oneBox({ id: "term", label: "Add the first term", prompt: s => [...term(n), op("="), num(a1), op("+"), num(climb), op("="), s], ans: a1 + climb,
         hint: "Start at the first term and add the climb.", explain: `${a1} + ${climb} = ${a1 + climb}.`, work: [...term(n), op("="), answer("x", a1 + climb)] }),
     ],
@@ -50,14 +51,14 @@ function explain(p: SequenceProblem, model: AnswerModel): Explanation {
       hops,
       spans: [{ from: a1, to: an, beat: 2, label: `${jumps} × ${d} = ${climb}` }],
       marks: [{ v: an, label: `term ${n}: ${an}`, beat: 3, cls: "dota" }],
-      alt: `Number line: from ${a1}, ${jumps} jumps of ${d} reach ${an}.`,
+      alt: `Number line: from ${a1}, ${count(jumps, "jump")} of ${d} reach ${an}.`,
     }),
-    caption: `Jump by ${d} each time: ${jumps} jumps from ${a1} reach ${an}.`,
+    caption: `Jump by ${d} each time: ${count(jumps, "jump")} from ${a1} reach ${an}.`,
     timeline: beats(4),
     steps: [
       { id: "d", narration: `Each term goes up by the same amount: ${a1 + d} − ${a1} = ${d}.`, math: [text("d"), op("="), num(d)], state: 0, answerStep: "d", result: d },
-      { id: "jumps", narration: `Term 1 is where you start, so reaching term ${n} takes ${n} − 1 = ${jumps} jumps.`, math: [num(n), op("−"), num(1), op("="), num(jumps)], state: 1, answerStep: "jumps", result: jumps },
-      { id: "climb", narration: `${jumps} jumps of ${d} climb ${jumps} × ${d} = ${climb}.`, math: [num(jumps), op("×"), num(d), op("="), num(climb)], state: 2, answerStep: "climb", result: climb },
+      { id: "jumps", narration: `Term 1 is where you start, so reaching term ${n} takes ${n} − 1 = ${count(jumps, "jump")}.`, math: [num(n), op("−"), num(1), op("="), num(jumps)], state: 1, answerStep: "jumps", result: jumps },
+      { id: "climb", narration: `${count(jumps, "jump")} of ${d} climb ${jumps} × ${d} = ${climb}.`, math: [num(jumps), op("×"), num(d), op("="), num(climb)], state: 2, answerStep: "climb", result: climb },
       { id: "term", narration: `Start at the first term and add the climb: ${a1} + ${climb} = ${f(an)}.`, math: [...term(n), op("="), num(a1), op("+"), num(climb), op("="), num(an)], state: 3, answerStep: "term", result: an },
     ],
   };

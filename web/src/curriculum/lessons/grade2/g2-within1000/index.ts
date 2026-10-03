@@ -6,6 +6,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildOpenLine } from "../../../../explanations/diagrams/early-g2/lines";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips } from "../kit";
+import { count } from "../../../text";
 
 /** a + b or a − b (sub = 1) with three-digit numbers; b has no zero digits so every hop is real. */
 export interface Within1000Problem { a: number; b: number; sub: number }
@@ -74,10 +75,10 @@ function answers(p: Within1000Problem): AnswerModel {
         wrong: slips(p2, [
           [p1 + s * B.t, "Used ones, not tens", `The ${B.t} is in the tens place, so it means ${B.t * 10}.`],
           tensCross && [digitwise(p1, B.t * 10, sub, 10), sub ? "Smaller from bigger" : "Forgot to carry",
-            sub ? `${T} tens is not enough to take away ${B.t}. Trade a hundred for 10 tens, so the hundreds go down by 1.`
-              : `${T} + ${B.t} tens make ${T + B.t} tens. That's a new hundred, so the hundreds go up by 1.`],
+            sub ? `${count(T, "ten")} is not enough to take away ${B.t}. Trade a hundred for 10 tens, so the hundreds go down by 1.`
+              : `${T} + ${count(B.t, "ten")} make ${count(T + B.t, "ten")}. That's a new hundred, so the hundreds go up by 1.`],
         ]),
-        hint: sub ? `Count back ${B.t} tens from ${p1}.` : `Count on ${B.t} tens from ${p1}.`,
+        hint: sub ? `Count back ${count(B.t, "ten")} from ${p1}.` : `Count on ${count(B.t, "ten")} from ${p1}.`,
         explain: `${p1} ${sign} ${B.t * 10} = ${p2}.`,
       }),
       oneBox({
@@ -85,7 +86,7 @@ function answers(p: Within1000Problem): AnswerModel {
         prompt: x => [num(p2), op(sign), num(B.o), op("="), x], ans: r,
         wrong: slips(r, [
           onesCross && [digitwise(p2, B.o, sub, 1), sub ? "Smaller from bigger" : "Forgot to carry",
-            sub ? `${O} ones is not enough to take away ${B.o}. Trade a ten for 10 ones, so the tens go down by 1.`
+            sub ? `${count(O, "one")} is not enough to take away ${B.o}. Trade a ten for 10 ones, so the tens go down by 1.`
               : `${O} + ${B.o} = ${O + B.o}. That makes a new ten, so the tens go up by 1.`],
           [p2 + s * B.o * 10, "Used tens, not ones", `The ${B.o} is in the ones place, so it means just ${B.o}.`],
         ]),

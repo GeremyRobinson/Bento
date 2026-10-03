@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine, type Hop } from "../../../../explanations/diagrams/number-line/build";
 import { dotGroups } from "../../../../explanations/diagrams/number-line/counters";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+import { count, isAre } from "../../../text";
 
 /** a dots and b more; the sum stays within 10 */
 export interface CountOnProblem { a: number; b: number }
@@ -24,7 +25,7 @@ function answers({ a, b }: CountOnProblem): AnswerModel {
         prompt: s => [s], ans: a,
         wrong: [[b, "Counted the wrong group", "That's the second group. Count the dots **before** the + sign."]],
         hint: "Touch each dot in the first group and count out loud.",
-        explain: `There are ${a} dots in the first group.`,
+        explain: `There ${isAre(a)} ${count(a, "dot")} in the first group.`,
         work: [text("First group: "), { t: "answer", id: "x", v: a }],
       }),
       oneBox({
@@ -73,7 +74,7 @@ export const lesson: LessonDefinition<CountOnProblem> = {
   generate: rng => { const a = rng.int(1, 5); return createCountOn(a, rng.int(1, Math.min(5, 10 - a))); },
   restore: raw => restoreVia(raw, ["a", "b"] as const, v => createCountOn(v.a, v.b)),
   display: p => [num(p.a), op("+"), num(p.b)],
-  picture: p => dotGroups([p.a, p.b], `${p.a} dots plus ${p.b} dots`),
+  picture: p => dotGroups([p.a, p.b], `${count(p.a, "dot")} plus ${count(p.b, "dot")}`),
   answers,
   explain,
 };

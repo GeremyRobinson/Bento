@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, gcd, ints, ns } from "../../_tape-family/steps";
+import { count, verb } from "../../../text";
 
 /** a : b = ? : b·k */
 export interface RatioProblem { a: number; b: number; k: number }
@@ -44,7 +45,7 @@ export function ratioPicture({ a, b, k }: RatioProblem) {
       { length: b, parts: b, fills: [{ a: 0, b, tone: "on", from: 1 }], each: [{ text: () => `${k}`, from: 1 }], label: [{ text: `${b} part${b === 1 ? "" : "s"}` }],
         total: [{ text: `${b * k}` }] },
     ],
-    alt: `A ratio tape: ${a} boxes and ${b} boxes of the same size. ${b} boxes make ${b * k}, so each box is ${k} and ${a} boxes make ${a * k}.`,
+    alt: `A ratio tape: ${count(a, "box", "boxes")} and ${count(b, "box", "boxes")} of the same size. ${count(b, "box", "boxes")} ${verb(b, "makes", "make")} ${b * k}, so each box is ${k} and ${count(a, "box", "boxes")} ${verb(a, "makes", "make")} ${a * k}.`,
   });
 }
 

@@ -6,6 +6,7 @@ import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid
 import { buildBox3d } from "../../../../explanations/diagrams/box3d/build";
 import { r1 } from "../../../../explanations/diagrams/scene/helpers";
 import { expectedOf, ns } from "../../area-common/steps";
+import { count } from "../../../text";
 
 /** √(n²) or ∛(n³): find n. */
 export interface RootProblem { cube: boolean; n: number }
@@ -43,7 +44,7 @@ export function explainRoot(p: RootProblem, answers: AnswerModel): Explanation {
   const diagram = cube
     ? buildBox3d({
       mode: "cubes", l: n, w: n, h: n, layerBeats: [0], labels: { l: String(n), w: String(n), h: String(n), from: 1 },
-      lines: [{ text: `${v} cubes`, from: 0, until: 1, cls: "lbl" }, { text: `${times} = ${check}`, from: 2 }],
+      lines: [{ text: `${count(v, "cube")}`, from: 0, until: 1, cls: "lbl" }, { text: `${times} = ${check}`, from: 2 }],
       alt: `A cube built from ${v} unit cubes; each edge is ${n}.`,
     })
     : buildAreaGrid({
@@ -64,7 +65,7 @@ export function explainRoot(p: RootProblem, answers: AnswerModel): Explanation {
     caption: cube ? `A cube with volume ${v} has edges of ${n}.` : `A square with area ${v} has sides of ${n}.`,
     timeline: beats(3),
     steps: [
-      { id: "root", narration: cube ? `${v} cubes make a cube with ${n} along each edge.` : `${v} squares make a square with ${n} along each side.`, math: [...radical(p), op("="), num(n)], state: 1, answerStep: "root", result: n },
+      { id: "root", narration: cube ? `${count(v, "cube")} make a cube with ${n} along each edge.` : `${count(v, "square")} make a square with ${n} along each side.`, math: [...radical(p), op("="), num(n)], state: 1, answerStep: "root", result: n },
       { id: "check", narration: `Check it: ${times} = ${check}.`, math: [...times.split(" × ").flatMap((t, i) => (i ? [op("×"), num(Number(t))] : [num(Number(t))])), op("="), num(check)], state: 2, answerStep: "check", result: check },
     ],
   };

@@ -6,6 +6,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPairs } from "../../../../explanations/diagrams/early-g2/counting";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, slips } from "../kit";
+import { count as countOf } from "../../../text";
 
 /** n dots to pair up. */
 export interface EvenOddProblem { n: number }
@@ -46,10 +47,10 @@ function answers({ n }: EvenOddProblem): AnswerModel {
         wrong: slips(pairs, [
           [n, "Counted every dot", `${n} is how many dots there are. A pair is 2 dots, so count the pairs.`],
           odd && [pairs + 1, "Counted the lone dot as a pair", "The last dot has no partner, so it does not make a pair."],
-          [n * 2, "Doubled", `Each pair uses 2 of the ${n} dots, so there are fewer pairs than dots.`],
+          [n * 2, "Doubled", `Each pair uses 2 of the ${countOf(n, "dot")}, so there are fewer pairs than dots.`],
         ]),
         hint: "Circle the dots two at a time and count the circles.",
-        explain: `${n} dots make ${count(pairs, "pair")}${odd ? " with 1 dot left" : ""}.`,
+        explain: `${countOf(n, "dot")} make ${count(pairs, "pair")}${odd ? " with 1 dot left" : ""}.`,
       }),
       oneBox({
         id: "left", label: "Check the leftover", question: "How many dots have no partner?",
@@ -79,12 +80,12 @@ function explain(p: EvenOddProblem, model: AnswerModel): Explanation {
     diagram: buildPairs({
       n, beats: { pairs: 1, left: 2, verdict: 3 },
       text: { pairs: count(pairs, "pair"), left: `${left} left over`, verdict: `${n} is ${word}` },
-      alt: `${n} dots put into ${count(pairs, "pair")} with ${left} left over, so ${n} is ${word}.`,
+      alt: `${countOf(n, "dot")} put into ${count(pairs, "pair")} with ${left} left over, so ${n} is ${word}.`,
     }),
     caption: left ? "One dot has no partner." : "Every dot has a partner.",
     timeline: beats(4),
     steps: [
-      { id: "pairs", narration: `Put the ${n} dots in twos: ${count(pairs, "pair")}.`, math: [text("Pairs: "), num(pairs)], state: 1, answerStep: "pairs", result: pairs },
+      { id: "pairs", narration: `Put the ${countOf(n, "dot")} in twos: ${count(pairs, "pair")}.`, math: [text("Pairs: "), num(pairs)], state: 1, answerStep: "pairs", result: pairs },
       { id: "left", narration: left ? "One dot is left all alone." : "No dots are left over.", math: [text("Left over: "), num(left)], state: 2, answerStep: "left", result: left },
       { id: "evenodd", narration: left ? `So ${n} is **odd**.` : `So ${n} is **even**.`, math: [num(n), text(` is ${word}`)], state: 3, answerStep: "evenodd", result: pick },
     ],

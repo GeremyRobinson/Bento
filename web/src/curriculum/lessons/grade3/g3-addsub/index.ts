@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine, fitRange, type Hop } from "../../../../explanations/diagrams/number-line/build";
 import { box, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** a + b (s = 1) or a − b (s = −1) within 1000, done as jumps of hundreds, tens and ones. */
 export interface AddSubProblem { a: number; b: number; s: number }
@@ -51,7 +52,7 @@ function jumpStep(p: AddSubProblem, j: ReturnType<typeof jumps>[number]): Answer
   if (place > 1) wrong.push([from + s * d, `Jumped ${d} instead of ${v}`, `The ${d} in ${p.b} means ${d} ${d === 1 ? one : many}, so jump ${v}.`]);
   wrong.push([from - s * v, s === 1 ? "Took away instead of adding" : "Added instead of taking away", s === 1 ? `This is adding, so the number gets bigger.` : `This is taking away, so the number gets smaller.`]);
   if (s === 1 && place < 100 && digit + v >= place * 10) {
-    wrong.push([to - place * 10, `Lost the new ${NAMES[place * 10]![1]}`, `${digit / place} + ${d} ${many} is ${(digit + v) / place} ${many}. That makes a new ${NAMES[place * 10]![1]}, so the next place goes up by 1.`]);
+    wrong.push([to - place * 10, `Lost the new ${NAMES[place * 10]![1]}`, `${count(digit / place, one, many)} + ${count(d, one, many)} is ${count((digit + v) / place, one, many)}. That makes a new ${NAMES[place * 10]![1]}, so the next place goes up by 1.`]);
   }
   if (s === -1 && place < 100 && digit < v) {
     const flip = from - digit + (v - digit);

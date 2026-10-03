@@ -13,10 +13,10 @@ import { box, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
 export interface TwoStepProblem { kind: number; a: number; b: number; c: number; who: number }
 
 const CAST = [
-  { name: "Mia", they: "She", their: "her", things: "stickers", groups: "packs", group: "pack", lose: "gives away" },
-  { name: "Leo", they: "He", their: "his", things: "crayons", groups: "boxes", group: "box", lose: "loses" },
-  { name: "Ava", they: "She", their: "her", things: "marbles", groups: "bags", group: "bag", lose: "loses" },
-  { name: "Sam", they: "He", their: "his", things: "cookies", groups: "trays", group: "tray", lose: "eats" },
+  { name: "Mia", they: "She", their: "her", things: "stickers", thing: "sticker", groups: "packs", group: "pack", lose: "gives away" },
+  { name: "Leo", they: "He", their: "his", things: "crayons", thing: "crayon", groups: "boxes", group: "box", lose: "loses" },
+  { name: "Ava", they: "She", their: "her", things: "marbles", thing: "marble", groups: "bags", group: "bag", lose: "loses" },
+  { name: "Sam", they: "He", their: "his", things: "cookies", thing: "cookie", groups: "trays", group: "tray", lose: "eats" },
 ] as const;
 
 export function createTwoStep(kind: number, a: number, b: number, c: number, who: number): TwoStepProblem {
@@ -165,8 +165,8 @@ function explain(p: TwoStepProblem, model: AnswerModel): Explanation {
       { id: s1.id, state: 1, answerStep: s1.id, result: first, math: [num(a), op(ops[0]), num(kind < 2 ? b : c), op("="), num(first)],
         narration: kind < 2 ? `First the ${w.groups}: ${a} ${w.groups} of ${b} is ${a} × ${b} = ${first} ${w.things}.` : `First take away: ${a} − ${c} = ${first} ${w.things} left.` },
       { id: s2.id, state: 2, answerStep: s2.id, result: second, math: [num(first), op(ops[1]), num(kind < 2 ? c : b), op("="), num(second)],
-        narration: kind === 0 ? `Then ${c} go away: ${first} − ${c} = ${second}. ${w.name} has ${second} ${w.things} left.`
-          : kind === 1 ? `Then add the ${c} more: ${first} + ${c} = ${second}. ${w.name} has ${second} ${w.things} in all.`
+        narration: kind === 0 ? `Then ${c} go away: ${first} − ${c} = ${second}. ${w.name} has ${second === 1 ? `1 ${w.thing}` : `${second} ${w.things}`} left.`
+          : kind === 1 ? `Then add the ${c} more: ${first} + ${c} = ${second}. ${w.name} has ${second === 1 ? `1 ${w.thing}` : `${second} ${w.things}`} in all.`
           : `Then share them into ${b} equal ${w.groups}: ${first} ÷ ${b} = ${second} in each ${w.group}.` },
     ],
   };

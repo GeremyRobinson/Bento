@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildArray } from "../../../../explanations/diagrams/early-g3/array";
 import { box, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** a × b as a rows of b: skip count by b, a times, then turn it around. */
 export interface FactProblem { a: number; b: number }
@@ -38,19 +39,19 @@ function answers(p: FactProblem): AnswerModel {
         prompt: x => skipList(p, x), ans: P,
         wrong: [
           [(a - 1) * b + 1, "Counted on by 1", `Each jump is ${b}, not 1. ${(a - 1) * b} + ${b} = ${P}.`],
-          [(a - 1) * b, "Stopped one jump short", `That's only ${a - 1} jumps of ${b}. Make ${a} jumps.`],
-          [(a + 1) * b, "One jump too many", `That's ${a + 1} jumps of ${b}. Stop after ${a} jumps.`],
-          [a + b, "Added the two numbers", `${a} + ${b} puts them together once. We need ${a} groups of ${b}.`],
+          [(a - 1) * b, "Stopped one jump short", `That's only ${count(a - 1, "jump")} of ${b}. Make ${count(a, "jump")}.`],
+          [(a + 1) * b, "One jump too many", `That's ${count(a + 1, "jump")} of ${b}. Stop after ${count(a, "jump")}.`],
+          [a + b, "Added the two numbers", `${a} + ${b} puts them together once. We need ${count(a, "group")} of ${b}.`],
         ],
         hint: `Add ${b} to the last number you see.`,
-        explain: `${a} jumps of ${b} land on ${P}.`,
+        explain: `${count(a, "jump")} of ${b} land on ${P}.`,
       }),
       box({
-        id: "turn", label: "Turn it around", question: `${a} groups of ${b} is the same as ${b} groups of ${a}.`,
+        id: "turn", label: "Turn it around", question: `${count(a, "group")} of ${b} is the same as ${count(b, "group")} of ${a}.`,
         prompt: x => [num(b), op("×"), num(a), op("="), x], ans: P,
         wrong: [
-          [a + b, "Added instead of multiplied", `× means groups. ${b} groups of ${a} is ${P}, not ${a + b}.`],
-          [b * b, "Used the same number twice", `That's ${b} × ${b}. Here it is ${b} groups of ${a}.`],
+          [a + b, "Added instead of multiplied", `× means groups. ${count(b, "group")} of ${a} is ${P}, not ${a + b}.`],
+          [b * b, "Used the same number twice", `That's ${b} × ${b}. Here it is ${count(b, "group")} of ${a}.`],
         ],
         hint: `Turning the array around does not change how many dots there are. You just found ${a} × ${b}.`,
         explain: `${b} × ${a} = ${P}, the same as ${a} × ${b}.`,
@@ -67,11 +68,11 @@ export function factPicture({ a, b }: FactProblem, P: number) {
     rowTotals: { from: 1, text: r => String((r + 1) * b), acc: r => r === a - 1 },
     colBoxes: { from: 2, text: () => String(a) },
     lines: [
-      { text: `${a} rows of ${b}`, from: 0, until: 0, cls: "lbl" },
+      { text: `${count(a, "row")} of ${b}`, from: 0, until: 0, cls: "lbl" },
       { text: `${a} × ${b} = ${P}`, from: 1, until: 1 },
-      { text: `${b} columns of ${a}: ${b} × ${a} = ${P}`, from: 2 },
+      { text: `${count(b, "column")} of ${a}: ${b} × ${a} = ${P}`, from: 2 },
     ],
-    alt: `${a} rows of ${b} dots. Counting by ${b}s row by row reaches ${P}. Seen as ${b} columns of ${a}, it is still ${P}.`,
+    alt: `${count(a, "row")} of ${count(b, "dot")}. Counting by ${b}s row by row reaches ${P}. Seen as ${count(b, "column")} of ${a}, it is still ${P}.`,
   });
 }
 
@@ -82,13 +83,13 @@ function explain(p: FactProblem, model: AnswerModel): Explanation {
     idea: ["Multiplying counts equal groups. Count by the group size, once for each group.", "You can turn the array around. The total stays the same."],
     statement: [num(a), op("×"), num(b)],
     diagram: factPicture(p, P),
-    caption: `${a} rows with ${b} dots in each row.`,
+    caption: `${count(a, "row")} with ${count(b, "dot")} in each row.`,
     timeline: beats(3),
     steps: [
       { id: "count", state: 1, answerStep: "count", result: P, math: [num(a), op("×"), num(b), op("="), num(P)],
-        narration: `Count by ${b}s, one row at a time: ${Array.from({ length: Math.min(a, 3) }, (_, i) => (i + 1) * b).join(", ")}${a > 3 ? `, and on to ${P}` : ""}. That's ${a} rows, so ${a} × ${b} = ${P}.` },
+        narration: `Count by ${b}s, one row at a time: ${Array.from({ length: Math.min(a, 3) }, (_, i) => (i + 1) * b).join(", ")}${a > 3 ? `, and on to ${P}` : ""}. That's ${count(a, "row")}, so ${a} × ${b} = ${P}.` },
       { id: "turn", state: 2, answerStep: "turn", result: T, math: [num(b), op("×"), num(a), op("="), num(T)],
-        narration: `Now look down the columns. There are ${b} columns of ${a}, and still ${T} dots.` },
+        narration: `Now look down the columns. There are ${count(b, "column")} of ${a}, and still ${count(T, "dot")}.` },
     ],
   };
 }

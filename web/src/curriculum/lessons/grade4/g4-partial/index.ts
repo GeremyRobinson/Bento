@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid, type AreaCell, type AreaSide } from "../../../../explanations/diagrams/area-model/grid";
 import { expectedOf, numStep, plusChain, readNumbers } from "../../area-common/steps";
+import { count, aNum, cap } from "../../../text";
 
 /** n × m: a three-digit number times a one-digit number, one place at a time. */
 export interface PartialProblem { n: number; m: number }
@@ -30,7 +31,7 @@ export function partialAnswers({ n, m }: PartialProblem): AnswerModel {
         hint: `Do ${T} × ${m}, then add one zero.`, explain: `${T * 10} × ${m} = ${P[1]}.`, work: [num(T * 10), op("×"), num(m), op("="), num(P[1]!)] }),
       numStep({ id: "ones", label: "Ones", prompt: x => [num(O), op("×"), num(m), op("="), x], ans: P[2]!,
         wrong: [[O + m, "Added instead of multiplied", "This one is times, not plus."]],
-        hint: `${O} groups of ${m}.`, explain: `${O} × ${m} = ${P[2]}.`, work: [num(O), op("×"), num(m), op("="), num(P[2]!)] }),
+        hint: `${count(O, "group")} of ${m}.`, explain: `${O} × ${m} = ${P[2]}.`, work: [num(O), op("×"), num(m), op("="), num(P[2]!)] }),
       numStep({ id: "sum", label: "Add the parts", prompt: x => [...plusChain(P), op("="), x], ans: n * m,
         hint: "Line them up by place value and add.", explain: `${P.join(" + ")} = ${n * m}.`, work: [num(n), op("×"), num(m), op("="), answer("x", n * m)] }),
     ],
@@ -55,7 +56,7 @@ export function explainPartial(p: PartialProblem, answers: AnswerModel): Explana
     diagram: buildAreaGrid({
       cols, rows: [{ label: String(m), size: m }], cells: [cells], minRow: 80,
       lines: [{ text: `${n} × ${m} = ${P.filter(x => x > 0).join(" + ")} = ${total}`, from: 4 }],
-      alt: `A ${m} by ${n} rectangle cut by place value: ${shown.map(([v, i]) => `${m} × ${v} = ${P[i]}`).join(", ")}. Together ${total}.`,
+      alt: `${cap(aNum(m))} by ${n} rectangle cut by place value: ${shown.map(([v, i]) => `${m} × ${v} = ${P[i]}`).join(", ")}. Together ${total}.`,
     }),
     caption: `${n} is ${shown.map(([v]) => v).join(" + ")}: one strip for each place.`,
     timeline: beats(5),

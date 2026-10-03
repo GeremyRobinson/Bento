@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, ints, ns, pieceName, round6 } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 /** W ÷ 1/d: how many pieces of size 1/d fit in W wholes. */
 export interface UnitDivisionProblem { W: number; d: number }
@@ -20,8 +21,8 @@ export const generateUnitDivision = (rng: Rng) => createUnitDivision(rng.int(2, 
 function answers({ W, d }: UnitDivisionProblem): AnswerModel {
   return {
     steps: [
-      ns({ id: "one", l: "Pieces in one whole", q: `How many 1/${d} pieces make 1 whole?`, a: s => s, ans: d, h: `It takes ${d} of them.` }),
-      ns({ id: "all", l: "Pieces in all", a: s => [num(W), op("×"), num(d), op("="), ...s], ans: W * d, h: `${W} wholes, ${d} pieces in each.`,
+      ns({ id: "one", l: "Pieces in one whole", q: `How many 1/${count(d, "piece")} make 1 whole?`, a: s => s, ans: d, h: `It takes ${d} of them.` }),
+      ns({ id: "all", l: "Pieces in all", a: s => [num(W), op("×"), num(d), op("="), ...s], ans: W * d, h: `${count(W, "whole")}, ${count(d, "piece")} in each.`,
         w: [[round6(W / d), "Divided the wrong way", `The pieces are small, so lots of them fit. The answer is bigger than ${W}.`]] }),
     ],
     finalParts: [-1],
@@ -35,7 +36,7 @@ export function unitDivisionPicture({ W, d }: UnitDivisionProblem) {
     each: [{ text: () => `1/${d}`, from: j === 0 ? 1 : 2 }], label: [{ text: "1" }],
     total: j === 0 ? [{ text: `${d}`, from: 1, acc: W === 1 }] : [{ text: `${(j + 1) * d}`, from: 2, acc: j === W - 1 }],
   }));
-  return buildTape({ rows, alt: `${W} whole bars, each cut into ${d} pieces of 1/${d}: ${W * d} pieces in all.` });
+  return buildTape({ rows, alt: `${W} whole bars, each cut into ${count(d, "piece")} of 1/${d}: ${count(W * d, "piece")} in all.` });
 }
 
 function explain(p: UnitDivisionProblem, model: AnswerModel): Explanation {
@@ -44,13 +45,13 @@ function explain(p: UnitDivisionProblem, model: AnswerModel): Explanation {
     heading: "How many pieces fit?",
     statement: [num(W), op("÷"), frac(1, d)],
     diagram: unitDivisionPicture(p),
-    caption: `${W} wholes, ${d} ${pieceName(d)} in each: ${W * d} ${pieceName(d)}.`,
+    caption: `${count(W, "whole")}, ${d} ${pieceName(d)} in each: ${W * d} ${pieceName(d)}.`,
     timeline: beats(3),
     steps: [
       { id: "one", state: 1, answerStep: "one", result: one, math: [num(1), op("="), num(one), op("×"), frac(1, d)],
-        narration: `Cut one whole into ${pieceName(d)}: it holds ${one} pieces of 1/${d}.` },
+        narration: `Cut one whole into ${pieceName(d)}: it holds ${count(one, "piece")} of 1/${d}.` },
       { id: "all", state: 2, answerStep: "all", result: all, math: [num(W), op("×"), num(one), op("="), num(all)],
-        narration: `${W} wholes hold ${W} × ${one} = ${all} pieces, so ${W} ÷ 1/${d} = ${all}.` },
+        narration: `${count(W, "whole")} hold ${W} × ${one} = ${count(all, "piece")}, so ${W} ÷ 1/${d} = ${all}.` },
     ],
   };
 }
@@ -69,7 +70,7 @@ export const lesson: LessonDefinition<UnitDivisionProblem> = {
     try { return r && createUnitDivision(r.W, r.d); } catch { return null; }
   },
   display: (p): MathText => [num(p.W), op("÷"), frac(1, p.d)],
-  displayNote: p => `How many 1/${p.d} pieces fit in ${p.W}?`,
+  displayNote: p => `How many 1/${count(p.d, "piece")} fit in ${p.W}?`,
   answers,
   explain,
   story: ({ W, d }) => ({ op: "÷", text: `You have **${W}** cups of flour. Each batch of cookies uses 1/${d} cup. How many batches can you make?` }),

@@ -40,7 +40,7 @@ function explain(p: SubtractIntegersProblem, model: AnswerModel): Explanation {
         { from: b, to: opp, label: "opposite", below: true, beat: 1, start: false },
         { from: a, to: diff, label: opp > 0 ? `+${opp}` : `+ (${f(opp)})`, beat: 2, land: false },
       ],
-      alt: `Number line: ${f(b)} flips to ${f(opp)}; then from ${f(a)} move ${B} ${dir} to ${f(diff)}.`,
+      alt: `Number line: ${f(b)} turns into ${f(opp)}; then from ${f(a)} move ${B} ${dir} to ${f(diff)}.`,
     }),
     caption: `Taking away ${f(b)} moves you ${B} ${dir}.`,
     timeline: beats(3),

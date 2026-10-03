@@ -5,6 +5,7 @@ import { numStep, v } from "../../algebra-kit/steps";
 import { attempt, readInts, rule } from "../../algebra-kit/restore";
 import { beatExplanation } from "../../../../explanations/diagrams/algebra/chain";
 import { block, buildBalance, xTiles } from "../../../../explanations/diagrams/algebra/balance";
+import { count } from "../../../text";
 
 /** ax + b = c, with c = a·x + b. */
 export interface TwoStepEquation { kind: "equation.twoStep"; a: number; b: number; c: number; x: number }
@@ -46,7 +47,7 @@ export function explainTwoStep(p: TwoStepEquation, model: AnswerModel) {
     { left: [xTiles(a), [block(b, { off: true })]], right: [[block(c - b)], [block(b, { off: true })]], note: `take ${f(b)} off both sides` },
     { left: xTiles(a).map(t => [t]), right: Array.from({ length: a }, () => [block(x)]), note: `split both sides into ${f(a)}` },
     { left: [xTiles(1)], right: [[block(x)]], note: `x = ${f(x)}` },
-  ], `A balance with ${f(a)} x tiles and ${f(b)} on one pan and ${f(c)} on the other. Taking ${f(b)} off both pans leaves ${f(a)} x's against ${f(c - b)}; splitting both into ${f(a)} groups shows x = ${f(x)}.`);
+  ], `A balance with ${f(a)} x tiles and ${f(b)} on one pan and ${f(c)} on the other. Taking ${f(b)} off both pans leaves ${f(a)} x's against ${f(c - b)}; splitting both into ${count(f(a), "group")} shows x = ${f(x)}.`);
   return beatExplanation({
     heading: "Undo in reverse order",
     statement: [...lhs(a), op("+"), num(b), op("="), num(c)],

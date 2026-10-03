@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildArray } from "../../../../explanations/diagrams/early-g3/array";
 import { box, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** a × t, where t is a whole number of tens: a groups of (t ÷ 10) tens. */
 export interface Mult10Problem { a: number; t: number }
@@ -26,22 +27,22 @@ function answers({ a, t }: Mult10Problem): AnswerModel {
   return {
     steps: [
       box({
-        id: "fact", label: "Multiply the tens", question: `${t} is ${m} tens. First find ${a} × ${m}.`,
+        id: "fact", label: "Multiply the tens", question: `${t} is ${count(m, "ten")}. First find ${a} × ${m}.`,
         prompt: x => [num(a), op("×"), num(m), op("="), x], ans: f,
-        wrong: [[a + m, "Added instead of multiplied", `× means groups: ${a} groups of ${m}, not ${a} + ${m}.`]],
+        wrong: [[a + m, "Added instead of multiplied", `× means groups: ${count(a, "group")} of ${m}, not ${a} + ${m}.`]],
         hint: `Count by ${m}s, ${a} times.`,
-        explain: `${a} × ${m} = ${f}, so ${a} × ${m} tens is ${f} tens.`,
+        explain: `${a} × ${m} = ${f}, so ${a} × ${count(m, "ten")} is ${count(f, "ten")}.`,
       }),
       box({
-        id: "tens", label: "Make them tens", question: `${f} tens is how much?`,
+        id: "tens", label: "Make them tens", question: `${count(f, "ten")} is how much?`,
         prompt: x => [num(a), op("×"), num(t), op("="), x], ans: a * t,
         wrong: [
-          [f, "Forgot they are tens", `${f} is how many tens. Each ten is 10, so ${f} tens is ${f * 10}.`],
-          [f * 100, "One zero too many", `${f} tens is ${f} × 10, which is ${f * 10}. You wrote ${f} hundreds.`],
-          [a + t, "Added instead of multiplied", `${a} groups of ${t} is much more than ${a} + ${t}.`],
+          [f, "Forgot they are tens", `${f} is how many tens. Each ten is 10, so ${count(f, "ten")} is ${f * 10}.`],
+          [f * 100, "One zero too many", `${count(f, "ten")} is ${f} × 10, which is ${f * 10}. You wrote ${count(f, "hundred")}.`],
+          [a + t, "Added instead of multiplied", `${count(a, "group")} of ${t} is much more than ${a} + ${t}.`],
         ],
-        hint: `${f} tens means ${f} × 10. Put a 0 on the end of ${f}.`,
-        explain: `${f} tens = ${f * 10}.`,
+        hint: `${count(f, "ten")} means ${f} × 10. Put a 0 on the end of ${f}.`,
+        explain: `${count(f, "ten")} = ${f * 10}.`,
       }),
     ],
     finalParts: [-1],
@@ -55,11 +56,11 @@ export function mult10Picture({ a, t }: Mult10Problem, f: number, P: number) {
     rows: a, cols: m, chip: "10",
     rowTotals: { from: 2, text: r => String((r + 1) * t), acc: r => r === a - 1 },
     lines: [
-      { text: `${a} rows of ${m} tens`, from: 0, until: 0, cls: "lbl" },
-      { text: `${a} × ${m} = ${f} tens`, from: 1, until: 1 },
-      { text: `${f} tens = ${P}`, from: 2 },
+      { text: `${count(a, "row")} of ${count(m, "ten")}`, from: 0, until: 0, cls: "lbl" },
+      { text: `${a} × ${m} = ${count(f, "ten")}`, from: 1, until: 1 },
+      { text: `${count(f, "ten")} = ${P}`, from: 2 },
     ],
-    alt: `${a} rows of ${m} tens. That's ${a} × ${m} = ${f} tens, and ${f} tens is ${P}.`,
+    alt: `${count(a, "row")} of ${count(m, "ten")}. That's ${a} × ${m} = ${count(f, "ten")}, and ${count(f, "ten")} is ${P}.`,
   });
 }
 
@@ -70,13 +71,13 @@ function explain(p: Mult10Problem, model: AnswerModel): Explanation {
     idea: ["Tens can be counted just like ones.", "Find the fact, then remember the answer is in tens."],
     statement: [num(a), op("×"), num(t), op("="), num(a), op("×"), num(m), text(" tens")],
     diagram: mult10Picture(p, f, P),
-    caption: `${a} rows with ${m} tens in each row.`,
+    caption: `${count(a, "row")} with ${count(m, "ten")} in each row.`,
     timeline: beats(3),
     steps: [
       { id: "fact", state: 1, answerStep: "fact", result: f, math: [num(a), op("×"), num(m), op("="), num(f)],
-        narration: `Count the tens: ${a} rows of ${m} make ${f} tens.` },
+        narration: `Count the tens: ${count(a, "row")} of ${m} make ${count(f, "ten")}.` },
       { id: "tens", state: 2, answerStep: "tens", result: P, math: [num(a), op("×"), num(t), op("="), num(P)],
-        narration: `Each ten is worth 10, so ${f} tens is ${P}. Count by ${t}s down the rows to check.` },
+        narration: `Each ten is worth 10, so ${count(f, "ten")} is ${P}. Count by ${t}s down the rows to check.` },
     ],
   };
 }

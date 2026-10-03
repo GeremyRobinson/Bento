@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildArray } from "../../../../explanations/diagrams/early-g3/array";
 import { box, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** a ÷ b, where a = b × q: share a into b equal groups. */
 export interface DivFactProblem { a: number; b: number }
@@ -27,16 +28,16 @@ function answers({ a, b }: DivFactProblem): AnswerModel {
   return {
     steps: [
       box({
-        id: "think", label: "Think multiplication", question: `${b} groups of what make ${a}?`,
+        id: "think", label: "Think multiplication", question: `${count(b, "group")} of what make ${a}?`,
         prompt: x => [num(b), op("×"), x, op("="), num(a)], ans: q,
         wrong: [
           [a - b, "Subtracted", `Taking ${b} away once leaves ${a - b}. We want ${b} equal groups that make ${a}.`],
           [q + 1, "One too many in each group", `${b} × ${q + 1} = ${b * (q + 1)}. That's more than ${a}.`],
           [q - 1, "One too few in each group", `${b} × ${q - 1} = ${b * (q - 1)}. That's less than ${a}.`],
-          [a, "Wrote the total", `${a} is all the dots together. How many go in each of the ${b} groups?`],
+          [a, "Wrote the total", `${a} is all the dots together. How many go in each of the ${count(b, "group")}?`],
         ],
         hint: `Count by ${b}s until you reach ${a}. Count how many jumps it took.`,
-        explain: `Counting by ${b}s reaches ${a} after ${q} jumps, so ${b} × ${q} = ${a}.`,
+        explain: `Counting by ${b}s reaches ${a} after ${count(q, "jump")}, so ${b} × ${q} = ${a}.`,
       }),
       box({
         id: "divide", label: "Divide", question: `So ${a} shared into ${b} equal groups is…`,
@@ -60,11 +61,11 @@ export function divPicture({ a, b }: DivFactProblem, q: number) {
     rowBoxes: { from: 1 },
     rowTotals: { from: 1, text: () => String(q), acc: () => true },
     lines: [
-      { text: `${a} dots`, from: 0, until: 0, cls: "lbl" },
-      { text: `${b} groups of ${q}: ${b} × ${q} = ${a}`, from: 1, until: 1 },
+      { text: `${count(a, "dot")}`, from: 0, until: 0, cls: "lbl" },
+      { text: `${count(b, "group")} of ${q}: ${b} × ${q} = ${a}`, from: 1, until: 1 },
       { text: `${a} ÷ ${b} = ${q}`, from: 2 },
     ],
-    alt: `${a} dots shared into ${b} equal rows. Each row holds ${q}, so ${a} ÷ ${b} = ${q}.`,
+    alt: `${count(a, "dot")} shared into ${b} equal rows. Each row holds ${q}, so ${a} ÷ ${b} = ${q}.`,
   });
 }
 
@@ -75,11 +76,11 @@ function explain(p: DivFactProblem, model: AnswerModel): Explanation {
     idea: ["Dividing shares a number into equal groups.", "Every division fact has a multiplication fact hiding inside it."],
     statement: [num(a), op("÷"), num(b)],
     diagram: divPicture(p, q),
-    caption: `Share ${a} dots into ${b} equal groups.`,
+    caption: `Share ${count(a, "dot")} into ${b} equal groups.`,
     timeline: beats(3),
     steps: [
       { id: "think", state: 1, answerStep: "think", result: q, math: [num(b), op("×"), num(q), op("="), num(a)],
-        narration: `Put the ${a} dots in ${b} equal rows. Each row gets ${q}, because ${b} × ${q} = ${a}.` },
+        narration: `Put the ${count(a, "dot")} in ${b} equal rows. Each row gets ${q}, because ${b} × ${q} = ${a}.` },
       { id: "divide", state: 2, answerStep: "divide", result: d, math: [num(a), op("÷"), num(b), op("="), num(d)],
         narration: `So ${a} ÷ ${b} = ${d}. Each group has ${d}.` },
     ],

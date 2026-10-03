@@ -6,6 +6,7 @@ import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { pieceName } from "../../_tape-family/steps";
 import { box, choice, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** Compare a/b with c/d: the same bottom, the same top, or the same amount cut into smaller pieces. */
 export interface CompareProblem { a: number; b: number; c: number; d: number }
@@ -82,8 +83,8 @@ function answers(p: CompareProblem): AnswerModel {
     first = choice({
       id: "more", label: "Count the pieces", question: `Both are cut into ${b} equal pieces. Which has more pieces?`,
       prompt: pair(p, [text(" or ")]), choices: [ft(a, b), ft(c, d)], right,
-      wrong: { [1 - right]: ["Picked fewer pieces", `${ft(fewer, b)} is only ${fewer} pieces. ${ft(more, b)} is ${more} pieces of the same size.`] },
-      hint: "The pieces are the same size, so more pieces is more.", explain: `${more} pieces is more than ${fewer} pieces of the same size.`,
+      wrong: { [1 - right]: ["Picked fewer pieces", `${ft(fewer, b)} is only ${count(fewer, "piece")}. ${ft(more, b)} is ${count(more, "piece")} of the same size.`] },
+      hint: "The pieces are the same size, so more pieces is more.", explain: `${count(more, "piece")} is more than ${count(fewer, "piece")} of the same size.`,
       work: [frac(more, b), text(` has more ${pieceName(b)}`)],
     });
   } else if (kind === "top") {
@@ -91,17 +92,17 @@ function answers(p: CompareProblem): AnswerModel {
     first = choice({
       id: "size", label: "Compare the pieces", question: `Both have ${a} ${a === 1 ? "piece" : "pieces"}. Which piece is bigger?`,
       prompt: [frac(1, b), text(" or "), frac(1, d)], choices: [ft(1, b), ft(1, d)], right,
-      wrong: { [1 - right]: ["Thought a bigger bottom is bigger", `${hi} is bigger than ${lo}, but cutting a whole into ${hi} pieces makes each piece smaller. 1/${lo} is bigger.`] },
+      wrong: { [1 - right]: ["Thought a bigger bottom is bigger", `${hi} is bigger than ${lo}, but cutting a whole into ${count(hi, "piece")} makes each piece smaller. 1/${lo} is bigger.`] },
       hint: "Fewer pieces in the whole means each piece is bigger.", explain: `1/${lo} is bigger than 1/${hi}: ${pieceName(lo)} are bigger than ${pieceName(hi)}.`,
       work: [frac(1, lo), op(">"), frac(1, hi)],
     });
   } else {
     const B = Math.min(b, d), D = Math.max(b, d), k = D / B;
     first = box({
-      id: "fit", label: "Fit the small pieces", question: `How many 1/${D} pieces fit in one 1/${B} piece?`,
+      id: "fit", label: "Fit the small pieces", question: `How many 1/${count(D, "piece")} fit in one 1/${B} piece?`,
       prompt: x => [x, op("×"), frac(1, D), op("="), frac(1, B)], ans: k,
-      wrong: [[D, "Counted all the small pieces", `There are ${D} small pieces in the whole bar. How many fit in just one 1/${B} piece?`], [B, "Used the big pieces", `Look at one 1/${B} piece and count the 1/${D} pieces under it.`]],
-      hint: `${D} ÷ ${B} = ${k}. Look at the bars to check.`, explain: `${k} pieces of 1/${D} fit in each 1/${B}.`,
+      wrong: [[D, "Counted all the small pieces", `There are ${D} small pieces in the whole bar. How many fit in just one 1/${B} piece?`], [B, "Used the big pieces", `Look at one 1/${B} piece and count the 1/${count(D, "piece")} under it.`]],
+      hint: `${D} ÷ ${B} = ${k}. Look at the bars to check.`, explain: `${count(k, "piece")} of 1/${D} fit in each 1/${B}.`,
     });
   }
   return { steps: [first, compareStep(p)], finalParts: [-1] };
@@ -138,7 +139,7 @@ function explain(p: CompareProblem, model: AnswerModel): Explanation {
     ? { narration: `Both bars are cut into ${b} equal pieces. Count the shaded ones: ${a} and ${c}.`, math: [num(a), op(a > c ? ">" : "<"), num(c)] as MathText, result: expectedOf(model, "more", "c") }
     : kind === "top"
       ? { narration: `Both have ${a} shaded ${a === 1 ? "piece" : "pieces"}. A whole cut into ${Math.min(b, d)} has bigger pieces than one cut into ${Math.max(b, d)}.`, math: [frac(1, Math.min(b, d)), op(">"), frac(1, Math.max(b, d))] as MathText, result: expectedOf(model, "size", "c") }
-      : { narration: `Each 1/${Math.min(b, d)} piece is the same as ${expectedOf(model, "fit")} pieces of 1/${Math.max(b, d)}.`, math: [num(expectedOf(model, "fit")), op("×"), frac(1, Math.max(b, d)), op("="), frac(1, Math.min(b, d))] as MathText, result: expectedOf(model, "fit") };
+      : { narration: `Each 1/${Math.min(b, d)} piece is the same as ${count(expectedOf(model, "fit"), "piece")} of 1/${Math.max(b, d)}.`, math: [num(expectedOf(model, "fit")), op("×"), frac(1, Math.max(b, d)), op("="), frac(1, Math.min(b, d))] as MathText, result: expectedOf(model, "fit") };
   return {
     heading: kind === "bottom" ? "Same pieces: count them" : kind === "top" ? "Same count: compare the pieces" : "Same amount, different pieces",
     idea: kind === "top"

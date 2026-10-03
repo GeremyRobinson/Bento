@@ -8,6 +8,7 @@ import { buildMixedBars } from "../../../../explanations/diagrams/early-g4/mixed
 import { gcd, pieceName } from "../../_tape-family/steps";
 import { expectedOf, manyBoxes, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { boxSlips, slips } from "../_kit";
+import { count } from "../../../text";
 
 /** w1 n1/d + w2 n2/d */
 export interface MixedProblem { w1: number; n1: number; w2: number; n2: number; d: number }
@@ -69,7 +70,7 @@ function answers(p: MixedProblem): AnswerModel {
       [{ w: 1, n: S }, "Kept every piece", `${d} of the pieces became the whole, so take ${d} away: ${S} − ${d} = ${R}.`],
       [{ w: 0, n: S }, "Didn't make a whole", `${S} is ${d} or more, so ${d} of them make 1 whole.`],
     ]),
-    hint: `${d}/${d} is 1 whole. Take ${d} pieces out of ${S}.`,
+    hint: `${d}/${d} is 1 whole. Take ${count(d, "piece")} out of ${S}.`,
   }));
   const fin: [Record<string, number>, string, string][] = trade
     ? [

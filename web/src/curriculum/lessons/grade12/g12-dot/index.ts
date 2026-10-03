@@ -44,7 +44,7 @@ export function explainDot(p: DotProblem, model: AnswerModel): Explanation {
     heading: "Multiply matching parts, then add",
     idea: ["The dot product multiplies the x parts, multiplies the y parts, and adds. It is one number: positive when the arrows point roughly the same way, negative when they point apart, 0 when they are perpendicular."],
     statement: dotMath(p),
-    caption: `${f(a)} × ${fP(c)} + ${f(b)} × ${fP(d)} = ${f(D)}: the arrows are ${sense}.`,
+    caption: `${f(a)} × ${fP(c)} + ${fP(b)} × ${fP(d)} = ${f(D)}: the arrows are ${sense}.`,
     diagram: buildPlane({
       alt: `Graph: the vectors ${vt(a, b)} and ${vt(c, d)} from the origin; their dot product is ${f(D)}.`,
       equal: true,

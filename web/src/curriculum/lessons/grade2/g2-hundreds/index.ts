@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPlaceBlocks } from "../../../../explanations/diagrams/early-g2/blocks";
 import { expectedOf, manyBoxes, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, slips } from "../kit";
+import { isAre } from "../../../text";
 
 /** A three-digit number. */
 export interface HundredsProblem { n: number }
@@ -32,7 +33,7 @@ function answers({ n }: HundredsProblem): AnswerModel {
         id: "hundreds", label: "Count the hundreds", question: `How many hundreds are in ${n}?`,
         prompt: s => [text("Hundreds: "), s], ans: h,
         wrong: slips(h, [
-          [h * 100, "Wrote the value", `${count(h, "hundred")} are worth ${h * 100}. The question asks how many hundreds: just ${h}.`],
+          [h * 100, "Wrote the value", `${count(h, "hundred")} ${isAre(h)} worth ${h * 100}. The question asks how many hundreds: just ${h}.`],
           [t, "Read the tens digit", `${t} is the middle digit, the tens. The hundreds digit is the first one on the left.`],
           [o, "Read the ones digit", `${o} is the last digit, the ones. The hundreds digit is the first one on the left.`],
         ]),
@@ -43,7 +44,7 @@ function answers({ n }: HundredsProblem): AnswerModel {
         id: "tens", label: "Count the tens", question: `How many tens are left after the hundreds?`,
         prompt: s => [text("Tens: "), s], ans: t,
         wrong: slips(t, [
-          [t * 10, "Wrote the value", `${count(t, "ten")} are worth ${t * 10}. The question asks how many tens: just ${t}.`],
+          [t * 10, "Wrote the value", `${count(t, "ten")} ${isAre(t)} worth ${t * 10}. The question asks how many tens: just ${t}.`],
           [h, "Read the hundreds digit", `${h} is the first digit, the hundreds. The tens digit is in the middle.`],
           [o, "Read the ones digit", `${o} is the last digit, the ones. The tens digit is in the middle.`],
         ]),

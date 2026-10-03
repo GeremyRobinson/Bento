@@ -2,6 +2,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildRadians } from "../../../../explanations/diagrams/circle/build";
 import { asRecord, expected, gcd, mt, ns, numberField, piText } from "../../_geometry/kit";
+import { count } from "../../../text";
 
 /** An angle of nπ/d radians to write in degrees. */
 export interface RadiansToDegreesProblem {
@@ -42,7 +43,7 @@ export function explainRadiansToDegrees({ n, d }: RadiansToDegreesProblem, answe
       t: deg, piece, pieceBeat: 1, angleBeat: 2,
       pieceNote: `π/${d} = 180° ÷ ${d} = ${piece}°`,
       answerNote: `${n} × ${piece}° = ${deg}°`,
-      alt: `A circle with the half turn, π, cut into ${d} pieces of ${piece}°. ${piText(n, d)} covers ${n} of them: ${deg}°.`,
+      alt: `A circle with the half turn, π, cut into ${count(d, "piece")} of ${piece}°. ${piText(n, d)} covers ${n} of them: ${deg}°.`,
     }),
     timeline: beats(3),
     steps: [

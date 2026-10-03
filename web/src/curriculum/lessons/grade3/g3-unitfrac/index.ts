@@ -6,6 +6,7 @@ import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeText } from "../../../../explanations/diagrams/tape/schema";
 import { pieceName } from "../../_tape-family/steps";
 import { box, expectedOf, fracBoxes, restoreVia, wholeIn } from "../_kit/steps";
+import { count, isAre } from "../../../text";
 
 /** A bar cut into b equal parts with k of them shaded: each part is 1/b, so k parts are k/b. */
 export interface UnitFracProblem { b: number; k: number }
@@ -31,7 +32,7 @@ function answers({ b, k }: UnitFracProblem): AnswerModel {
       id: "parts", label: "Count the equal parts", question: "How many equal parts is the whole bar cut into?",
       prompt: x => [text("equal parts "), op("="), x], ans: b,
       wrong: [
-        [b - 1, "Counted the cut lines", `There are ${b - 1} cut lines, but ${b} parts. Count the pieces, not the lines.`],
+        [b - 1, "Counted the cut lines", `There ${isAre(b - 1)} ${count(b - 1, "cut line")}, but ${count(b, "part")}. Count the pieces, not the lines.`],
         [k, "Counted only the shaded parts", `Count every part of the bar, shaded or not.`],
       ],
       hint: "Touch each part of the bar as you count it.",
@@ -42,24 +43,24 @@ function answers({ b, k }: UnitFracProblem): AnswerModel {
       prompt: f => [text("one part "), op("="), f], N: 1, D: b,
       wrong: [
         [b, 1, "Flipped the fraction", `The bottom number says how many equal parts make the whole: ${b}. The top says how many we take: 1.`],
-        [1, b - 1, "Counted the other parts", `The bottom counts all ${b} parts of the whole, not just the other ${b - 1}.`],
+        [1, b - 1, "Counted the other parts", `The bottom counts all ${count(b, "part")} of the whole, not just the other ${b - 1}.`],
       ],
-      hint: `The whole is cut into ${b} parts and we take 1. That's 1 on top, ${b} on the bottom.`,
+      hint: `The whole is cut into ${count(b, "part")} and we take 1. That's 1 on top, ${b} on the bottom.`,
       explain: `One of ${b} equal parts is 1/${b}, one ${pieceName(b, false)}.`,
     }),
   ];
   if (k > 1) {
     steps.push(fracBoxes({
-      id: "shaded", label: "Name the shaded part", question: `${k} parts are shaded. Each part is 1/${b}.`,
+      id: "shaded", label: "Name the shaded part", question: `${count(k, "part")} ${isAre(k)} shaded. Each part is 1/${b}.`,
       prompt: f => [text("shaded "), op("="), f], N: k, D: b,
       wrong: [
-        [k, b - k, "Compared shaded to not shaded", `The bottom counts all ${b} parts of the whole, not just the ${b - k} that are not shaded.`],
-        [b - k, b, "Counted the parts not shaded", `${b - k} parts are not shaded. Count the shaded parts for the top.`],
+        [k, b - k, "Compared shaded to not shaded", `The bottom counts all ${count(b, "part")} of the whole, not just the ${b - k} that ${isAre(b - k)} not shaded.`],
+        [b - k, b, "Counted the parts not shaded", `${count(b - k, "part")} ${isAre(b - k)} not shaded. Count the shaded parts for the top.`],
         [b, k, "Flipped the fraction", `The bottom says how many parts make the whole: ${b}. The top counts the shaded parts: ${k}.`],
-        [1, b, "Named only one part", `That's one part. ${k} parts are shaded, so count ${k} pieces of 1/${b}.`],
+        [1, b, "Named only one part", `That's one part. ${count(k, "part")} ${isAre(k)} shaded, so count ${count(k, "piece")} of 1/${b}.`],
       ],
-      hint: `Count the shaded parts for the top. The whole still has ${b} parts.`,
-      explain: `${k} parts of 1/${b} make ${k}/${b}.`,
+      hint: `Count the shaded parts for the top. The whole still has ${count(b, "part")}.`,
+      explain: `${count(k, "part")} of 1/${b} make ${k}/${b}.`,
     }));
   }
   return { steps, finalParts: [-1] };
@@ -91,7 +92,7 @@ function explain(p: UnitFracProblem, model: AnswerModel): Explanation {
     idea: ["The bottom number says how many equal parts make the whole.", "The top number says how many of those parts we have."],
     statement: [text("shaded "), op("="), text("?")],
     diagram: unitFracPicture(p),
-    caption: `${k === 1 ? "One part" : `${k} parts`} of the bar ${k === 1 ? "is" : "are"} shaded.`,
+    caption: `${k === 1 ? "One part" : `${count(k, "part")}`} of the bar ${k === 1 ? "is" : "are"} shaded.`,
     timeline: beats(k > 1 ? 4 : 3),
     steps: [
       { id: "parts", state: 1, answerStep: "parts", result: B, math: [text("equal parts "), op("="), num(B)],
@@ -99,7 +100,7 @@ function explain(p: UnitFracProblem, model: AnswerModel): Explanation {
       { id: "one", state: 2, answerStep: "one", result: d, math: [text("one part "), op("="), frac(1, d)],
         narration: `Each part is one of ${d}, so each part is 1/${d}, one ${pieceName(d, false)}.` },
       ...(k > 1 ? [{ id: "shaded", state: 3, answerStep: "shaded", result: k, math: [text("shaded "), op("="), frac(k, b)],
-        narration: `${k} parts are shaded. ${k} pieces of 1/${b} make ${k}/${b}.` }] : []),
+        narration: `${count(k, "part")} ${isAre(k)} shaded. ${count(k, "piece")} of 1/${b} make ${k}/${b}.` }] : []),
     ],
   };
 }

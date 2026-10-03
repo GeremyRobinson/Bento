@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, gcd, ints, ns } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 /** a/b = ?/(b·k): the bottom is multiplied by k, so the top must be too. */
 export interface EquivProblem { a: number; b: number; k: number }
@@ -67,7 +68,7 @@ export function equivPicture({ a, b, k }: EquivProblem) {
   return buildTape({
     rows,
     guides: [{ at: a / b, rows: [0, rows.length - 1], from: 2 }],
-    alt: `Fraction bars: ${a}/${b} shaded, then the same bar cut into ${b * k} pieces with ${a * k} shaded. The shaded amount is the same.`,
+    alt: `Fraction bars: ${a}/${b} shaded, then the same bar cut into ${count(b * k, "piece")} with ${a * k} shaded. The shaded amount is the same.`,
     width: 420,
   });
 }

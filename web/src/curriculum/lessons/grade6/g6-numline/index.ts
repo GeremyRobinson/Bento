@@ -4,6 +4,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine, fitRange } from "../../../../explanations/diagrams/number-line/build";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+import { count } from "../../../text";
 
 /** from a (−12 to −1) to b (1 to 12) */
 export interface DistanceProblem { a: number; b: number }
@@ -40,7 +41,7 @@ function explain(p: DistanceProblem, model: AnswerModel): Explanation {
       marks: [{ v: b, beat: 0, cls: "hole" }],
       hops: [{ from: a, to: 0, label: String(left), beat: 0 }, { from: 0, to: b, label: String(right), beat: 1, start: false }],
       spans: [{ from: a, to: b, beat: 2, label: `${left} + ${right} = ${total} apart` }],
-      alt: `Number line: from ${f(a)} to 0 is ${left} steps, from 0 to ${b} is ${right} steps, ${total} in all.`,
+      alt: `Number line: from ${f(a)} to 0 is ${count(left, "step")}, from 0 to ${b} is ${count(right, "step")}, ${total} in all.`,
     }),
     caption: `${left} + ${right} = ${total} apart.`,
     timeline: beats(3),

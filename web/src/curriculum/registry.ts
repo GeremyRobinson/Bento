@@ -1,10 +1,20 @@
-import type { AnyLesson } from "./schemas/lesson";
+import type { AnswerModel, AnswerStep, AnyLesson } from "./schemas/lesson";
 import { CATALOG } from "./catalog";
-import { withSingulars } from "./plural";
+import { eq } from "../engine/evaluation/numbers";
+
+/**
+ * Some slips equal the right answer for some numbers ("2² means 2 × 2, not 2 × 2"). Right answers are checked first,
+ * so a child never sees them, but they'd still show up as mistakes the step knows about. Drop them here, once.
+ */
+const isAnswer = (s: AnswerStep, values: Record<string, number>) =>
+  s.slots.every(x => (x.expected == null ? values[x.id] == null : eq(values[x.id], x.expected)));
+export const dropDeadSlips = (m: AnswerModel): AnswerModel =>
+  ({ ...m, steps: m.steps.map(s => (s.known.some(k => isAnswer(s, k.values)) ? { ...s, known: s.known.filter(k => !isAnswer(s, k.values)) } : s)) });
+const live = (l: AnyLesson): AnyLesson => ({ ...l, answers: (p: never) => dropDeadSlips(l.answers(p)) }) as AnyLesson;
 
 // Every lesson module registers itself by living at lessons/<grade>/<id>/index.ts and exporting `lesson`.
 const modules = import.meta.glob<{ lesson: AnyLesson }>("./lessons/*/*/index.ts", { eager: true });
-const BY_ID = new Map(Object.values(modules).map(m => [m.lesson.id, withSingulars(m.lesson)]));
+const BY_ID = new Map(Object.values(modules).map(m => [m.lesson.id, live(m.lesson)]));
 
 /** Lessons rebuilt so far, in curriculum order (the catalog's). */
 export const LESSONS: AnyLesson[] = CATALOG.flatMap(c => {

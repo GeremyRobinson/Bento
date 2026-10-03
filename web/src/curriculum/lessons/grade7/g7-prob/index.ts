@@ -3,6 +3,7 @@ import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildMarbleBag } from "../../../../explanations/diagrams/marbles/build";
 import { asRecord, expected, fracText, fs, mt, ns, numberField } from "../../_geometry/kit";
+import { count } from "../../../text";
 
 /** A bag of r red, b blue and g green marbles; c picks the colour asked about (0 red, 1 blue, 2 green). */
 export interface ProbabilityProblem {
@@ -33,7 +34,7 @@ export function probabilityAnswers(p: ProbabilityProblem): AnswerModel {
   const want = [p.r, p.b, p.g][p.c]!, name = NAMES[p.c], T = p.r + p.b + p.g;
   return {
     steps: [
-      ns({ id: "want", label: "Ways to win", question: `How many marbles are ${name}?`, prompt: s => [s], ans: want, hint: `Count the ${name} ones.` }),
+      ns({ id: "want", label: "Ways to win", question: `How many marbles are ${name}?`, prompt: s => [s], ans: want, hint: `Count the ${count(name, "one")}.` }),
       ns({ id: "all", label: "All the ways", question: "How many marbles in all?", prompt: s => [s], ans: T, hint: "Add all three colors." }),
       fs({ id: "chance", label: "Write the chance", prompt: s => mt`P(${name}) = ${s}`, N: want, D: T, hint: `${name} out of all: ${want} over ${T}, simplified.`,
         wrong: [[want, T - want, "Used the losers on the bottom", "The bottom is **all** the marbles."]] }),
@@ -62,7 +63,7 @@ export function explainProbability(p: ProbabilityProblem, answers: AnswerModel):
     steps: [
       { id: "bag", narration: `The bag holds ${p.r} red, ${p.b} blue and ${p.g} green marbles. You pick one without looking.`, math: mt`${p.r} red, ${p.b} blue, ${p.g} green`, state: 0 },
       { id: "want", narration: `${want} of them are ${name}: those are the ways to win.`, math: mt`${want}`, state: 1, answerStep: "want", result: want },
-      { id: "all", narration: `There are ${p.r} + ${p.b} + ${p.g} = ${T} marbles in all.`, math: mt`${p.r} + ${p.b} + ${p.g} = ${T}`, state: 2, answerStep: "all", result: T },
+      { id: "all", narration: `There are ${p.r} + ${p.b} + ${p.g} = ${count(T, "marble")} in all.`, math: mt`${p.r} + ${p.b} + ${p.g} = ${T}`, state: 2, answerStep: "all", result: T },
       { id: "chance", narration: `The chance is ${want} out of ${T}${chance === `${want}/${T}` ? "" : `, which simplifies to ${chance}`}.`, math: mt`P(${name}) = ${frac(want, T)} = ${frac(n, d)}`, state: 3, answerStep: "chance", result: n },
     ],
   };

@@ -6,6 +6,7 @@ import { buildHundredRows } from "../../../../explanations/diagrams/early-g1/cha
 import { buildTensOnes } from "../../../../explanations/diagrams/early-g1/blocks";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, onesOf, plural, slips, tensOf } from "../_kit";
+import { count as countOf, verb } from "../../../text";
 
 const TEN = 10;
 
@@ -77,7 +78,7 @@ function explain({ n, more }: TenMoreProblem, model: AnswerModel): Explanation {
       beats: { start: 0, jump: 1, land: 2 },
       alt: `Hundreds chart: from ${n}, jump one row ${more ? "down" : "up"} to ${res}.`,
     }),
-    caption: `Only the tens change: ${t} becomes ${newT}. The ${o} ones stay.`,
+    caption: `Only the tens change: ${t} becomes ${newT}. The ${countOf(o, "one")} ${verb(o, "stays", "stay")}.`,
     timeline: beats(3),
     steps: [
       { id: "tens", narration: `Find ${n} on the chart. It has **${t}** tens.`, math: count(t, "ten", "tens"), state: 0, answerStep: "tens", result: t },

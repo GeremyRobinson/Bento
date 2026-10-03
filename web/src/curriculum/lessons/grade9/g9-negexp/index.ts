@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { fs, ns, supText } from "../../algebra-kit/steps";
 import { attempt, readInts, rule } from "../../algebra-kit/restore";
 import { beatExplanation } from "../../../../explanations/diagrams/algebra/chain";
+import { count } from "../../../text";
 
 /** a to the −n: 1 over aⁿ. */
 export interface NegativeExponent { kind: "exponents.negative"; a: number; n: number; power: number }
@@ -26,7 +27,7 @@ const pow = (a: number, e: number): MathText => [num(a), sup(e)];
 export function negativeExponentAnswers({ a, n }: NegativeExponent): AnswerModel {
   return {
     steps: [
-      ns({ id: "positive", l: "Make the exponent positive", a: s => [...pow(a, n), op("="), ...s], ans: a ** n, h: `Multiply ${f(n)} copies of ${f(a)}.` }),
+      ns({ id: "positive", l: "Make the exponent positive", a: s => [...pow(a, n), op("="), ...s], ans: a ** n, h: `Multiply ${count(f(n), "copy", "copies")} of ${f(a)}.` }),
       fs({ id: "flip", l: "Flip it", a: s => [...pow(a, -n), op("="), ...s], N: 1, D: a ** n, n: "A negative exponent means 1 over the power.", h: `1 over ${f(a ** n)}.`,
         w: [[-(a ** n), 1, "Thought it was a negative number", "A negative exponent doesn't make the number negative. It flips it: 1 over the power."]] }),
     ],

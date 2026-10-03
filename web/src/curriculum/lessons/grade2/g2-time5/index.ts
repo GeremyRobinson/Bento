@@ -6,6 +6,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildClock } from "../../../../explanations/diagrams/early-g2/measure";
 import { expectedOf, manyBoxes, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips } from "../kit";
+import { count } from "../../../text";
 
 /** A time on the clock: hour 1 to 12, minutes in fives. */
 export interface TimeProblem { h: number; m: number }
@@ -62,14 +63,14 @@ function answers({ h, m }: TimeProblem): AnswerModel {
           m > 5 && [m - 5, "One five too few", `Count one 5 for each number, all the way to ${K}.`],
         ]),
         hint: m ? `Count by 5s, one for each number: ${Array.from({ length: K }, (_, i) => 5 * (i + 1)).join(", ")}.` : "On 12, no minutes have gone by yet.",
-        explain: m ? `${Array.from({ length: K }, (_, i) => 5 * (i + 1)).join(", ")}. That's ${m} minutes.` : "On 12 it is 0 minutes past the hour.",
+        explain: m ? `${Array.from({ length: K }, (_, i) => 5 * (i + 1)).join(", ")}. That's ${count(m, "minute")}.` : "On 12 it is 0 minutes past the hour.",
       }),
       manyBoxes({
         id: "time", label: "Write the time", question: "Put the hour and the minutes together.",
         prompt: b => [b.h!, text(m < 10 ? ":0" : ":"), b.m!], ans: { h, m },
         wrong: ([
           [{ h: next, m }, "Read the next hour", `The short hand has not reached ${next} yet, so the hour is ${h}.`],
-          [{ h, m: K }, "Read the number as the minutes", `The long hand on ${K} means ${m} minutes.`],
+          [{ h, m: K }, "Read the number as the minutes", `The long hand on ${K} means ${count(m, "minute")}.`],
           [{ h: K, m: (h % 12) * 5 }, "Swapped the hands", "The short hand gives the hour and the long hand gives the minutes."],
         ] as [Record<string, number>, string, string][]).filter(([v]) => !same(v)),
         hint: `Hour first, then minutes: ${h} and ${m}.`,
@@ -88,15 +89,15 @@ function explain(p: TimeProblem, model: AnswerModel): Explanation {
     statement: [text("What time is it?")],
     diagram: buildClock({
       hour: p.h, minute: p.m, beats: { hour: 1, number: 2, count: 3, time: 4 },
-      text: { hour: `hour: ${h}`, number: `long hand on ${K}`, count: `${m} minutes`, time: shown },
-      alt: `A clock. The short hand is ${m ? `just past ${h}` : `on ${h}`} and the long hand is on ${K}, which is ${m} minutes. The time is ${shown}.`,
+      text: { hour: `hour: ${h}`, number: `long hand on ${K}`, count: `${count(m, "minute")}`, time: shown },
+      alt: `A clock. The short hand is ${m ? `just past ${h}` : `on ${h}`} and the long hand is on ${K}, which is ${count(m, "minute")}. The time is ${shown}.`,
     }),
     caption: "Short hand: hours. Long hand: minutes.",
     timeline: beats(5),
     steps: [
       { id: "hour", narration: m ? `The short hand has passed ${h} but not reached the next number. The hour is ${h}.` : `The short hand points right at ${h}.`, math: [text("Hour: "), num(h)], state: 1, answerStep: "hour", result: h },
       { id: "number", narration: `The long hand points to ${K}.`, math: [text("Long hand: "), num(K)], state: 2, answerStep: "number", result: K },
-      { id: "minutes", narration: m ? `Count by 5s up to ${K}: ${Array.from({ length: K }, (_, i) => 5 * (i + 1)).join(", ")}. That's ${m} minutes.` : "On 12 it is 0 minutes past the hour, so it is o'clock.", math: [text("Minutes: "), num(m)], state: 3, answerStep: "minutes", result: m },
+      { id: "minutes", narration: m ? `Count by 5s up to ${K}: ${Array.from({ length: K }, (_, i) => 5 * (i + 1)).join(", ")}. That's ${count(m, "minute")}.` : "On 12 it is 0 minutes past the hour, so it is o'clock.", math: [text("Minutes: "), num(m)], state: 3, answerStep: "minutes", result: m },
       { id: "time", narration: `The time is **${shown}**.`, math: [text(shown)], state: 4, answerStep: "time", result: h },
     ],
   };

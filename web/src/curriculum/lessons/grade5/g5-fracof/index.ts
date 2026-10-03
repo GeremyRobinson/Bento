@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, ints, ns } from "../../_tape-family/steps";
 import { coprimeTop } from "../../grade4/g4-equiv";
+import { count, isAre } from "../../../text";
 
 /** n/d of W: split W into d equal groups, take n of them. W is a multiple of d. */
 export interface FractionOfNumberProblem { n: number; d: number; W: number }
@@ -41,7 +42,7 @@ export function fractionOfNumberPicture({ n, d, W }: FractionOfNumberProblem) {
       total: [{ text: `${n} × ${g} = ${R}`, from: 2, acc: true }],
     }],
     brackets: [{ row: 0, a: 0, b: n / d, text: `${n}/${d}`, side: "below", from: 2 }],
-    alt: `A bar for ${W} split into ${d} equal groups of ${g}; ${n} groups are shaded: ${R}.`,
+    alt: `A bar for ${W} split into ${d} equal groups of ${g}; ${count(n, "group")} ${isAre(n)} shaded: ${R}.`,
   });
 }
 
@@ -51,7 +52,7 @@ function explain(p: FractionOfNumberProblem, model: AnswerModel): Explanation {
     heading: "Divide by the bottom, multiply by the top",
     statement: [frac(n, d), text(" of "), num(W)],
     diagram: fractionOfNumberPicture(p),
-    caption: `Split ${W} into ${d} groups. Take ${n} of them.`,
+    caption: `Split ${W} into ${count(d, "group")}. Take ${n} of them.`,
     timeline: beats(3),
     steps: [
       { id: "groups", state: 1, answerStep: "groups", result: g, math: [num(W), op("÷"), num(d), op("="), num(g)],

@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { teenFrames } from "../../../../explanations/diagrams/early-k/frames";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { TEN, countUp, slips, words } from "../kit";
+import { count } from "../../../text";
 
 /** ten and `ones` more, ones from 1 to 9 */
 export interface TeenProblem { ones: number }
@@ -75,7 +76,7 @@ export const lesson: LessonDefinition<TeenProblem> = {
   generate: (rng, index) => createTeen(rng.int(1, index < 3 ? 5 : 9)),
   restore: raw => restoreVia(raw, ["ones"] as const, v => createTeen(v.ones)),
   display: () => words("What number is this?"),
-  picture: p => teenFrames(p.ones, `A full ten frame and a frame with ${p.ones} dots`),
+  picture: p => teenFrames(p.ones, `A full ten frame and a frame with ${count(p.ones, "dot")}`),
   answers,
   explain,
 };

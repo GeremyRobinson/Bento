@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeSpec } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, gcd, ns } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 export const RATES = [10, 15, 20, 25, 30, 40, 50];
 
@@ -46,7 +47,7 @@ export function discountPicture({ P, p, off }: DiscountProblem) {
           fills: [{ a: 0, b: 1 - cut, tone: "on" }, { a: 1 - cut, b: 1, tone: "on", until: 0 }, { a: 1 - cut, b: 1, tone: "acc", from: 1, until: 1 }, { a: 1 - cut, b: 1, tone: "cut", from: 2 }],
           each: [{ text: () => `$${f(each)}` }], total: [{ text: `$${f(P - amt)}`, from: 2, acc: true }] }],
         brackets: [{ row: 0, a: 1 - cut, b: 1, text: `${p}% = $${f(amt)}`, side: "above", from: 1, acc: true }],
-        alt: `$${P} cut into ${blocks} blocks of ${g}%; ${p}% off takes $${f(amt)} away, leaving $${f(P - amt)}.`,
+        alt: `$${P} cut into ${count(blocks, "block")} of ${g}%; ${p}% off takes $${f(amt)} away, leaving $${f(P - amt)}.`,
       }
     : {
         rows: [
@@ -55,7 +56,7 @@ export function discountPicture({ P, p, off }: DiscountProblem) {
             label: [{ text: "total" }], total: [{ text: `$${f(P + amt)}`, from: 2, acc: true }] },
         ],
         brackets: [{ row: 1, a: 1, b: 1 + cut, text: `${p}% = $${f(amt)}`, side: "above", from: 1, acc: true }],
-        alt: `$${P} cut into ${blocks} blocks of ${g}%; a ${p}% tip adds ${p / g} more blocks, $${f(amt)}, for $${f(P + amt)}.`,
+        alt: `$${P} cut into ${count(blocks, "block")} of ${g}%; a ${p}% tip adds ${p / g} more blocks, $${f(amt)}, for $${f(P + amt)}.`,
       };
   return buildTape(spec);
 }

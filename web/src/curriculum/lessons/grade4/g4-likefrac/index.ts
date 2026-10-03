@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, fs, gcd, ints, ns, pieceName } from "../../_tape-family/steps";
+import { count as countOf } from "../../../text";
 
 /** a/d + c/d: same-size pieces, so only the tops add. */
 export interface LikeFractionsProblem { a: number; c: number; d: number }
@@ -59,7 +60,7 @@ export function likeFractionsPicture({ a, c, d }: LikeFractionsProblem) {
   }
   return buildTape({
     rows,
-    alt: `Fraction bars: ${a}/${d} and ${c}/${d}, then together ${S} pieces of size 1/${d}, which is ${S}/${d}.`,
+    alt: `Fraction bars: ${a}/${d} and ${c}/${d}, then together ${countOf(S, "piece")} of size 1/${d}, which is ${S}/${d}.`,
   });
 }
 

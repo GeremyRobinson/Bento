@@ -7,6 +7,7 @@ import { beats, type Explanation, type ExplanationStep } from "../../../../expla
 import { buildDoubleLine } from "../../../../explanations/diagrams/early-g4/double-line";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips } from "../_kit";
+import { count } from "../../../text";
 
 interface Unit {
   big: [string, string];
@@ -74,9 +75,9 @@ function answers(p: ConvertProblem): AnswerModel {
       prompt: s => [num(n), op("×"), num(f), op("="), s], ans: all,
       wrong: slips(all, [
         [n * 10, "Multiplied by 10", `That's ${n} × 10. Each ${one} is ${f} ${smalls}, so multiply by ${f}.`],
-        [n + f, "Added instead of multiplied", `There are ${n} ${name(u.big, n)}, each ${f} ${smalls}. That's ${n} groups of ${f}: multiply.`],
+        [n + f, "Added instead of multiplied", `There are ${n} ${name(u.big, n)}, each ${f} ${smalls}. That's ${count(n, "group")} of ${f}: multiply.`],
       ]),
-      hint: `Big unit to small unit: multiply. ${n} groups of ${f}.`, explain: `${n} × ${f} = ${all} ${smalls}.`,
+      hint: `Big unit to small unit: multiply. ${count(n, "group")} of ${f}.`, explain: `${n} × ${f} = ${all} ${smalls}.`,
     }),
   ];
   if (m) steps.push(oneBox({

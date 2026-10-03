@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { changeDots } from "../../../../explanations/diagrams/early-k/groups";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { TEN, countUp, indexIn, lines, slips, tapStep, words } from "../kit";
+import { count, isAre } from "../../../text";
 
 const NAMES = ["Mia", "Leo", "Ava", "Sam", "Zoe", "Ben"] as const;
 const THINGS = ["apples", "crayons", "stickers", "shells", "blocks", "cookies"] as const;
@@ -84,7 +85,7 @@ function answers(p: StoryProblem): AnswerModel {
           [end - 1, "One short", `One short. Count ${take ? "back" : "on"} exactly ${b}.`],
         ]),
         hint: take ? `Start at ${a} and count back ${b}.` : `Start at ${a} and count on ${b}.`,
-        explain: take ? `${a}, then back ${b}: ${countUp(end, a - 1).split(", ").reverse().join(", ")}. ${end} are left.`
+        explain: take ? `${a}, then back ${b}: ${countUp(end, a - 1).split(", ").reverse().join(", ")}. ${end} ${isAre(end)} left.`
           : `${a}, then on ${b}: ${countUp(a + 1, end)}. Now there are ${end}.`,
       }),
     ],
@@ -99,7 +100,7 @@ function explain(p: StoryProblem, model: AnswerModel): Explanation {
     idea: ["Find how many there are at the start. Do more come, or do some go away? Then add or take away."],
     statement: storyMath(p),
     diagram: changeDots({ start: p.a, change: p.b, kind: p.take ? "take" : "join", beats: { start: 0, change: 1, end: 2 },
-      alt: `${a} dots for the ${what}. ${p.take ? `${p.b} are crossed out` : `${p.b} more join them`}, and ${end} are counted at the end.` }),
+      alt: `${count(a, "dot")} for the ${what}. ${p.take ? `${p.b} ${isAre(p.b)} crossed out` : `${p.b} more join them`}, and ${end} ${isAre(end)} counted at the end.` }),
     caption: `${a} ${sign(p)} ${p.b} = ${end}`,
     timeline: beats(3),
     steps: [
@@ -126,7 +127,7 @@ export const lesson: LessonDefinition<StoryProblem> = {
   },
   restore: raw => restoreVia(raw, ["a", "b", "take", "who", "what", "tale"] as const, v => createStory(v.a, v.b, v.take, v.who, v.what, v.tale)),
   display: storyMath,
-  picture: p => changeDots({ start: p.a, change: p.b, kind: p.take ? "take" : "join", alt: `${p.a} dots for the ${THINGS[p.what]}` }),
+  picture: p => changeDots({ start: p.a, change: p.b, kind: p.take ? "take" : "join", alt: `${count(p.a, "dot")} for the ${THINGS[p.what]}` }),
   story: p => ({ op: p.take ? "−" : "+", text: storyText(p) }),
   answers,
   explain,

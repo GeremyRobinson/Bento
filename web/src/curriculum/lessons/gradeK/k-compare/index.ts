@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { pairRows } from "../../../../explanations/diagrams/early-k/groups";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { TEN, countUp, slips, tapStep, words } from "../kit";
+import { count } from "../../../text";
 
 /** two rows of dots, 1 to 10 each */
 export interface CompareProblem { top: number; bottom: number }
@@ -76,7 +77,7 @@ function explain(p: CompareProblem, model: AnswerModel): Explanation {
     idea: ["Count each row. Then match the dots in pairs. The row with dots left over has more."],
     statement: words("Which row has more?"),
     diagram: pairRows({ top: p.top, bottom: p.bottom, beats: { top: 0, bottom: 1, match: 2 },
-      alt: `${top} dots on top and ${bottom} dots below, matched in pairs. ${matched}` }),
+      alt: `${count(top, "dot")} on top and ${count(bottom, "dot")} below, matched in pairs. ${matched}` }),
     caption: matched,
     timeline: beats(3),
     steps: [
@@ -105,7 +106,7 @@ export const lesson: LessonDefinition<CompareProblem> = {
   restore: raw => restoreVia(raw, ["top", "bottom"] as const, v => createCompare(v.top, v.bottom)),
   display: () => words("Which row has more?"),
   displayNote: () => "Count each row. They might be the same!",
-  picture: p => pairRows({ top: p.top, bottom: p.bottom, alt: `${p.top} dots on top and ${p.bottom} dots below` }),
+  picture: p => pairRows({ top: p.top, bottom: p.bottom, alt: `${count(p.top, "dot")} on top and ${count(p.bottom, "dot")} below` }),
   answers,
   explain,
 };

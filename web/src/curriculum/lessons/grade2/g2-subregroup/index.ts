@@ -6,6 +6,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTradeBlocks } from "../../../../explanations/diagrams/early-g2/blocks";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, slips } from "../kit";
+import { count as countOf } from "../../../text";
 
 /** a − b with two-digit numbers where a has fewer ones than b. */
 export interface SubRegroupProblem { a: number; b: number }
@@ -43,16 +44,16 @@ function answers(p: SubRegroupProblem): AnswerModel {
         wrong: slips(O, [
           [ao + 1, "Traded a ten for 1 one", "A ten is worth 10 ones, not 1. Add 10 to the ones."],
           [ao, "Forgot the new ones", `Add the 10 new ones to the ${ao} you already have.`],
-          [10, "Lost the old ones", `Keep the ${ao} ones you had and add the 10 new ones.`],
+          [10, "Lost the old ones", `Keep the ${countOf(ao, "one")} you had and add the 10 new ones.`],
         ]),
         hint: `You had ${count(ao, "one")}. Add the 10 ones from the ten you traded.`,
-        explain: `10 + ${ao} = ${O}. Now there are ${O} ones.`,
+        explain: `10 + ${ao} = ${O}. Now there are ${countOf(O, "one")}.`,
       }),
       oneBox({
         id: "ones", label: "Take away the ones",
         prompt: s => [num(O), op("−"), num(bo), op("="), s], ans: ones,
         wrong: slips(ones, [
-          [bo - ao, "Smaller from bigger", `That's ${bo} − ${ao}, the smaller digit from the bigger one. Start with the ${O} ones you have now and take away ${bo}.`],
+          [bo - ao, "Smaller from bigger", `That's ${bo} − ${ao}, the smaller digit from the bigger one. Start with the ${countOf(O, "one")} you have now and take away ${bo}.`],
           [O + bo, "Added the ones", `Take away ${bo}, don't add it.`],
         ]),
         hint: `Count back ${bo} from ${O}.`,
@@ -63,10 +64,10 @@ function answers(p: SubRegroupProblem): AnswerModel {
         question: `You traded 1 ten, so ${count(at, "ten")} became ${at - 1}.`,
         prompt: s => [num(at - 1), op("−"), num(bt), op("="), s], ans: tens,
         wrong: slips(tens, [
-          [at - bt, "Forgot the traded ten", `One ten became ones, so start from ${at - 1} tens, not ${at}.`],
+          [at - bt, "Forgot the traded ten", `One ten became ones, so start from ${countOf(at - 1, "ten")}, not ${at}.`],
           [at - 1 + bt, "Added the tens", `Take away ${bt}, don't add it.`],
         ]),
-        hint: `Start with ${at - 1} tens and take away ${bt}.`,
+        hint: `Start with ${countOf(at - 1, "ten")} and take away ${bt}.`,
         explain: `${at - 1} − ${bt} = ${tens}.`,
       }),
       oneBox({
@@ -94,14 +95,14 @@ function explain(p: SubRegroupProblem, model: AnswerModel): Explanation {
     statement: [num(a), op("−"), num(b)],
     diagram: buildTradeBlocks({
       a, b, beats: { blocks: 0, trade: 1, ones: 2, tens: 3, total: 4 },
-      text: { start: `${ao} ones, need ${bo}`, trade: `10 + ${ao} = ${O}`, ones: `${O} − ${bo} = ${ones}`, tens: `${at - 1} − ${bt} = ${tens}`, total: `${a} − ${b} = ${diff}` },
-      alt: `${a} as ${count(at, "ten")} and ${count(ao, "one")}. One ten is traded for 10 ones, making ${O} ones. ${bo} ones and ${count(bt, "ten")} are taken away, leaving ${count(tens, "ten")} and ${count(ones, "one")}: ${diff}.`,
+      text: { start: `${countOf(ao, "one")}, need ${bo}`, trade: `10 + ${ao} = ${O}`, ones: `${O} − ${bo} = ${ones}`, tens: `${at - 1} − ${bt} = ${tens}`, total: `${a} − ${b} = ${diff}` },
+      alt: `${a} as ${count(at, "ten")} and ${count(ao, "one")}. One ten is traded for 10 ones, making ${countOf(O, "one")}. ${countOf(bo, "one")} and ${count(bt, "ten")} are taken away, leaving ${count(tens, "ten")} and ${count(ones, "one")}: ${diff}.`,
     }),
     caption: `${count(ao, "one")} can't give away ${bo}, so one ten becomes 10 ones.`,
     timeline: beats(5),
     steps: [
-      { id: "trade", narration: `${count(ao, "one")} is not enough to take away ${bo}. Trade 1 ten for 10 ones: now there are ${O} ones and ${at - 1} tens.`, math: [num(10), op("+"), num(ao), op("="), num(O)], state: 1, answerStep: "trade", result: O },
-      { id: "ones", narration: `Take away ${bo} ones: ${O} − ${bo} = ${ones}.`, math: [num(O), op("−"), num(bo), op("="), num(ones)], state: 2, answerStep: "ones", result: ones },
+      { id: "trade", narration: `${count(ao, "one")} is not enough to take away ${bo}. Trade 1 ten for 10 ones: now there are ${countOf(O, "one")} and ${countOf(at - 1, "ten")}.`, math: [num(10), op("+"), num(ao), op("="), num(O)], state: 1, answerStep: "trade", result: O },
+      { id: "ones", narration: `Take away ${countOf(bo, "one")}: ${O} − ${bo} = ${ones}.`, math: [num(O), op("−"), num(bo), op("="), num(ones)], state: 2, answerStep: "ones", result: ones },
       { id: "tens", narration: `Take away ${count(bt, "ten")} from the ${at - 1} left: ${tens}.`, math: [num(at - 1), op("−"), num(bt), op("="), num(tens)], state: 3, answerStep: "tens", result: tens },
       { id: "answer", narration: `${count(tens, "ten")} and ${count(ones, "one")} is ${diff}.`, math: [num(a), op("−"), num(b), op("="), num(diff)], state: 4, answerStep: "answer", result: diff },
     ],

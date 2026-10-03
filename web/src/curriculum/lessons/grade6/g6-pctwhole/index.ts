@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, ints, ns, round6 } from "../../_tape-family/steps";
+import { count } from "../../../text";
 
 /** P is p% of ?, with p dividing 100. */
 export interface PercentWholeProblem { p: number; P: number }
@@ -38,7 +39,7 @@ export function percentWholePicture({ p, P }: PercentWholeProblem) {
         total: [{ text: "?", until: 1 }, { text: `${P * k}`, from: 2, acc: true }] },
     ],
     guides: [{ at: p / 100, rows: [0, 1], from: 1 }],
-    alt: `${p}% is ${P}. ${k} blocks of ${p}% make 100%, so the whole is ${k} × ${P} = ${P * k}.`,
+    alt: `${p}% is ${P}. ${count(k, "block")} of ${p}% make 100%, so the whole is ${k} × ${P} = ${P * k}.`,
   });
 }
 
@@ -48,7 +49,7 @@ function explain(pr: PercentWholeProblem, model: AnswerModel): Explanation {
     heading: "Count up to 100%",
     statement: [num(P), text(" is "), num(p), text("% of ?")],
     diagram: percentWholePicture(pr),
-    caption: `${k} blocks of ${p}% make 100%.`,
+    caption: `${count(k, "block")} of ${p}% make 100%.`,
     timeline: beats(3),
     steps: [
       { id: "parts", state: 1, answerStep: "parts", result: k, math: [num(p), text("%"), op("×"), num(k), op("="), num(100), text("%")],

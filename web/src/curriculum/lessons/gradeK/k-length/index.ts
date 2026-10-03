@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { lengthBars } from "../../../../explanations/diagrams/early-k/lengths";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { TEN, countUp, indexIn, slips, tapStep, words } from "../kit";
+import { count } from "../../../text";
 
 const THINGS = ["pencil", "crayon", "ribbon", "spoon", "snake", "straw"] as const;
 
@@ -21,7 +22,7 @@ export function createLength(top: number, bottom: number, a: number, b: number):
 }
 
 const cap = (s: string) => `${s[0]!.toUpperCase()}${s.slice(1)}`;
-const cubes = (n: number) => (n === 1 ? "1 cube" : `${n} cubes`);
+const cubes = (n: number) => (n === 1 ? "1 cube" : `${count(n, "cube")}`);
 
 function answers(p: LengthProblem): AnswerModel {
   const { a, b } = p, top = THINGS[p.top]!, bottom = THINGS[p.bottom]!;

@@ -6,6 +6,7 @@ import { buildTape, textWidth } from "../../../../explanations/diagrams/tape/bui
 import type { TapeBracket, TapeFill } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, finalForm, gcd, ints, mixedLabel, mixedMath, ns, pieceName, simplifyStep } from "../../_tape-family/steps";
 import { coprimeTop } from "../g4-equiv";
+import { count as countOf } from "../../../text";
 
 /** W × n/d: W groups of n pieces, each piece 1/d. */
 export interface FractionTimesWholeProblem { n: number; d: number; W: number }
@@ -26,7 +27,7 @@ const count = (k: number, d: number) => `${k} ${pieceName(d, k !== 1)}`;
 function answers({ n, d, W }: FractionTimesWholeProblem): AnswerModel {
   return {
     steps: [
-      ns({ id: "top", l: "Multiply the top", a: s => [num(W), op("×"), num(n), op("="), ...s], ans: W * n, h: `${W} groups of ${n} pieces.`,
+      ns({ id: "top", l: "Multiply the top", a: s => [num(W), op("×"), num(n), op("="), ...s], ans: W * n, h: `${countOf(W, "group")} of ${countOf(n, "piece")}.`,
         w: [[W * d, "Multiplied the bottom", "The pieces stay the same size. Only the number of pieces changes."]] }),
       simplifyStep(W * n, d, "Write as a mixed number"),
     ],
@@ -56,25 +57,25 @@ export function fractionTimesWholePicture({ n, d, W }: FractionTimesWholeProblem
         total: [{ text: `${S}/${d}`, from: 1, ...(same ? {} : { until: 1 }) }, ...(same ? [] : [{ text: `= ${mixedLabel(S, d)}`, from: 2, acc: true }])] },
     ],
     brackets,
-    alt: `${W} bars, each with ${n} of ${d} pieces shaded; together they make ${S} pieces of size 1/${d}, which is ${mixedLabel(S, d)}.`,
+    alt: `${W} bars, each with ${n} of ${countOf(d, "piece")} shaded; together they make ${countOf(S, "piece")} of size 1/${d}, which is ${mixedLabel(S, d)}.`,
   });
 }
 
 function explain(p: FractionTimesWholeProblem, model: AnswerModel): Explanation {
   const { n, d, W } = p, S = expectedOf(model.steps, "top"), F = finalForm(S, d), g = gcd(S, d);
   const simple = S >= d
-    ? `${count(S, d)} is ${mixedLabel(S, d)}: every ${d} pieces make one whole.`
+    ? `${count(S, d)} is ${mixedLabel(S, d)}: every ${countOf(d, "piece")} make one whole.`
     : g > 1 ? `Divide the top and the bottom by ${g}: ${S}/${d} = ${mixedLabel(S, d)}.`
     : `${S}/${d} is already as simple as it gets.`;
   return {
     heading: "Groups of pieces",
     statement: [num(W), op("×"), frac(n, d)],
     diagram: fractionTimesWholePicture(p),
-    caption: `${W} groups of ${count(n, d)}.`,
+    caption: `${countOf(W, "group")} of ${count(n, d)}.`,
     timeline: beats(3),
     steps: [
       { id: "top", state: 1, answerStep: "top", result: S, math: [num(W), op("×"), num(n), op("="), num(S)],
-        narration: `${W} groups of ${count(n, d)} make ${count(S, d)}. The pieces stay the same size.` },
+        narration: `${countOf(W, "group")} of ${count(n, d)} make ${count(S, d)}. The pieces stay the same size.` },
       { id: "simplify", state: 2, answerStep: "simplify", ...(F.num === 0 ? { result: F.whole } : {}), math: [frac(S, d), op("="), ...mixedMath(S, d)], narration: simple },
     ],
   };

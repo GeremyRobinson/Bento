@@ -3,6 +3,7 @@ import { formatNumber as f, mark, num, op, text, type MathText } from "../../../
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { chainExplanation } from "../../../../explanations/diagrams/chain/build";
 import { expectedOf, oneBox, restoreVia, round6, wholeIn } from "../../_number-line/steps";
+import { count } from "../../../text";
 
 /** a has tenths (1.1 to 99.9), b has hundredths (1.01 to 99.99) */
 export interface AddDecimalsProblem { a: number; b: number }
@@ -33,7 +34,7 @@ function answers(p: AddDecimalsProblem): AnswerModel {
         id: "decimal", label: "Add the decimal parts", prompt: s => [num(da), op("+"), num(db), op("="), s], ans: round6(da + db),
         hint: `Line up the points: ${f(da)} is the same as ${da.toFixed(2)}.`,
         wrong: [[round6((Math.round(da * 10) + Math.round(db * 100)) / 100), "Didn't line up the decimal points",
-          `${f(da)} means ${Math.round(da * 10)} tenths, which is ${Math.round(da * 100)} hundredths. Line up the points.`]],
+          `${f(da)} means ${count(Math.round(da * 10), "tenth")}, which is ${count(Math.round(da * 100), "hundredth")}. Line up the points.`]],
       }),
       oneBox({ id: "total", label: "Put them together", prompt: s => [num(a), op("+"), num(b), op("="), s], ans: round6(a + b), hint: `${wa + wb} + ${f(round6(da + db))}.` }),
     ],

@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPlane } from "../../../../explanations/diagrams/plane/build";
 import { attempt, expected, f, ints, ns, supText } from "../../_plane/kit";
+import { count } from "../../../text";
 
 /** a, a·r, a·r², … and the term number n we want. */
 export interface GeoProblem { kind: "sequence.geometric"; a: number; r: number; n: number }
@@ -32,9 +33,9 @@ export function geoAnswers({ a, r, n }: GeoProblem): AnswerModel {
       ns({ id: "r", label: "Common ratio", prompt: s => [text("r"), op("="), num(a * r), op("÷"), num(a), op("="), ...s], ans: r,
         hint: "Divide a term by the one before it.", wrong: [[a * r - a, "Subtracted instead of divided", "Geometric sequences multiply. Divide to find the ratio."]] }),
       ns({ id: "jumps", label: "Count the jumps", question: `From term 1 to term ${n}, how many jumps?`, prompt: s => s, ans: n - 1,
-        hint: `${n} − 1.`, wrong: [[n, "Off by one", `You start on term 1, so it's ${n} − 1 jumps.`]] }),
+        hint: `${n} − 1.`, wrong: [[n, "Off by one", `You start on term 1, so it's ${n} minus 1, which is ${count(n - 1, "jump")}.`]] }),
       ns({ id: "pow", label: "Ratio to the power", prompt: s => [num(r), sup(n - 1), op("="), ...s], ans: pw,
-        hint: `Multiply ${n - 1} copies of ${r}.`, wrong: [[r * (n - 1), "Multiplied instead of a power", `${r}${supText(n - 1)} means ${r} times itself ${n - 1} times.`]] }),
+        hint: `Multiply ${count(n - 1, "copy", "copies")} of ${r}.`, wrong: [[r * (n - 1), "Multiplied instead of a power", `${r}${supText(n - 1)} means ${r} times itself ${n - 1} times.`]] }),
       ns({ id: "term", label: "Times the first term", prompt: s => [...term(n), op("="), num(a), op("×"), num(pw), op("="), ...s], ans: a * pw,
         hint: "Start at the first term and multiply." }),
     ],
@@ -67,7 +68,7 @@ export function explainGeo(p: GeoProblem, model: AnswerModel): Explanation {
       { id: "terms", narration: `The sequence starts ${first4(p).map(f).join(", ")}. We want term ${n}.`, math: geoMath(p), state: 0 },
       { id: "r", narration: `Divide a term by the one before it: ${f(a * r)} ÷ ${f(a)} = ${f(r)}. Each jump multiplies by ${f(r)}.`,
         math: [text("r"), op("="), num(a * r), op("÷"), num(a), op("="), num(r)], state: 1, answerStep: "r", result: r },
-      { id: "pow", narration: `From term 1 to term ${n} is ${n - 1} jumps, so multiply by ${f(r)} ${n - 1} times: ${f(r)}${supText(n - 1)} = ${f(pw)}.`,
+      { id: "pow", narration: `From term 1 to term ${n} is ${count(n - 1, "jump")}, so multiply by ${f(r)} ${n - 1} times: ${f(r)}${supText(n - 1)} = ${f(pw)}.`,
         math: [num(r), sup(n - 1), op("="), num(pw)], state: 2, answerStep: "pow", result: pw },
       { id: "term", narration: `Start at ${f(a)} and multiply: ${f(a)} × ${f(pw)} = ${f(an)}.`,
         math: [...term(n), op("="), num(a), op("×"), num(pw), op("="), num(an)], state: 3, answerStep: "term", result: an },

@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTimeline } from "../../../../explanations/diagrams/early-g3/timeline";
 import { box, boxes, expectedOf, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** How long from start to end, both in minutes after midnight on the same day. */
 export interface ElapsedProblem { start: number; end: number }
@@ -60,7 +61,7 @@ function answers(p: ElapsedProblem): AnswerModel {
           [100 - (start % 60), "Counted to 100", `An hour has 60 minutes, not 100. ${start % 60} + ${m1} = 60.`],
         ],
         hint: `An hour has 60 minutes. What goes with ${start % 60} to make 60?`,
-        explain: `${start % 60} + ${m1} = 60, so it's ${m1} minutes up to ${clock(H1 * 60)}.`,
+        explain: `${start % 60} + ${m1} = 60, so it's ${count(m1, "minute")} up to ${clock(H1 * 60)}.`,
       }),
       box({
         id: "hours", label: "Whole hours", question: `From ${clock(H1 * 60)} to ${clock(H2 * 60)}, how many hours?`,
@@ -75,17 +76,17 @@ function answers(p: ElapsedProblem): AnswerModel {
       box({
         id: "after", label: "Past the hour", question: `From ${clock(H2 * 60)} to ${clock(end)}, how many minutes?`,
         prompt: x => [text(`${clock(H2 * 60)} to ${clock(end)} `), op("="), x, text(" min")], ans: m3,
-        wrong: [[60 - m3, "Counted to the next hour", `Count from :00 up to :${String(m3).padStart(2, "0")}. That's ${m3} minutes.`]],
+        wrong: [[60 - m3, "Counted to the next hour", `Count from :00 up to :${String(m3).padStart(2, "0")}. That's ${count(m3, "minute")}.`]],
         hint: `The minute hand goes from :00 to :${String(m3).padStart(2, "0")}.`,
-        explain: `${clock(H2 * 60)} to ${clock(end)} is ${m3} minutes.`,
+        explain: `${clock(H2 * 60)} to ${clock(end)} is ${count(m3, "minute")}.`,
       }),
       boxes({
-        id: "total", label: "Put it together", question: `${hrs(h)}, and ${m1} + ${m3} minutes.${m1 + m3 >= 60 ? " Trade 60 minutes for 1 hour." : ""}`,
+        id: "total", label: "Put it together", question: `${hrs(h)}, and ${m1} + ${count(m3, "minute")}.${m1 + m3 >= 60 ? " Trade 60 minutes for 1 hour." : ""}`,
         prompt: b => [text("in all "), op("="), b.h!, text(" h "), b.m!, text(" min")] as MathText,
         ans: { h: th, m: tm },
         wrong: [
           ...(m1 + m3 >= 60 ? [
-            [{ h, m: m1 + m3 }, "Kept 60 or more minutes", `${m1 + m3} minutes is more than an hour. Trade 60 of them for 1 more hour.`],
+            [{ h, m: m1 + m3 }, "Kept 60 or more minutes", `${count(m1 + m3, "minute")} is more than an hour. Trade 60 of them for 1 more hour.`],
             [{ h, m: m1 + m3 - 60 }, "Lost the traded hour", `You traded 60 minutes for an hour. Add that hour to the ${hrs(h)}.`],
           ] as [Record<string, number>, string, string][] : []),
           [{ h, m: Math.abs(m3 - m1) }, "Subtracted the minutes", `Add the minutes before and after: ${m1} + ${m3}.`],
@@ -114,19 +115,19 @@ function explain(p: ElapsedProblem, model: AnswerModel): Explanation {
         { from: H2 * 60, to: end, text: `${m3} min`, beat: 3, cls: "hl" },
       ],
       total: { text: `${totalText} in all`, beat: 4 },
-      alt: `A timeline from ${clockAmPm(start)} to ${clockAmPm(end)}: ${m1} minutes to ${clock(H1 * 60)}, ${hrs(h)} to ${clock(H2 * 60)}, then ${m3} minutes. ${totalText} in all.`,
+      alt: `A timeline from ${clockAmPm(start)} to ${clockAmPm(end)}: ${count(m1, "minute")} to ${clock(H1 * 60)}, ${hrs(h)} to ${clock(H2 * 60)}, then ${count(m3, "minute")}. ${totalText} in all.`,
     }),
     caption: `From ${clockAmPm(start)} to ${clockAmPm(end)}`,
     timeline: beats(5),
     steps: [
       { id: "to-hour", state: 1, answerStep: "to-hour", result: m1, math: [text(`${clock(start)} → ${clock(H1 * 60)}: `), num(m1), text(" min")],
-        narration: `First jump to the next o'clock: ${clock(start)} to ${clock(H1 * 60)} is ${m1} minutes.` },
+        narration: `First jump to the next o'clock: ${clock(start)} to ${clock(H1 * 60)} is ${count(m1, "minute")}.` },
       { id: "hours", state: 2, answerStep: "hours", result: h, math: [text(`${clock(H1 * 60)} → ${clock(H2 * 60)}: `), num(h), text(" h")],
         narration: `Then whole hours: ${clock(H1 * 60)} to ${clock(H2 * 60)} is ${hrs(h)}.${H1 <= 12 && H2 > 12 ? " After 12 comes 1." : ""}` },
       { id: "after", state: 3, answerStep: "after", result: m3, math: [text(`${clock(H2 * 60)} → ${clock(end)}: `), num(m3), text(" min")],
-        narration: `Last, the minutes past the hour: ${clock(H2 * 60)} to ${clock(end)} is ${m3} minutes.` },
+        narration: `Last, the minutes past the hour: ${clock(H2 * 60)} to ${clock(end)} is ${count(m3, "minute")}.` },
       { id: "total", state: 4, answerStep: "total", result: th, math: [num(th), text(" h "), num(tm), text(" min")],
-        narration: m1 + m3 >= 60 ? `${m1} + ${m3} = ${m1 + m3} minutes, which is 1 hour and ${m1 + m3 - 60} minutes. In all: ${totalText}.` : `${hrs(h)} and ${m1} + ${m3} = ${m1 + m3} minutes. In all: ${totalText}.` },
+        narration: m1 + m3 >= 60 ? `${m1} + ${m3} = ${count(m1 + m3, "minute")}, which is 1 hour and ${count(m1 + m3 - 60, "minute")}. In all: ${totalText}.` : `${hrs(h)} and ${m1} + ${m3} = ${count(m1 + m3, "minute")}. In all: ${totalText}.` },
     ],
   };
 }

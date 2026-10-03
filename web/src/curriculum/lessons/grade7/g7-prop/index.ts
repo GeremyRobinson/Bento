@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, ints, ns } from "../../_tape-family/steps";
+import { count, verb } from "../../../text";
 
 /** a/b = x/(b·k) */
 export interface ProportionProblem { a: number; b: number; k: number }
@@ -44,7 +45,7 @@ export function proportionPicture({ a, b, k }: ProportionProblem) {
       { length: b, parts: b, fills: [{ a: 0, b, tone: "on", from: 2 }], each: [{ text: () => `${k}`, from: 2 }], label: [{ text: "bottom" }],
         total: [{ text: `${b}`, until: 0 }, { text: `${b * k}`, from: 1 }] },
     ],
-    alt: `${a} boxes over ${b} boxes of the same size. When the ${b} boxes make ${b * k}, each box is ${k}, so the ${a} boxes make ${a * k}.`,
+    alt: `${count(a, "box", "boxes")} over ${count(b, "box", "boxes")} of the same size. When the ${count(b, "box", "boxes")} ${verb(b, "makes", "make")} ${b * k}, each box is ${k}, so the ${count(a, "box", "boxes")} ${verb(a, "makes", "make")} ${a * k}.`,
   });
 }
 

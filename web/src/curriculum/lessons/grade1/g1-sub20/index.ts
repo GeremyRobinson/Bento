@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildNumberLine } from "../../../../explanations/diagrams/number-line/build";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips } from "../_kit";
+import { count, isAre } from "../../../text";
 
 const TEN = 10;
 
@@ -26,7 +27,7 @@ function answers({ a, b }: Sub20Problem): AnswerModel {
         prompt: s => [num(a), op("−"), s, op("="), num(TEN)], ans: first,
         wrong: slips(first, [
           [b, "Took it all at once", `Take away just enough to land on 10 first. ${a} is 10 and ${first} more.`],
-          [TEN, "Took away the ten", `Keep the 10. Take away only the ${first} ones on top of it.`],
+          [TEN, "Took away the ten", `Keep the 10. Take away only the ${count(first, "one")} on top of it.`],
         ]),
         hint: `${a} is 10 and how many more?`,
         explain: `${a} is 10 and ${first} more, so take away ${first} to get to 10.`,
@@ -39,7 +40,7 @@ function answers({ a, b }: Sub20Problem): AnswerModel {
           [first, "Repeated the first part", `${first} + ${first} isn't ${b}. Count up from ${first} to ${b}.`],
         ]),
         hint: `Count up from ${first} to ${b}.`,
-        explain: `${b} is ${first} and ${rest}, so ${rest} are left to take.`,
+        explain: `${b} is ${first} and ${rest}, so ${rest} ${isAre(rest)} left to take.`,
       }),
       oneBox({
         id: "from-ten", label: "Take the rest from 10", prompt: s => [num(TEN), op("−"), num(rest), op("="), s], ans: res,

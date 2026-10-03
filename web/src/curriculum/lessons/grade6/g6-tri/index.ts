@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildAreaGrid } from "../../../../explanations/diagrams/area-model/grid";
 import { r1 } from "../../../../explanations/diagrams/scene/helpers";
 import { expectedOf, ns, readNumbers } from "../../area-common/steps";
+import { aNum } from "../../../text";
 
 /** A triangle with base b and height h; b × h is even so the area is whole. */
 export interface TriangleProblem { b: number; h: number }
@@ -60,7 +61,7 @@ export function explainTriangle(p: TriangleProblem, answers: AnswerModel): Expla
         { text: `rectangle: ${b} × ${h} = ${R}`, from: 1, until: 1 },
         { text: `${b} × ${h} = ${R}, half is ${A}`, from: 2 },
       ],
-      alt: `A triangle with base ${b} and height ${h} inside a ${b} by ${h} rectangle of ${R}; the triangle is half, ${A}.`,
+      alt: `A triangle with base ${b} and height ${h} inside ${aNum(b)} by ${h} rectangle of ${R}; the triangle is half, ${A}.`,
     }),
     caption: `The triangle is half of its ${b} by ${h} rectangle.`,
     timeline: beats(3),

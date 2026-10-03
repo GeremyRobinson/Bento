@@ -6,6 +6,7 @@ import type { PlaneItem } from "../../../../explanations/diagrams/plane/schema";
 import { expected, supText } from "../../_plane/kit";
 import { growWord } from "./answers";
 import type { GrowthProblem } from "./problem";
+import { count } from "../../../text";
 
 export function explainGrowth(p: GrowthProblem, model: AnswerModel): Explanation {
   const { P, r, t } = p;
@@ -26,19 +27,19 @@ export function explainGrowth(p: GrowthProblem, model: AnswerModel): Explanation
           label: { text: n(P * r ** h), optional: true, prefer: ["nw", "w", "n"] } })),
         { kind: "point", at: [0, P], label: { text: n(P), prefer: ["e", "ne", "se"] } },
         { kind: "point", at: [t, total], cls: "dota", from: 2, label: { text: n(total), acc: true, prefer: ["w", "nw", "sw"] } },
-        { kind: "label", at: [t, 0], from: 1, label: { text: `${t} hours`, optional: true, prefer: ["n", "nw"] } },
+        { kind: "label", at: [t, 0], from: 1, label: { text: `${count(t, "hour")}`, optional: true, prefer: ["n", "nw"] } },
       ],
     }),
     timeline: beats(3),
     steps: [
       { id: "start", narration: `Start with ${n(P)} bacteria. Every hour they ${growWord(r)}: × ${r}.`, math: [num(P)], state: 0 },
-      { id: "factor", narration: `${t} hours means × ${r}, ${t} times: ${Array(t).fill(r).join(" × ")} = ${r}${supText(t)} = ${n(factor)}.`,
+      { id: "factor", narration: `${count(t, "hour")} means × ${r}, ${t} times: ${Array(t).fill(r).join(" × ")} = ${r}${supText(t)} = ${n(factor)}.`,
         math: [num(r), sup(t), op("="), num(factor)], state: 1, answerStep: "factor", result: factor },
-      { id: "total", narration: `Multiply the start by the growth factor: ${n(P)} × ${n(factor)} = ${n(total)} bacteria after ${t} hours.`,
+      { id: "total", narration: `Multiply the start by the growth factor: ${n(P)} × ${n(factor)} = ${n(total)} bacteria after ${count(t, "hour")}.`,
         math: [num(P), op("×"), num(factor), op("="), num(total)], state: 2, answerStep: "total", result: total },
     ],
   };
 }
 
 export const growthDisplay = ({ P, r, t }: GrowthProblem) => [num(P), op("×"), num(r), sup(t)];
-export const growthNote = ({ P, r, t }: GrowthProblem) => `${P} bacteria ${growWord(r)} every hour. How many after ${t} hours?`;
+export const growthNote = ({ P, r, t }: GrowthProblem) => `${P} bacteria ${growWord(r)} every hour. How many after ${count(t, "hour")}?`;

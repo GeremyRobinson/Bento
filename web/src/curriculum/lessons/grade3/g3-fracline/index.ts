@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildFracLine } from "../../../../explanations/diagrams/early-g3/frac-line";
 import { box, expectedOf, fracBoxes, plural, restoreVia, wholeIn } from "../_kit/steps";
+import { count } from "../../../text";
 
 /** A point a/b on a number line from 0 to w, each whole cut into b equal spaces. */
 export interface FracLineProblem { a: number; b: number; w: number }
@@ -46,7 +47,7 @@ function answers({ a, b, w }: FracLineProblem): AnswerModel {
         id: "jumps", label: "Count the jumps", question: "How many spaces from 0 to the point?",
         prompt: x => [text("jumps "), op("="), x], ans: a,
         wrong: [
-          [a + 1, "Counted the tick at 0", `Start at 0 and count each jump, not each tick. It takes ${a} jumps.`],
+          [a + 1, "Counted the tick at 0", `Start at 0 and count each jump, not each tick. It takes ${count(a, "jump")}.`],
           [a - 1, "Missed a jump", "Count every jump from 0, right up to the point."],
           ...(a > b ? [[a - b, "Started counting at 1", `Count from 0, not from 1. The jumps past 1 are only part of it.`] as [number, string, string]] : []),
         ],
@@ -77,7 +78,7 @@ function explain(p: FracLineProblem, model: AnswerModel): Explanation {
     statement: [text("point "), op("="), text("?")],
     diagram: buildFracLine({
       den: b, wholes: w, at: a, spacesBeat: 1, hopsBeat: 2, nameBeat: 3,
-      alt: `A number line from 0 to ${w}. Each whole is cut into ${b} equal spaces. The point is ${a} jumps from 0, at ${a}/${b}.`,
+      alt: `A number line from 0 to ${w}. Each whole is cut into ${b} equal spaces. The point is ${count(a, "jump")} from 0, at ${a}/${b}.`,
     }),
     caption: `A number line from 0 to ${w}, with a point on it.`,
     timeline: beats(4),

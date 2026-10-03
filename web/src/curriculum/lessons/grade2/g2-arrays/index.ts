@@ -6,6 +6,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildArray } from "../../../../explanations/diagrams/early-g2/counting";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { count, slips } from "../kit";
+import { count as countOf } from "../../../text";
 
 /** Dots in `rows` rows with `cols` in each row. */
 export interface ArrayProblem { rows: number; cols: number }
@@ -52,15 +53,15 @@ function answers({ rows, cols }: ArrayProblem): AnswerModel {
         explain: `Each row has ${count(cols, "dot")}.`,
       }),
       oneBox({
-        id: "total", label: "Add the rows", question: `Add ${cols} once for each of the ${rows} rows.`,
+        id: "total", label: "Add the rows", question: `Add ${cols} once for each of the ${countOf(rows, "row")}.`,
         prompt: s => repeated(rows, cols, s), ans: total,
         wrong: slips(total, [
           [rows + cols, "Added rows and dots", `Add ${cols} once for every row: that's ${rows} times.`],
-          [total - cols, "Left out a row", `There are ${rows} rows, so add ${cols} ${rows} times.`],
-          [total + cols, "Added an extra row", `There are only ${rows} rows. Add ${cols} ${rows} times.`],
+          [total - cols, "Left out a row", `There are ${countOf(rows, "row")}, so add ${cols} ${rows} times.`],
+          [total + cols, "Added an extra row", `There are only ${countOf(rows, "row")}. Add ${cols} ${rows} times.`],
         ]),
         hint: `Skip count by ${cols}s: ${Array.from({ length: rows }, (_, i) => cols * (i + 1)).join(", ")}.`,
-        explain: `${Array.from({ length: rows }, (_, i) => cols * (i + 1)).join(", ")}. There are ${total} dots.`,
+        explain: `${Array.from({ length: rows }, (_, i) => cols * (i + 1)).join(", ")}. There are ${countOf(total, "dot")}.`,
       }),
     ],
     finalParts: [-1],

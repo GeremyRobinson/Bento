@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import { expectedOf, ints, ns } from "../../_tape-family/steps";
+import { count, isAre } from "../../../text";
 
 export const PERCENTS = [10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90];
 
@@ -27,7 +28,7 @@ function answers({ p, W }: PercentOfProblem): AnswerModel {
       ns({ id: "base", l: `Find ${base}%`, a: s => [num(base), text("% of "), num(W), op("="), ...s], ans: part,
         h: base === 10 ? `10% is one tenth: ${W} ÷ 10.` : `25% is one quarter: ${W} ÷ 4.`,
         w: [[W * base, "Multiplied instead of divided", `${base}% is a part of ${W}, so it's smaller than ${W}.`]] }),
-      ns({ id: "scale", l: `Scale up to ${p}%`, a: s => [num(p / base), op("×"), num(part), op("="), ...s], ans: (W * p) / 100, h: `${p}% is ${p / base} groups of ${base}%.` }),
+      ns({ id: "scale", l: `Scale up to ${p}%`, a: s => [num(p / base), op("×"), num(part), op("="), ...s], ans: (W * p) / 100, h: `${p}% is ${count(p / base, "group")} of ${base}%.` }),
     ],
     finalParts: [-1],
   };
@@ -42,7 +43,7 @@ export function percentOfPicture({ p, W }: PercentOfProblem) {
       { row: 0, a: 0, b: base / 100, text: `${base}%`, side: "above", from: 1 },
       { row: 0, a: 0, b: p / 100, text: `${p}% = ${(W * p) / 100}`, side: "below", from: 2, acc: true },
     ],
-    alt: `A bar for ${W} cut into ${blocks} blocks of ${base}%, each ${part}; ${p / base} blocks are shaded: ${(W * p) / 100}.`,
+    alt: `A bar for ${W} cut into ${count(blocks, "block")} of ${base}%, each ${part}; ${count(p / base, "block")} ${isAre(p / base)} shaded: ${(W * p) / 100}.`,
   });
 }
 

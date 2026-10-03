@@ -4,6 +4,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPlane } from "../../../../explanations/diagrams/plane/build";
 import { call, expected, f, fP, P, poly, polyText, pt } from "../../_plane/kit";
 import type { FuncProblem } from "./problem";
+import { coef } from "../../../text";
 
 export const funcMath = ({ a, b }: FuncProblem) => [text("f(x)"), op("="), ...poly([[a, "x"], [b, ""]])];
 
@@ -16,9 +17,9 @@ export function explainFunc(p: FuncProblem, model: AnswerModel): Explanation {
     heading: "Plug in x",
     idea: ["f(x) is a rule: put the number in for x and work it out. The graph of the rule shows every answer at once."],
     statement: [...funcMath(p), text(", find "), ...call("f", x)],
-    caption: `Above x = ${f(x)}, ${f(a)}x reaches ${f(ax)}; the ${up ? "+" : "−"} ${f(Math.abs(b))} moves it to f(${f(x)}) = ${f(v)}.`,
+    caption: `Above x = ${f(x)}, ${coef(a, "x")} reaches ${f(ax)}; the ${up ? "+" : "−"} ${f(Math.abs(b))} moves it to f(${f(x)}) = ${f(v)}.`,
     diagram: buildPlane({
-      alt: `Graph of f(x) = ${fx}. At x = ${f(x)}, ${f(a)}x is ${f(ax)} and f(${f(x)}) is ${f(v)}.`,
+      alt: `Graph of f(x) = ${fx}. At x = ${f(x)}, ${coef(a, "x")} is ${f(ax)} and f(${f(x)}) is ${f(v)}.`,
       fit: [[x, 0], [x, ax], [x, v], [x - 2, 0], [x + 2, 0]],
       items: [
         { kind: "line", m: a, b: 0, cls: "ln thin", from: 1, label: { text: `y = ${polyText([[a, "x"]])}`, optional: true } },

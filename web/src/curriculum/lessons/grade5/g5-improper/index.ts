@@ -6,6 +6,7 @@ import { buildTape } from "../../../../explanations/diagrams/tape/build";
 import type { TapeRow } from "../../../../explanations/diagrams/tape/schema";
 import { expectedOf, ints, ms, ns, pieceName } from "../../_tape-family/steps";
 import { coprimeTop } from "../../grade4/g4-equiv";
+import { count } from "../../../text";
 
 /** w n/d as one fraction: (w·d + n)/d. */
 export interface MixedToImproperProblem { w: number; n: number; d: number }
@@ -25,11 +26,11 @@ function answers({ w, n, d }: MixedToImproperProblem): AnswerModel {
   const S = w * d + n;
   return {
     steps: [
-      ns({ id: "wholes", l: "Wholes into pieces", a: s => [num(w), op("×"), num(d), op("="), ...s], ans: w * d, h: `Each whole has ${d} pieces.`,
-        w: [[w + d, "Added instead of multiplied", `${w} wholes with ${d} pieces each: multiply.`]] }),
+      ns({ id: "wholes", l: "Wholes into pieces", a: s => [num(w), op("×"), num(d), op("="), ...s], ans: w * d, h: `Each whole has ${count(d, "piece")}.`,
+        w: [[w + d, "Added instead of multiplied", `${count(w, "whole")} with ${count(d, "piece")} each: multiply.`]] }),
       ns({ id: "extra", l: "Add the extra pieces", a: s => [num(w * d), op("+"), num(n), op("="), ...s], ans: S, h: `Add the ${n} extra pieces.` }),
       ms({ id: "fraction", l: "Write the fraction", a: X => [num(w), frac(n, d), op("="), frac(X.n!, X.d!)], ans: { n: S, d },
-        h: `${S} pieces, each a ${d === 2 ? "half" : "1/" + d}. The bottom stays ${d}.`,
+        h: `${count(S, "piece")}, each a ${d === 2 ? "half" : "1/" + d}. The bottom stays ${d}.`,
         w: [[{ n: S, d: w * d }, "Changed the bottom", "The piece size doesn't change: the bottom stays " + d + "."]] }),
     ],
     finalParts: [-1],
@@ -45,7 +46,7 @@ export function mixedToImproperPicture({ w, n, d }: MixedToImproperProblem) {
   }));
   rows.push({ length: 1, parts: d, fills: [{ a: 0, b: n / d, tone: "acc" }], label: [{ text: `${n}/${d}` }],
     total: [{ text: `${S}`, from: 2, until: 2, acc: true }, { text: `${S}/${d}`, from: 3, acc: true }] });
-  return buildTape({ rows, alt: `${w} whole bars of ${d} pieces and a bar with ${n} of ${d} pieces: ${S} pieces in all, so ${w} ${n}/${d} = ${S}/${d}.` });
+  return buildTape({ rows, alt: `${w} whole bars of ${count(d, "piece")} and a bar with ${n} of ${count(d, "piece")}: ${count(S, "piece")} in all, so ${w} ${n}/${d} = ${S}/${d}.` });
 }
 
 function explain(p: MixedToImproperProblem, model: AnswerModel): Explanation {
@@ -63,7 +64,7 @@ function explain(p: MixedToImproperProblem, model: AnswerModel): Explanation {
       { id: "extra", state: 2, answerStep: "extra", result: S, math: [num(W), op("+"), num(n), op("="), num(S)],
         narration: `Add the ${n} extra ${n === 1 ? "piece" : "pieces"}: ${W} + ${n} = ${S}.` },
       { id: "fraction", state: 3, answerStep: "fraction", math: [num(w), frac(n, d), op("="), frac(S, d)],
-        narration: `${S} pieces, each one ${pieceName(d, false)}. The bottom stays ${d}: ${w} ${n}/${d} = ${S}/${d}.` },
+        narration: `${count(S, "piece")}, each one ${pieceName(d, false)}. The bottom stays ${d}: ${w} ${n}/${d} = ${S}/${d}.` },
     ],
   };
 }

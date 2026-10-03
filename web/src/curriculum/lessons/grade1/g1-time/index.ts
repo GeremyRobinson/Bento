@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildClock } from "../../../../explanations/diagrams/early-g1/clock";
 import { expectedOf, manyBoxes, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { slips, slipsMany, type Slip, type SlipMany } from "../_kit";
+import { count } from "../../../text";
 
 const HALF = 30;
 /** the clock number the long hand points at for these minutes (12 for o'clock, 6 for half past) */
@@ -28,7 +29,7 @@ function answers({ hour, minute }: TimeProblem): AnswerModel {
     id: "time", label: "Write the time", prompt: x => [x.h!, text(" : "), x.m!],
     ans: { h: hour, m: minute },
     wrong: slipsMany({ h: hour, m: minute }, [
-      [{ h: hour, m: longAt }, "Wrote the number, not the minutes", `The long hand points at ${longAt}, but that means ${minute} minutes.`],
+      [{ h: hour, m: longAt }, "Wrote the number, not the minutes", `The long hand points at ${longAt}, but that means ${count(minute, "minute")}.`],
       [{ h: longAt, m: minute }, "Mixed up the hands", "The **short** hand tells the hour. The long hand tells the minutes."],
       ...(half ? [[{ h: next, m: minute }, "Read the next hour", `The short hand hasn't reached ${next} yet. It's still ${hour}.`] as SlipMany] : []),
     ]),
@@ -51,17 +52,17 @@ function answers({ hour, minute }: TimeProblem): AnswerModel {
         prompt: s => [text("Minutes: "), s], ans: minute,
         wrong: slips(minute, [
           [longAt, "Wrote the number, not the minutes", half
-            ? `The long hand at ${longAt} is halfway around the clock. Halfway is ${HALF} minutes.`
+            ? `The long hand at ${longAt} is halfway around the clock. Halfway is ${count(HALF, "minute")}.`
             : `The long hand at 12 means a new hour is just starting: 0 minutes.`],
           [60, "Counted a whole hour", half
-            ? `A whole hour is 60 minutes, but the long hand has only gone halfway around: ${HALF} minutes.`
+            ? `A whole hour is 60 minutes, but the long hand has only gone halfway around: ${count(HALF, "minute")}.`
             : "The long hand at the top means the hour is just starting: 0 minutes."],
           [hour, "Read the short hand", "That's the short hand. The **long** hand tells the minutes."],
         ]),
         hint: half ? "The long hand has gone halfway around. Half an hour is 30 minutes." : "Long hand at the top, on 12, means 0 minutes: o'clock.",
-        explain: half ? `The long hand at ${longAt} is halfway around: ${HALF} minutes.` : "The long hand at 12 means 0 minutes.",
+        explain: half ? `The long hand at ${longAt} is halfway around: ${count(HALF, "minute")}.` : "The long hand at 12 means 0 minutes.",
       }),
-      { ...time, explain: `${hour} hours and ${minute} minutes is written ${timeText(hour, minute)}.`, work: timeWork },
+      { ...time, explain: `${count(hour, "hour")} and ${count(minute, "minute")} is written ${timeText(hour, minute)}.`, work: timeWork },
     ],
     finalParts: [-1],
   };
@@ -76,7 +77,7 @@ function explain({ hour, minute }: TimeProblem, model: AnswerModel): Explanation
     diagram: buildClock({
       hour, minute,
       beats: { hour: 0, minute: 1, time: 2 },
-      text: { hour: half ? `short hand: past ${h}` : `short hand: ${h}`, minute: `long hand: ${m} minutes`, time: shown },
+      text: { hour: half ? `short hand: past ${h}` : `short hand: ${h}`, minute: `long hand: ${count(m, "minute")}`, time: shown },
       alt: `A clock with the short hand ${half ? `between ${h} and ${next}` : `on ${h}`} and the long hand on ${minuteNumber(m)}: ${shown}.`,
     }),
     caption: half ? `Half past ${h} is ${shown}.` : `${h} o'clock is ${shown}.`,
@@ -84,7 +85,7 @@ function explain({ hour, minute }: TimeProblem, model: AnswerModel): Explanation
     steps: [
       { id: "hour", narration: half ? `The short hand is halfway between ${h} and ${next}. It has passed **${h}**, so the hour is ${h}.` : `The short hand points right at **${h}**.`, math: [text("Hour: "), num(h)], state: 0, answerStep: "hour", result: h },
       { id: "minute", narration: half ? `The long hand has gone halfway around, to 6. That's **${m}** minutes.` : `The long hand is at the top, on 12. That's **${m}** minutes.`, math: [text("Minutes: "), num(m)], state: 1, answerStep: "minute", result: m },
-      { id: "time", narration: half ? `${h} hours and ${m} minutes: **${shown}**, half past ${h}.` : `${h} hours and no minutes: **${shown}**, ${h} o'clock.`, math: [num(h), text(`:${twoDigits(m)}`)], state: 2, answerStep: "time", result: h },
+      { id: "time", narration: half ? `${count(h, "hour")} and ${count(m, "minute")}: **${shown}**, half past ${h}.` : `${count(h, "hour")} and no minutes: **${shown}**, ${h} o'clock.`, math: [num(h), text(`:${twoDigits(m)}`)], state: 2, answerStep: "time", result: h },
     ],
   };
 }

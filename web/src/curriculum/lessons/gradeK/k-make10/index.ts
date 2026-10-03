@@ -5,6 +5,7 @@ import { beats, type Explanation } from "../../../../explanations/schema";
 import { fillTen } from "../../../../explanations/diagrams/early-k/frames";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
 import { TEN, countUp, slips } from "../kit";
+import { count } from "../../../text";
 
 /** `have` dots in a ten frame, 1 to 9 */
 export interface MakeTenProblem { have: number }
@@ -28,7 +29,7 @@ function answers({ have }: MakeTenProblem): AnswerModel {
           [have + 1, "Counted a dot twice", "One too many. Touch each dot only once."],
         ]),
         hint: "Touch each dot and count.",
-        explain: `${countUp(1, have)}. There ${have === 1 ? "is 1 dot" : `are ${have} dots`}.`,
+        explain: `${countUp(1, have)}. There ${have === 1 ? "is 1 dot" : `are ${count(have, "dot")}`}.`,
       }),
       oneBox({
         id: "need", label: "Fill the frame", question: `How many more make ${TEN}?`,
@@ -54,7 +55,7 @@ function explain(p: MakeTenProblem, model: AnswerModel): Explanation {
     heading: "Fill the ten frame",
     idea: [`A ten frame holds ${TEN}. The empty boxes show how many more you need.`],
     statement: [num(p.have), op("+"), text("?"), op("="), num(TEN)],
-    diagram: fillTen(p.have, `A ten frame with ${have} dots. ${need} more fill it: ${have} + ${need} = ${TEN}.`, { have: 0, fill: 1, whole: 2 }),
+    diagram: fillTen(p.have, `A ten frame with ${count(have, "dot")}. ${need} more fill it: ${have} + ${need} = ${TEN}.`, { have: 0, fill: 1, whole: 2 }),
     caption: `${have} and ${need} make ${TEN}.`,
     timeline: beats(3),
     steps: [
@@ -75,7 +76,7 @@ export const lesson: LessonDefinition<MakeTenProblem> = {
   generate: (rng, index) => createMakeTen(rng.int(index < 3 ? 6 : 1, TEN - 1)),
   restore: raw => restoreVia(raw, ["have"] as const, v => createMakeTen(v.have)),
   display: p => [num(p.have), op("+"), text("?"), op("="), num(TEN)],
-  picture: p => fillTen(p.have, `A ten frame with ${p.have} dots`),
+  picture: p => fillTen(p.have, `A ten frame with ${count(p.have, "dot")}`),
   answers,
   explain,
 };

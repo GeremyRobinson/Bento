@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildBox3d } from "../../../../explanations/diagrams/box3d/build";
 import { expectedOf, ns, readNumbers } from "../../area-common/steps";
+import { count } from "../../../text";
 
 /** A box l cm long, w cm wide and h cm tall, filled with centimeter cubes. */
 export interface BoxProblem { l: number; w: number; h: number }
@@ -38,15 +39,15 @@ export function explainBox(p: BoxProblem, answers: AnswerModel): Explanation {
       mode: "cubes", l, w, h, layerBeats: [1, ...Array.from({ length: h - 1 }, () => 2)],
       labels: { l: String(l), w: String(w), h: String(h), from: 0 },
       lines: [
-        { text: `${l} × ${w} = ${base} cubes in a layer`, from: 1, until: 1 },
+        { text: `${l} × ${w} = ${count(base, "cube")} in a layer`, from: 1, until: 1 },
         { text: `${h} layers: ${base} × ${h} = ${V}`, from: 2 },
       ],
       alt: `A box ${l} by ${w} by ${h} built from cubes: ${base} in each layer, ${h} layers, ${V} in all.`,
     }),
-    caption: `${base} cubes in a layer, ${h} layers: ${V}.`,
+    caption: `${count(base, "cube")} in a layer, ${h} layers: ${V}.`,
     timeline: beats(3),
     steps: [
-      { id: "base", narration: `The bottom layer is ${l} by ${w}: ${base} cubes.`, math: [num(l), op("×"), num(w), op("="), num(base)], state: 1, answerStep: "base", result: base },
+      { id: "base", narration: `The bottom layer is ${l} by ${w}: ${count(base, "cube")}.`, math: [num(l), op("×"), num(w), op("="), num(base)], state: 1, answerStep: "base", result: base },
       { id: "volume", narration: `Stack ${h} layers of ${base}: ${V} cubic cm.`, math: [num(base), op("×"), num(h), op("="), num(V)], state: 2, answerStep: "volume", result: V },
     ],
   };

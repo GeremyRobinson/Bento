@@ -126,10 +126,13 @@ function startPlacement(g: number, progress: Progress, deps: Deps): PracticeSess
 }
 
 /**
- * Where a placement lands: climb the grades while at least one of each grade's problems was right. A problem counts as
- * right with at most one slip and no "Show me", so one small mistake doesn't send anyone down a grade.
+ * Where a placement lands. A problem counts as right when every step was right first time, or with one slip on a long
+ * problem (4 steps or more), and never after "Show me". A grade passes with 2 of its 3 right. The child starts in the
+ * highest grade passed before the first one that isn't, never more than one below the grade they picked (a bigger
+ * drop needs more than three problems to be sure) and never above the grades tested: a clean top grade offers
+ * "Try the next grade" instead.
  */
-export function placementResult(probs: { lessonId: string; wrong: number; shown: number }[]): { grade: number; rows: { grade: number; right: number; total: number }[] } {
+export function placementResult(probs: { lessonId: string; wrong: number; shown: number; work?: unknown[] }[], picked?: number): { grade: number; next: number | null; rows: { grade: number; right: number; total: number }[] } {
   const rows: { grade: number; right: number; total: number }[] = [];
   for (const p of probs) {
     const g = lessonById(p.lessonId)?.grade;
@@ -137,17 +140,18 @@ export function placementResult(probs: { lessonId: string; wrong: number; shown:
     let r = rows.find(x => x.grade === g);
     if (!r) rows.push(r = { grade: g, right: 0, total: 0 });
     r.total++;
-    if (p.wrong <= 1 && !p.shown) r.right++;
+    if (!p.shown && (p.wrong === 0 || (p.wrong === 1 && (p.work?.length ?? 0) >= 4))) r.right++;
   }
   rows.sort((a, b) => a.grade - b.grade);
   let grade = rows[0]?.grade ?? 0;
   for (const r of rows) {
-    if (r.right === 0) break;
+    if (r.right * 3 < r.total * 2) break;
     grade = r.grade;
-    // everything right at the top grade tested: ready for the one after
-    if (r === rows[rows.length - 1] && r.right === r.total && r.grade < 12) grade = r.grade + 1;
   }
-  return { grade, rows };
+  if (picked != null) grade = Math.max(grade, Math.min(picked - 1, rows.at(-1)?.grade ?? grade));
+  const top = rows.at(-1);
+  const next = top && top.grade === grade && top.right === top.total && grade < 12 ? grade + 1 : null;
+  return { grade, next, rows };
 }
 
 /** Lessons already scored, weighted to low scores and long gaps since last practice. */

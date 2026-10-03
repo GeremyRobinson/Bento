@@ -4,6 +4,7 @@ import type { Rng } from "../../../generators/rng";
 import { beats, type Explanation } from "../../../../explanations/schema";
 import { buildPlane } from "../../../../explanations/diagrams/plane/build";
 import { attempt, expected, f, ints, ns, nz, P, poly, polyText, pt } from "../../_plane/kit";
+import { signed } from "../../../text";
 
 /** lim x→a of (x − a)(x + b) ÷ (x − a) = a + b */
 export interface LimitProblem { kind: "limit.factor"; a: number; b: number }
@@ -36,7 +37,7 @@ export function limitAnswers({ a, b }: LimitProblem): AnswerModel {
       ns({ id: "b", label: "Factor the top", prompt: s => [text(`${factor(a)}(x + `), ...s, text(")")], ans: b,
         hint: `Find the other factor: it multiplies with ${f(-a)} to make ${f(-a * b)}.`, note: "Plugging in gives 0 ÷ 0, so factor first." }),
       ns({ id: "lim", label: "Cancel and plug in", prompt: s => [num(a), op("+"), ...P(b), op("="), ...s], ans: a + b,
-        hint: `After canceling, plug x = ${f(a)} into x + ${f(b)}.`, wrong: [[0, "Stopped at 0 ÷ 0", "0 ÷ 0 means simplify, not that the limit is 0."]] }),
+        hint: `After canceling, plug x = ${f(a)} into x ${signed(b)}.`, wrong: [[0, "Stopped at 0 ÷ 0", "0 ÷ 0 means simplify, not that the limit is 0."]] }),
     ],
     finalParts: [-1],
   };
@@ -61,9 +62,9 @@ export function explainLimit(p: LimitProblem, model: AnswerModel): Explanation {
     timeline: beats(3),
     steps: [
       { id: "zero", narration: `At x = ${f(a)} the top and the bottom are both 0. 0 ÷ 0 means: simplify first.`, math: limitMath(p), state: 0 },
-      { id: "b", narration: `Factor the top: ${polyText(top(p))} = ${factor(a)}(x + ${f(b)}). Cancel ${factor(a)}, leaving x + ${f(b)}, a line with a hole at x = ${f(a)}.`,
+      { id: "b", narration: `Factor the top: ${polyText(top(p))} = ${factor(a)}(x ${signed(b)}). Cancel ${factor(a)}, leaving x ${signed(b)}, a line with a hole at x = ${f(a)}.`,
         math: [text(`${factor(a)}(x + `), num(b), text(")")], state: 1, answerStep: "b", result: b },
-      { id: "lim", narration: `Plug in: ${f(a)} + ${f(b)} = ${f(L)}. The line heads to ${f(L)}, so the limit is ${f(L)}.`,
+      { id: "lim", narration: `Plug in: ${f(a)} ${signed(b)} = ${f(L)}. The line heads to ${f(L)}, so the limit is ${f(L)}.`,
         math: [num(a), op("+"), ...P(b), op("="), num(L)], state: 2, answerStep: "lim", result: L },
     ],
   };

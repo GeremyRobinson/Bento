@@ -3,6 +3,7 @@ import { mark, num, op } from "../../../schemas/math-text";
 import type { AnswerModel, LessonDefinition } from "../../../schemas/lesson";
 import { chainExplanation } from "../../../../explanations/diagrams/chain/build";
 import { expectedOf, oneBox, restoreVia, wholeIn } from "../../_number-line/steps";
+import { count } from "../../../text";
 
 /** n ÷ dv with n = dv × qt; the quotient qt is never a multiple of 10 */
 export interface LongDivisionProblem { dv: number; qt: number; n: number }
@@ -25,7 +26,7 @@ function answers({ dv, qt, n }: LongDivisionProblem): AnswerModel {
         hint: `Try ${dv} × 10, ${dv} × 20, … and stop before you go past ${n}.`,
         wrong: [
           [T - 10, "Not the most tens", `${dv} × ${T} still fits, so you can use more tens.`],
-          [T / 10, "Forgot it's tens", `${T / 10} tens is written ${T}.`],
+          [T / 10, "Forgot it's tens", `${count(T / 10, "ten")} is written ${T}.`],
           [T + 10, "Too many tens", `${dv} × ${T + 10} = ${dv * (T + 10)}, which is more than ${n}.`],
         ],
       }),

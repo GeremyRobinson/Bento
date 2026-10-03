@@ -3,7 +3,7 @@ import { useApp } from "../app/AppState";
 import { mins, when } from "../app/format";
 import { reduceMotion } from "../app/transition";
 import { bandOf, gradeOf, tintStyle } from "../curriculum/grades";
-import { placementResult } from "../engine/session/practice";
+import { placeKey, placementResult } from "../engine/session/practice";
 import { lessonById, lessonsInGrade } from "../curriculum/registry";
 import { LEVELS } from "../engine/mastery/levels";
 import { BuildUp } from "../components/BuildUp";
@@ -38,9 +38,9 @@ export function CountUp({ to, pre = "" }: { to: number; pre?: string }) {
 
 /** After "Find my level": the grade to start in, and how each grade went. */
 function Placed({ rep }: { rep: SessionReport }) {
-  const { progress, chooseGrade, go } = useApp();
-  const { grade, rows } = placementResult(rep.probs), gd = gradeOf(grade);
-  const from = Number(rep.key.split(":")[1]), same = grade === from && progress.grade === from;
+  const { progress, chooseGrade, go, startTest } = useApp();
+  const from = Number(rep.key.split(":")[1]);
+  const { grade, next, rows } = placementResult(rep.probs, from), gd = gradeOf(grade), same = grade === from && progress.grade === from;
   return (
     <section className="placed" style={tintStyle(gd) as CSSProperties}>
       <span className="k">Your level</span>
@@ -54,6 +54,7 @@ function Placed({ rep }: { rep: SessionReport }) {
       ))}</ol>
       <div className="actions">
         <button className="ctl go" onClick={() => same ? go({ name: "home" }, "fwd") : chooseGrade(grade)}>Start {gd.name} ›</button>
+        {next != null && <button className="ctl" onClick={() => startTest(placeKey(next))}>Try {gradeOf(next).name}</button>}
         {!same && progress.grade != null && <button className="ctl" onClick={() => go({ name: "home" }, "back")}>Stay in {gradeOf(progress.grade).name}</button>}
       </div>
     </section>
