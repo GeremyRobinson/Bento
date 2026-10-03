@@ -1,6 +1,6 @@
 import { flushSync } from "react-dom";
 
-export type Dir = "" | "fwd" | "back";
+export type Dir = "" | "fwd" | "back" | "next" | "prev";
 
 export { motionOff as reduceMotion } from "./settings";
 import { motionOff as reduceMotion } from "./settings";

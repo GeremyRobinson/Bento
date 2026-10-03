@@ -17,6 +17,8 @@ import { ScoreChip } from "../components/primitives/Score";
 import type { Explanation } from "../explanations/schema";
 
 const PLAY_MS = 1800;
+/** the last lesson page shown, so the next one can glide its pill over from there */
+let lastPage: { chapter: string; i: number } | null = null;
 import { reduceMotion } from "../app/transition";
 import { readSettings, speak } from "../app/settings";
 import { toPlainText } from "../curriculum/schemas/math-text";
@@ -74,6 +76,14 @@ export function Learn({ lessonId }: { lessonId: string }) {
   const low = sc != null && sc <= 1;
   const all = entriesInGrade(lesson.grade), place = all.findIndex(c => c.id === lesson.id);
   const unit = all.filter(c => (c.unit || "") === (all[place]?.unit || ""));
+  // the pill for this lesson glides over from the one you came from, like turning a slide
+  const page = unit.findIndex(c => c.id === lesson.id), chapter = all[place]?.unit || "";
+  const [shownPage, setShownPage] = useState(() => lastPage && lastPage.chapter === chapter && !reduceMotion() ? lastPage.i : page);
+  useEffect(() => {
+    lastPage = { chapter, i: page };
+    const t = requestAnimationFrame(() => setShownPage(page));
+    return () => cancelAnimationFrame(t);
+  }, [chapter, page]);
 
   const step = (d: 1 | -1) => { setPlaying(false); setAt(a => Math.max(0, Math.min(last, a + d))); };
   // arrow keys and a sideways swipe move through the explanation, like the current app's lesson cards
@@ -97,13 +107,16 @@ export function Learn({ lessonId }: { lessonId: string }) {
 
   return (
     <>
-      <div className="bar">
-        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "back")} aria-label="Previous lesson"><Chevron dir="left" /></button>
-        <span className="dots-nav grow" aria-label={`Part ${at + 1} of ${last + 1}`}>
-          {ex.timeline.map((_, i) => <span key={i} className={`dot ${i < at ? "ok" : i === at ? "busy" : ""}`} />)}
+      <div className="bar lbar">
+        <button className="ctl circ" disabled={!prev} onClick={() => prev && go({ name: "learn", lessonId: prev.id }, "prev")} aria-label="Previous lesson"><Chevron dir="left" /></button>
+        <span className="dots-nav grow" role="group" aria-label={`Lesson ${unit.indexOf(all[place]!) + 1} of ${unit.length} in ${all[place]?.unit || gradeOf(lesson.grade).name}`}>
+          {unit.map((c, i) => (
+            <button key={c.id} className={`dot ${i === shownPage ? "busy" : lastScore(progress, c.id) != null ? "ok" : ""}`} disabled={c.id === lesson.id || !isReady(c.id)}
+              onClick={() => go({ name: "learn", lessonId: c.id }, i < shownPage ? "prev" : "next")} aria-label={c.title} aria-current={c.id === lesson.id ? "page" : undefined} />
+          ))}
         </span>
         <button className="ctl pbtn" onClick={() => startLesson(lesson.id)}>Practice</button>
-        <button className="ctl circ" disabled={!next} onClick={() => next && go({ name: "learn", lessonId: next.id }, "fwd")} aria-label="Next lesson"><Chevron dir="right" /></button>
+        <button className="ctl circ" disabled={!next} onClick={() => next && go({ name: "learn", lessonId: next.id }, "next")} aria-label="Next lesson"><Chevron dir="right" /></button>
       </div>
       <div className="blearn">
         <section className="panel learn walk">
@@ -152,7 +165,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
                 const n = all.indexOf(c) + 1, here = c.id === lesson.id, s = lastScore(progress, c.id);
                 return (
                   <button key={c.id} className={here ? "on" : s != null ? "seen" : ""} disabled={here || !isReady(c.id)}
-                    onClick={() => go({ name: "learn", lessonId: c.id }, all.indexOf(c) < place ? "back" : "fwd")}>
+                    onClick={() => go({ name: "learn", lessonId: c.id }, all.indexOf(c) < place ? "prev" : "next")}>
                     <span className="badge">{n}</span><span className="name">{c.title}</span>
                   </button>
                 );

@@ -86,7 +86,7 @@ export function Results() {
           </div>
           {low && <BuildUp lessonId={rep.key} />}
           <div className="actions">
-            {rep.mode === "practice" && next && <button className="ctl go" onClick={() => go({ name: "learn", lessonId: next.id }, "fwd")}>Next lesson</button>}
+            {rep.mode === "practice" && next && <button className="ctl go" onClick={() => go({ name: "learn", lessonId: next.id }, "next")}>Next lesson</button>}
             {test ? <button className="ctl go" onClick={() => startTest(rep.key)}>Take it again</button>
               : !review && lesson && <button className="ctl" onClick={() => startLesson(lesson.id)}>Practice again</button>}
             <button className="ctl" onClick={() => go({ name: "home" }, "back")}>All lessons</button>

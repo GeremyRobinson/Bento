@@ -156,3 +156,23 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
 
 /* the home progress tile reads top to bottom on phones too */
 @media (max-width:699px){.bhome .b-stats.battery{grid-template-columns:none;justify-items:center;text-align:center}.bhome .b-stats.battery>.ctl{justify-self:center}}
+
+/* lessons turn like slides: the page slides across while the island and the lesson bar hold still,
+   so the pill in the bar can glide to the next lesson */
+.itop{view-transition-name:island}
+.lbar{view-transition-name:lessonbar}
+::view-transition-group(island),::view-transition-group(lessonbar){animation-duration:.5s}
+::view-transition-old(island),::view-transition-old(lessonbar){display:none}
+::view-transition-new(island),::view-transition-new(lessonbar){animation:none}
+:root[data-dir="next"]::view-transition-old(root){animation:.5s var(--ease) both slideOutL}
+:root[data-dir="next"]::view-transition-new(root){animation:.5s var(--ease) both slideInR}
+:root[data-dir="prev"]::view-transition-old(root){animation:.5s var(--ease) both slideOutR}
+:root[data-dir="prev"]::view-transition-new(root){animation:.5s var(--ease) both slideInL}
+@keyframes slideOutL{to{opacity:0;transform:translateX(-14%)}}
+@keyframes slideInR{from{opacity:0;transform:translateX(14%)}}
+@keyframes slideOutR{to{opacity:0;transform:translateX(14%)}}
+@keyframes slideInL{from{opacity:0;transform:translateX(-14%)}}
+/* the dots in the lesson bar are buttons: tap one to jump to that lesson */
+.lbar .dots-nav button.dot{padding:0;border:0;cursor:pointer}
+.lbar .dots-nav button.dot:disabled{cursor:default}
+.lbar .dots-nav button.dot:not(:disabled):hover{background:var(--muted)}
