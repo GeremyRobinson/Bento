@@ -453,8 +453,6 @@
 /* ---- the one navigation bar: same place, same size, every screen ---- */
 .top{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:15;background:color-mix(in srgb,var(--well) 86%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);box-shadow:0 0 0 1px color-mix(in srgb,var(--rule) 70%,transparent)}
 .top .brand{display:flex;align-items:center;gap:8px;font:650 19px/1 var(--sans);letter-spacing:-.02em}
-.bmark rect{fill:none;stroke:currentColor;stroke-width:1.6;transition:fill .45s var(--ease),stroke .45s var(--ease)}
-.bmark rect.lit{fill:var(--tint,var(--c0));stroke:var(--tint,var(--c0))}
 .top .gpick.slim{flex:none;padding:0}
 .top .grow{flex:1}
 .trail{flex:1;min-width:0;display:flex;align-items:center;gap:4px}
@@ -471,7 +469,6 @@
   .trail .tback{display:grid}
   .trail li:not(:last-child){display:none}
   .trail li+li::before{content:none}
-  .top:not(.guest) .brand>span{display:none}
   .top .gpick.slim{display:none}
 }
 .top .tnote{color:var(--muted);font-size:var(--small);font-weight:550;padding-right:14px}

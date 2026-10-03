@@ -43,7 +43,8 @@ export interface AreaGridSpec {
   lines?: PictureLine[];
   /** extra shapes drawn over the grid, placed with the computed layout */
   extras?: (g: AreaGeometry) => SceneItem[];
-  /** beat the outline appears at (default 0); null draws none, for grids with an empty spot */
+  /** beat a plain outline of the whole rectangle appears at. Off unless a lesson needs the edge itself (a perimeter, the
+      rectangle a triangle is half of): the coloured cells and grid already show the shape (G, 2026-10-03) */
   outlineFrom?: number | null;
   maxWidth?: number;
   maxHeight?: number;
@@ -162,8 +163,7 @@ export function buildAreaGrid(spec: AreaGridSpec): SceneDiagram & { geometry: Ar
       }
     }));
   }
-
-  if (spec.outlineFrom !== null) items.push({ type: "rect", x: r1(left), y: r1(top), w: r1(g.width), h: r1(g.height), cls: "ax thin", from: spec.outlineFrom ?? 0, enter: "fade" });
+  if (spec.outlineFrom != null) items.push({ type: "rect", x: r1(left), y: r1(top), w: r1(g.width), h: r1(g.height), cls: "ax thin", from: spec.outlineFrom, enter: "fade" });
 
   // which cell the beat is about
   spec.cells.forEach((row, j) => row.forEach((c, i) => {

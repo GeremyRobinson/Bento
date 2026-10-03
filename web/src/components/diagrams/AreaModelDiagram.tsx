@@ -48,7 +48,6 @@ export function AreaModelDiagram({ diagram: d, timeline, at }: { diagram: AreaDi
         </g>
       ))}
       {d.splits.map(x => <line key={x} className="split-line" x1={x} y1={top - 6} x2={x} y2={top + height + 6} />)}
-      <rect className="outline" x={left} y={top} width={width} height={height} />
     </svg>
   );
 }

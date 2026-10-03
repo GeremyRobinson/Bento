@@ -13,22 +13,9 @@ const MeIcon = () => (
   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8.5" r="3.6" /><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" /></svg>
 );
 
-/**
- * The Bento mark: a box of four compartments, one for each part of the app (lessons, learn, practice, you).
- * The one you're in is filled, so the logo doubles as a "you are here".
- */
-export function BentoMark({ lit }: { lit: number | null }) {
-  const boxes = [[2, 2, 9, 20], [13, 2, 9, 9], [13, 13, 4, 9], [19, 13, 3, 9]] as const;
-  return (
-    <svg className="bmark" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      {boxes.map(([x, y, w, h], i) => <rect key={i} x={x} y={y} width={w} height={h} rx="2.4" className={i === lit ? "lit" : ""} />)}
-    </svg>
-  );
-}
-
 type Crumb = { label: string; to?: Route };
 
-/** Where you are, as a short trail from the top, and which compartment of the mark that is. */
+/** Where you are, as a short trail from the top, and which part of the app that is (lessons, learn, practice, you). */
 function placeOf(route: Route, app: ReturnType<typeof useApp>): { trail: Crumb[]; lit: number | null } {
   const lessons: Crumb = { label: "Lessons", to: { name: "home" } }, me: Crumb = { label: "Me", to: { name: "me" } };
   switch (route.name) {
@@ -56,7 +43,7 @@ function placeOf(route: Route, app: ReturnType<typeof useApp>): { trail: Crumb[]
 }
 
 /**
- * The one navigation bar. It sits in the same place, at the same size, on every screen: the Bento mark (to the
+ * The one navigation bar. It sits in the same place, at the same size, on every screen: the Bento name (to the
  * front page), your grade (to change it), where you are (tap any step back), anything left unfinished, and you.
  */
 export function TopBar({ grade }: { grade: number }) {
@@ -72,7 +59,7 @@ export function TopBar({ grade }: { grade: number }) {
   return (
     <header className={`top${showResume ? " has-resume" : ""}${welcome ? " guest" : ""}`}>
       <button className="brand" onClick={() => go({ name: "welcome" }, "back")} aria-label="Bento home page">
-        <BentoMark lit={welcome ? null : lit} /><span>Bento</span>
+        <span>Bento</span>
       </button>
       {welcome ? <span className="grow" /> : <>
         <button className={`gpick${trail.length ? " slim" : ""}`} onClick={() => openSheet(true)} aria-label="Change grade">

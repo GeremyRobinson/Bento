@@ -39,7 +39,7 @@ The delight is the moment it clicks: a picture that resolves, or a slip that's e
 ## 7. One way around
 The Bento bar is the only navigation, and it's the same on every screen. It holds:
 
-- The mark, which takes you to the front page. Its lit compartment shows where you are: lessons, learn, practice or you.
+- The Bento name, which takes you to the front page.
 - Your grade.
 - The trail back.
 - Anything you left unfinished.

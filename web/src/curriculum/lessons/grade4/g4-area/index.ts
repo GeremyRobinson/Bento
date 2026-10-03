@@ -41,6 +41,7 @@ export function explainRect(p: RectProblem, answers: AnswerModel): Explanation {
       cols: [{ label: `${l} m`, size: l }],
       rows: [{ label: `${w} m`, size: w }],
       cells: [[{ text: `${area} m`, sup: "2", from: 1 }]],
+      outlineFrom: 0,
       units: 1,
       extras: g => {
         const x0 = r1(g.left), y0 = r1(g.top), x1 = r1(g.left + g.width), y1 = r1(g.top + g.height);
