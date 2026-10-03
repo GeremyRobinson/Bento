@@ -2,7 +2,7 @@
    the contents, and you. ---- */
 .itop{position:sticky;top:max(10px,env(safe-area-inset-top));z-index:15;display:flex;justify-content:center;align-items:center;gap:8px;pointer-events:none;min-width:0}
 .itop>*{pointer-events:auto}
-.island{display:flex;align-items:center;gap:4px;height:52px;padding:4px;min-width:0;max-width:min(560px,100%);border-radius:999px;
+.island{display:flex;align-items:center;gap:8px;height:52px;padding:4px;min-width:0;max-width:min(560px,100%);border-radius:999px;
   background:color-mix(in srgb,var(--card) 72%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(20px);backdrop-filter:saturate(1.8) blur(20px);
   box-shadow:0 0 0 1px color-mix(in srgb,var(--rule) 80%,transparent),0 8px 28px -12px rgba(15,20,30,.18);animation:islandIn .5s var(--spring) both}
 @keyframes islandIn{from{opacity:0;transform:scale(.9)}}
