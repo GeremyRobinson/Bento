@@ -61,7 +61,7 @@ export function explainSplitFact(p: SplitFactProblem, answers: AnswerModel): Exp
 export const lesson: LessonDefinition<SplitFactProblem> = {
   id: "g3-split",
   grade: 3,
-  unit: "Skills",
+  unit: "Multiplication and division",
   title: "Multiply by breaking apart",
   reference: createSplitFact(7, 8),
   generate: rng => generateSplitFact(rng),

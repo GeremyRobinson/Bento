@@ -20,12 +20,13 @@ if (pending.length) describe("lessons still to rebuild", () => {
 });
 it("rebuilds every lesson of the current app", () => expect(pending.map(c => c.id)).toEqual([]));
 
-describe.each(CATALOG.filter(c => lessonById(c.id)).map(c => c.id))("%s matches the current app", id => {
+// lessons the current app never had (the K–4 full years) have no recording; tests/curriculum/new-lessons.test.ts covers them
+describe.each(CATALOG.filter(c => lessonById(c.id) && byId.has(c.id)).map(c => c.id))("%s matches the current app", id => {
   const lesson = lessonById(id)!, fx = byId.get(id)!, dev = DEVIATIONS[id] ?? {};
   const skip = (field: string) => !!dev[field];
 
   it("has the same place in the curriculum", () => {
-    expect({ grade: lesson.grade, unit: lesson.unit, title: lesson.title, pre: lesson.pre ?? null, story: !!lesson.story })
+    expect({ grade: lesson.grade, unit: skip("unit") ? fx.meta.unit : lesson.unit, title: lesson.title, pre: lesson.pre ?? null, story: !!lesson.story })
       .toEqual({ grade: fx.meta.grade, unit: fx.meta.unit, title: fx.meta.title, pre: fx.meta.pre, story: fx.meta.story });
     expect(lesson.answers(lesson.reference).finalParts).toEqual(fx.meta.final);
   });

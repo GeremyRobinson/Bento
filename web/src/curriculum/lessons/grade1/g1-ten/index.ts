@@ -60,7 +60,7 @@ function explain(p: MakeTenProblem, model: AnswerModel) {
 export const lesson: LessonDefinition<MakeTenProblem> = {
   id: "g1-ten",
   grade: 1,
-  unit: "Skills",
+  unit: "Adding and subtracting",
   title: "Make a ten to add",
   reference: createMakeTen(8, 5),
   generate: rng => { const a = rng.int(6, 9); return createMakeTen(a, rng.int(11 - a, 9)); },

@@ -73,7 +73,7 @@ export function explainRegroup(p: RegroupProblem, answers: AnswerModel): Explana
 export const lesson: LessonDefinition<RegroupProblem> = {
   id: "g2-regroup",
   grade: 2,
-  unit: "Skills",
+  unit: "Adding and subtracting",
   title: "Adding with regrouping",
   reference: createRegroup(47, 38),
   generate: rng => generateRegroup(rng),

@@ -67,7 +67,7 @@ function explain(p: CountOnProblem, model: AnswerModel): Explanation {
 export const lesson: LessonDefinition<CountOnProblem> = {
   id: "k-add",
   grade: 0,
-  unit: "Skills",
+  unit: "Adding and subtracting",
   title: "Adding within 10",
   reference: createCountOn(3, 4), // the current app's picture: start at 3, count on 4
   generate: rng => { const a = rng.int(1, 5); return createCountOn(a, rng.int(1, Math.min(5, 10 - a))); },
