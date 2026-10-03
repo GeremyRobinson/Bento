@@ -93,7 +93,9 @@ export function finalStep(parts: AnswerStep[]): RuntimeStep {
     id: "final",
     label: "Final answer",
     base: "Final answer",
-    question: "Type the final answer.",
+    question: !many && parts[0]!.choices ? parts[0]!.question ?? "Pick the final answer." : "Type the final answer.",
+    // a final answer that is one tap step keeps its buttons
+    ...(!many && parts[0]!.choices ? { choices: parts[0]!.choices } : {}),
     prompt,
     slots: withSuffix.flatMap(({ step, suffix }) => step.slots.filter(s => s.expected != null).map(s => ({ id: s.id + suffix, expected: s.expected }))),
     hint: parts.map(p => p.hint).join(" "),
