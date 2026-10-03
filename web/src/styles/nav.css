@@ -177,13 +177,20 @@ button.book:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--rule),0 
 .lbar .dots-nav button.dot:disabled{cursor:default}
 .lbar .dots-nav button.dot:not(:disabled):hover{background:var(--muted)}
 
-/* today's plan rows are pills like every other row, with the Start pill sitting concentric inside them,
-   and the card's bottom edge as far from the last row as its sides are */
-.pitem{border-radius:999px;padding:10px 10px 10px 14px;margin:0 -14px;width:calc(100% + 28px)}
+/* nesting is concentric: each shape sits the same gap (--nest) inside the one around it, and its radius is the outer
+   radius minus that gap. So the Start pill (radius 20) sits 8px inside its row (radius 28), which sits 8px inside the
+   Today card (radius 36). */
+.wrap{--nest:8px}
+.pitem{border-radius:999px;padding:var(--nest) var(--nest) var(--nest) 14px;margin:0 calc(var(--nest) - var(--u) * 1.75);width:calc(100% + (var(--u) * 1.75 - var(--nest)) * 2)}
 .pitem .ctl.go{height:40px}
-.bhome .today:has(.plan:last-child){padding-bottom:calc(var(--u) * 1.75 - 14px)}
+.bhome .today{border-radius:calc(20px + var(--nest) * 2)}
+.bhome .today:has(.plan:last-child){padding-bottom:var(--nest)}
 
 /* anything that sticks while you scroll stops below the island, not under it */
 .wrap{--below-island:calc(max(10px,env(safe-area-inset-top)) + 52px + var(--u))}
 @media (min-width:900px) and (orientation:landscape){.lside,.bdone>.panel{top:var(--below-island)}}
 .panel.split>.col:last-child{top:var(--below-island)}
+/* chapter rows on home follow the same rule: 8px inside their card, radius = card radius − 8px
+   (a full pill on iPad, a softer rounded row on phones where cards are less round) */
+.units>.panel{padding-bottom:var(--nest)}
+.units .lesson{height:56px;border-radius:calc(var(--r-panel) - var(--nest));margin:0 calc(var(--nest) - var(--u) * 1.25);width:calc(100% + (var(--u) * 1.25 - var(--nest)) * 2);padding:0 calc(var(--u) * 1.25 - var(--nest) + 14px)}

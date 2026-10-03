@@ -43,6 +43,8 @@ The island is the only navigation: a small floating capsule, the same on every s
 
 A grade is always its number in its own colour (K, 1st, 12th), never a badge plus its name. Progress is always a fill: a card fills from the bottom in its colour, like a battery charging. In a row of steps, the one you're on stretches into a pill and glides along.
 
+Corners are concentric. A shape inside another sits the same gap in from its edges (8px), and its radius is the outer radius minus that gap. That's why a row hugging a card's corner is a full pill on iPad, and the card it sits in is rounder than the row.
+
 ## 8. Respect people
 No account is needed, there are no ads, and nothing leaves the device. Accessibility settings sit in the hub, not hidden away.
 
