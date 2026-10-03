@@ -15,14 +15,14 @@ export type Level = "chapter" | "year" | "shelf";
 const LEVELS: Level[] = ["chapter", "year", "shelf"];
 const NAMES: Record<Level, string> = { chapter: "Chapter", year: "Year", shelf: "All grades" };
 
-/** A chapter's moving picture, from a fresh problem of its first lesson that has one. */
+/** A chapter's picture, from a fresh problem of its first lesson that has one: finished at rest, a tap plays it. */
 export function ChapterPic({ entries, rng }: { entries: Entry[]; rng: Rng }) {
   const ex = useMemo(() => {
     for (const c of entries) { const pic = isReady(c.id) ? showcasePicture(c.id, rng) : null; if (pic) return pic; }
     return null;
   }, [entries, rng]);
   const [replay, setReplay] = useState(0);
-  return ex ? <div className="cpic" onClick={() => setReplay(r => r + 1)}><PlayingDiagram ex={ex} replay={replay} /></div> : null;
+  return ex ? <div className="cpic" onClick={() => setReplay(r => r + 1)}><PlayingDiagram ex={ex} replay={replay} autoplay={false} /></div> : null;
 }
 
 /**

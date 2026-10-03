@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { SceneDiagram as Scene, SceneItem } from "../../explanations/diagrams/scene/schema";
+import { useLabelFloor } from "./labelFloor";
 
 const enterClass = (e: SceneItem["enter"]) => (e ? e.split(" ").map((w, i) => (i ? w : `a-${w}`)).join(" ") : "");
 
@@ -8,8 +9,9 @@ const enterClass = (e: SceneItem["enter"]) => (e ? e.split(" ").map((w, i) => (i
  * (and until its last beat); it plays its entrance when it first appears.
  */
 export function SceneDiagram({ diagram: d, at }: { diagram: Scene; at: number }) {
+  const ref = useLabelFloor(d.width);
   return (
-    <svg className="viz-svg" viewBox={`0 0 ${d.width} ${d.height}`} role="img" aria-label={d.alt}
+    <svg ref={ref} className="viz-svg" viewBox={`0 0 ${d.width} ${d.height}`} role="img" aria-label={d.alt}
       style={{ "--w": Math.round(d.width), "--h": Math.round(d.height) } as CSSProperties} data-family={d.family}>
       {d.items.map((it, i) => {
         const from = it.from ?? 0;

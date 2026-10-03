@@ -1,6 +1,6 @@
 /* Area model. The renderer sets data-* attributes from the animation state; CSS only animates the change. */
 .am{width:min(100%, calc(var(--w) * 1px), calc(min(56vh, 460px) * var(--w) / var(--h)));height:auto;overflow:visible;display:block;margin:0 auto}
-.am text{font-family:var(--num);font-size:20px;fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:650}
+.am text{font-family:var(--num);font-size:max(20px,calc(12px * var(--px,0)));fill:var(--text);text-anchor:middle;dominant-baseline:central;font-weight:650}
 .am .outline{fill:none;stroke:var(--faint);stroke-width:2}
 .am .axis-label{fill:var(--muted)}
 .am .whole{transition:opacity .4s ease}

@@ -1,6 +1,7 @@
 /* Facts: tables that fill in as they're learned, the pattern behind them, and the sprint. */
 .ftables{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--u);margin-top:var(--u)}
 .ftable{position:relative;overflow:hidden;display:grid;gap:4px;align-content:start;text-align:left;min-height:168px;padding:calc(var(--u) + 4px);transition:transform .2s var(--spring)}
+.ftable.panel{background:var(--card);box-shadow:0 0 0 1px var(--rule)}
 .ftable:active{transform:scale(.98)}
 .ftable h3{font-size:calc(var(--fs) * 1.1);line-height:1.2;position:relative}
 .ftable .k,.ftable p,.ftable .bcount{position:relative}
@@ -49,3 +50,4 @@
 .fdone{display:grid;gap:var(--u);justify-items:center;text-align:center;padding:calc(var(--u) * 2)}
 .fdone h2{font-size:calc(var(--fs) * 1.6)}
 @media (prefers-reduced-motion:reduce){.fcell,.fchip,.h100 span,.fbar i{transition:none}}
+.ftable .k{font-size:var(--small);color:var(--muted);font-weight:550}

@@ -152,7 +152,7 @@ export function Welcome({ shelf = false }: { shelf?: boolean }) {
         <HeroPictures rng={rng} />
       </section>
       <section className="lsec" id="lshelf"><h2>Pick your grade.</h2><p>Every grade is a book of chapters, Kindergarten to 12th. Start anywhere, and change any time.</p></section>
-      <div className="lshelf"><Shelf current={null} onPick={chooseGrade} soon={false} /></div>
+      <div className="lshelf"><Shelf current={null} onPick={chooseGrade} /></div>
       <section className="lsec"><h2>Everything in one box.</h2><p>Bento is more than lessons. Here's the rest of it, working.</p></section>
       <FeatureBox rng={rng} />
       <Advanced />

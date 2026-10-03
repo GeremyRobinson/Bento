@@ -68,8 +68,8 @@ function GradeFacts({ g }: { g: number }) {
             <button key={tb.id} className="panel ftable battery" onClick={() => go({ name: "facts", table: tb.id }, "fwd")}
               aria-label={`${tb.name}: ${known} of ${total} known`}>
               <Fill frac={total ? known / total : 0} />
-              <span className="k">{total} facts</span>
               <h3>{tb.name}</h3>
+              <span className="k">{total} facts</span>
               <p className="muted">{tb.blurb}</p>
               <span className="bcount">{known === total ? "All known" : `${known} of ${total} known`}</span>
             </button>

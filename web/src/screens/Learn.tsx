@@ -124,7 +124,7 @@ export function Learn({ lessonId }: { lessonId: string }) {
             <h2 className={`label${/[=²³√ⁿ₀-₉]/.test(ex.heading) ? " formula" : ""}`}>{ex.heading}</h2>
             {ex.idea?.map((t, i) => <p key={i} className="idea"><Rich text={t} /></p>)}
             <div className="math"><MathLine math={ex.statement} /></div>
-            {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={reduceMotion() && (playing || at === 0) ? last : at} />}
+            {ex.diagram && <Diagram diagram={ex.diagram} timeline={ex.timeline} at={at === 0 || (reduceMotion() && playing) ? last : at} />}
             {ex.caption && <p className="caption muted"><Rich text={ex.caption} /></p>}
             <ol className="beats" aria-live="polite">
               {ex.steps.map((s, i) => (

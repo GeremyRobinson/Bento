@@ -38,7 +38,8 @@ describe("a whole lesson in the browser", () => {
     expect(tens + ones).toBe(b);
     const pic = screen.getByRole("img");
     expect(pic.getAttribute("aria-label")).toBe(`${a} by ${b} rectangle, split into ${a} by ${tens} = ${a * tens} and ${a} by ${ones} = ${a * ones}. Total ${a * b}.`);
-    expect(pic.getAttribute("data-split")).toBe("false");
+    // before Play the picture rests on its finished frame (Design handoff 3)
+    expect(pic.getAttribute("data-split")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Show all" }));
     expect(pic.getAttribute("data-split")).toBe("true");
     expect(pic.getAttribute("data-sum")).toBe("true");

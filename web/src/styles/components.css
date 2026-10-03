@@ -235,9 +235,9 @@
 .bb .rod{width:10px;height:60px;border-radius:3px;background:var(--tint)}
 .bb .cube{width:10px;height:10px;border-radius:2px;background:color-mix(in srgb,var(--tint) 55%,var(--card))}
 .viz-svg{width:min(100%, calc(var(--w) * 1.15px), calc(min(54vh, 400px) * var(--w) / var(--h)));height:auto;overflow:visible;display:block;justify-self:center;margin-inline:auto}
-.viz-svg text{font-family:var(--num);font-size:17px;fill:var(--text);text-anchor:middle;dominant-baseline:central}
-.viz-svg text.sm{font-size:15px;font-family:var(--sans);font-weight:650} .viz-svg text.xs{font-size:12px;fill:var(--muted)} .viz-svg text.big{font-size:28px}
-.viz-svg text.lbl{font-weight:650;fill:var(--tint)} .viz-svg text.lbl.big{font-size:22px} .viz-svg text.acc{fill:var(--acc)} .viz-svg text.onlbl{fill:var(--on-tint)}
+.viz-svg text{font-family:var(--num);font-size:max(17px,calc(12px * var(--px,0)));fill:var(--text);text-anchor:middle;dominant-baseline:central}
+.viz-svg text.sm{font-size:max(15px,calc(12px * var(--px,0)));font-family:var(--sans);font-weight:650} .viz-svg text.xs{font-size:max(12px,calc(12px * var(--px,0)));fill:var(--muted)} .viz-svg text.big{font-size:max(28px,calc(12px * var(--px,0)))}
+.viz-svg text.lbl{font-weight:650;fill:var(--tint)} .viz-svg text.lbl.big{font-size:max(22px,calc(12px * var(--px,0)))} .viz-svg text.acc{fill:var(--acc)} .viz-svg text.onlbl{fill:var(--on-tint)}
 .viz-svg text.end{text-anchor:end} .viz-svg text.start{text-anchor:start}
 .viz-svg .ax{stroke:var(--text);stroke-width:2;fill:none;stroke-linecap:round}
 .viz-svg .ax.thin{stroke-width:1.5} .viz-svg .dash{stroke-dasharray:6 6}
@@ -254,6 +254,9 @@
 .viz-svg .cell{stroke-width:2} .viz-svg .cell.c0{fill:color-mix(in srgb,var(--c0) 18%,var(--card));stroke:var(--c0)} .viz-svg .cell.c1{fill:color-mix(in srgb,var(--c1) 18%,var(--card));stroke:var(--c1)} .viz-svg .cell.c2{fill:color-mix(in srgb,var(--c2) 18%,var(--card));stroke:var(--c2)}
 .viz-svg .seg{fill:var(--well);stroke:var(--faint);stroke-width:1.5} .viz-svg .seg.on{fill:var(--tint);stroke:var(--tint)} .viz-svg .seg.cut{opacity:.35}
 .viz-svg .cf{stroke:var(--card);stroke-width:1.5;stroke-linejoin:round} .viz-svg .cf.top{fill:color-mix(in srgb,var(--tint) 35%,var(--card))} .viz-svg .cf.left{fill:var(--tint)} .viz-svg .cf.right{fill:color-mix(in srgb,var(--tint) 70%,#000)}
+/* boxes of cubes: the front face light, the other faces stronger, the box's visible edges solid (pictures-k4 solids) */
+.viz-svg .cf.cube{stroke:color-mix(in srgb,var(--tint) 55%,var(--card));stroke-width:1.25} .viz-svg .cf.cube.left{fill:color-mix(in srgb,var(--tint) 18%,var(--card))} .viz-svg .cf.cube.top,.viz-svg .cf.cube.right{fill:color-mix(in srgb,var(--tint) 40%,var(--card))}
+.viz-svg .edge{fill:none;stroke:var(--tint);stroke-width:2.5;stroke-linejoin:round}
 .viz-svg .wire{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 5}
 .viz-svg .bar{fill:var(--tint)} .viz-svg .bar.mid{animation:barHi .5s ease var(--d) both}
 @keyframes barHi{to{fill:var(--acc)}}
@@ -342,7 +345,7 @@
 .mtile .ctl.go{background:var(--ink);justify-self:start}
 .mhero{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--u);padding:calc(var(--u) * 1.5);border-radius:var(--r-panel);background:color-mix(in srgb,var(--tint) 12%,var(--card))}
 .mhero h1{font:650 clamp(30px,5vw,44px)/1.05 var(--sans);letter-spacing:-.03em;margin:2px 0}
-.mhero .k{color:var(--ink);font-weight:var(--w-bold);font-size:var(--small)}
+.mhero .k{color:var(--ink);font-weight:var(--w-mid);font-size:var(--small)}
 .mstats{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mstats>div{background:var(--card);border-radius:var(--r-card);padding:12px;display:grid;gap:2px;text-align:center}
 .mstats b{font-size:calc(var(--fs) * 1.6);line-height:1}
@@ -453,3 +456,4 @@
 .plan li+li{border-top:0}
 .plan{gap:2px}
 .bhome .b-stats{grid-template-rows:none}
+.slegend{list-style:none;margin:0;padding:0 5px;display:grid;gap:6px}.slegend li{display:flex;align-items:center;gap:10px}

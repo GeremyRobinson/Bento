@@ -14,17 +14,18 @@ export function GradeNum({ grade }: { grade: number }) {
 
 /**
  * Every grade as a card, grouped by Bento's lines: the grade's number in its colour, what the year covers, and
- * how much is done as a fill. The same shelf in the contents, the grade picker and the personal hub.
+ * how much is done as a fill. The same shelf in the contents, the grade picker and the personal hub. Bento² stays off
+ * the shelf until every grade is complete (Design, 2026-10-03): its cards read as "2nd grade". The landing teases it.
  */
-export function Shelf({ current, onPick, soon = true }: { current: number | null; onPick: (grade: number) => void; soon?: boolean }) {
+export function Shelf({ current, onPick }: { current: number | null; onPick: (grade: number) => void }) {
   const { progress } = useApp();
   return (
     <div className="shelf">
-      {LINES.filter(l => soon || l.grades.length).map(line => (
+      {LINES.filter(l => l.grades.length).map(line => (
         <div key={line.id} className="sline">
           <span className="k">{line.name}</span>
           <div className="sbooks">
-            {line.grades.length ? line.grades.map(n => {
+            {line.grades.map(n => {
               const d = GRADES[n]!, list = entriesInGrade(n), done = doneCount(progress, list);
               return (
                 <button key={n} className={`book gcell battery${n === current ? " on" : ""}`} style={tintStyle(d) as CSSProperties}
@@ -35,7 +36,7 @@ export function Shelf({ current, onPick, soon = true }: { current: number | null
                   <span className="bcount">{done === 0 ? `${list.length} lesson${list.length === 1 ? "" : "s"}` : done === list.length ? "Finished" : `${done} of ${list.length} done`}</span>
                 </button>
               );
-            }) : line.soon?.map(c => <span key={c} className="book soon"><span className="gnum">²</span><b>{c}</b><span className="bcount">Coming soon</span></span>)}
+            })}
           </div>
         </div>
       ))}

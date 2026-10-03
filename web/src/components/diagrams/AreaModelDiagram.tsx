@@ -3,6 +3,7 @@ import type { AreaDiagram } from "../../explanations/diagrams/area-model/schema"
 import type { AnimationState } from "../../explanations/schema";
 import { formatNumber } from "../../curriculum/schemas/math-text";
 import { ROW } from "../../explanations/diagrams/area-model/build";
+import { useLabelFloor } from "./labelFloor";
 
 /** What the picture shows at one point of the timeline. Pure, so tests can check it without rendering. */
 export function areaView(timeline: AnimationState[], at: number) {
@@ -28,8 +29,9 @@ export function AreaModelDiagram({ diagram: d, timeline, at }: { diagram: AreaDi
   const left = d.horizontal.start, width = d.horizontal.length;
   const label = `${d.vertical.label} by ${d.horizontal.label} rectangle, split into ${d.regions
     .map(r => `${d.vertical.label} by ${r.partLabel} = ${r.productLabel}`).join(" and ")}. Total ${formatNumber(d.total.value)}.`;
+  const ref = useLabelFloor(d.width);
   return (
-    <svg className="am" viewBox={`0 0 ${d.width} ${d.height}`} role="img" aria-label={label}
+    <svg ref={ref} className="am" viewBox={`0 0 ${d.width} ${d.height}`} role="img" aria-label={label}
       data-split={v.split} data-sum={v.sum} style={{ "--w": d.width, "--h": d.height } as CSSProperties}>
       <text className="axis-label" x={left - 28} y={top + height / 2}>{d.vertical.label}</text>
       <text className="whole" x={left + width / 2} y={top - LABEL_GAP}>{d.horizontal.label}</text>

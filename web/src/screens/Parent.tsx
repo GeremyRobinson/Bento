@@ -39,7 +39,10 @@ export function Parent() {
               </div>
             )) : <div><span>No lessons finished yet.</span></div>}
           </div>
-          <p className="muted" style={{ padding: "0 5px" }}>4 Advanced · 3 Proficient · 2 Approaching · 1 Beginning · 0 Not yet. Based on how many steps were right on the first try. Hints count half.</p>
+          <ul className="slegend" aria-label="What the scores mean">
+            {([4, 3, 2, 1, 0] as Level[]).map(n => <li key={n}><ScoreChip n={n} /><span>{LEVELS[n]}</span></li>)}
+          </ul>
+          <p className="muted" style={{ padding: "0 5px" }}>Based on how many steps were right on the first try. Hints count half.</p>
         </section>
         <section className="panel">
           <div className="head"><h2>Mistake patterns</h2>{progress.log.length > 0 && <span className="muted">last {plural(progress.log.length, "session")}</span>}</div>

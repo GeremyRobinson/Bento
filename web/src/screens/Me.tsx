@@ -6,7 +6,7 @@ import { LEVEL_XP } from "../engine/mastery/levels";
 import { GradeLineup } from "../components/GradeLineup";
 import { placeKey } from "../engine/session/practice";
 import { gradeLevel } from "../components/primitives/Score";
-import { Fill } from "../components/Shelf";
+import { Fill, GradeNum } from "../components/Shelf";
 
 function Toggle({ label, note, on, set }: { label: string; note: string; on: boolean; set: (v: boolean) => void }) {
   return (
@@ -57,9 +57,10 @@ export function Me() {
         <section className="tile mhero battery" style={grade ? tintStyle(grade) as CSSProperties : undefined}>
           {grade ? <>
             <Fill frac={into / LEVEL_XP} />
-            <span className="bbig" aria-hidden>{lvl}</span>
+            {/* only grades get the big colored number; the level is words and the fill */}
+            <span className="bbig"><GradeNum grade={g!} /></span>
             <div className="mh-text">
-              <span className="k">{grade.name} · level {lvl}</span>
+              <span className="k">Level {lvl}</span>
               <h1>Your Bento</h1>
               <p className="muted">{into} of {LEVEL_XP} XP to level {lvl + 1}</p>
             </div>

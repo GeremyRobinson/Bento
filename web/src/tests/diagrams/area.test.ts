@@ -118,8 +118,9 @@ describe("boxes", () => {
   it("uses the current app's size rule", () => expect(boxUnit(4, 3, 2)).toBeCloseTo(200 / 7));
   it("builds a layer per unit of height, each a top, a front and a side", () => {
     const d = buildBox3d({ mode: "cubes", l: 4, w: 3, h: 2, layerBeats: [1, 2], alt: "" });
-    expect(d.items.filter(i => i.type === "polygon" && i.cls === "cf top")).toHaveLength(2);
-    expect(d.items.filter(i => i.cls === "cf" && i.from === 1)).toHaveLength((3 + 2) * 2);
+    expect(d.items.filter(i => i.type === "polygon" && i.cls === "cf cube top")).toHaveLength(2);
+    expect(d.items.filter(i => i.cls === "edge" && i.from === 2)).toHaveLength(3);
+    expect(d.items.filter(i => i.cls === "cf cube" && i.from === 1)).toHaveLength((3 + 2) * 2);
   });
   it("puts each face's area on it", () => {
     const d = scene("g10-surface", { l: 2, w: 3, h: 4 });
