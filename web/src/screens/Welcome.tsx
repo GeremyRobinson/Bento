@@ -91,18 +91,20 @@ function LandingPicture({ rng, band, big, delay }: { rng: Rng; band: readonly [n
     }
     return null;
   }, [n, pool, rng]);
+  // every picture opens finished, holds, then plays; the first round is staggered so the three stay out of step
+  const hold = 1200 + (n ? 0 : delay);
   useEffect(() => {
     if (reduceMotion() || !shot) return;
-    const t = setTimeout(() => setN(k => k + 1), 2400 + shot.ex.timeline.length * 750 + (n ? 0 : delay));
+    const t = setTimeout(() => setN(k => k + 1), hold + 2400 + shot.ex.timeline.length * 750);
     return () => clearTimeout(t);
-  }, [shot, n, delay]);
+  }, [shot, hold]);
   if (!shot) return null;
   const g = gradeOf(shot.grade), entry = entryById(shot.id);
   return (
     // the card stays put; only what's inside it fades over to the next picture
     <figure className={`lhpic${big ? "" : " sm"}`} style={tintStyle(g) as CSSProperties} onClick={() => setN(k => k + 1)}>
       <figcaption key={`c${n}`}><GradeNum grade={shot.grade} /><span>{big && <small>See it first</small>}<b>{entry?.title ?? shot.id}</b></span></figcaption>
-      <div className="lhd" key={`d${n}`}><PlayingDiagram ex={shot.ex} /></div>
+      <div className="lhd" key={`d${n}`}><PlayingDiagram ex={shot.ex} hold={hold} /></div>
     </figure>
   );
 }
@@ -121,7 +123,7 @@ export function Welcome() {
   return (
     <div className="land">
       <section className="lhero">
-        <h1>Math that <span>finally clicks.</span></h1>
+        <h1>Math that <span>clicks.</span></h1>
         <p>See the idea move. Solve it one step at a time. When you slip, find out exactly where, and why.</p>
         <div className="lcta"><button className="ctl go" onClick={toShelf}>Choose your grade</button><span>Free. No account.</span></div>
       </section>
